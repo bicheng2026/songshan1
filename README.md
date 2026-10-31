@@ -2,7 +2,8 @@
 
 一个**纯静态、零后端、打开即用**的生信科研训练站：能读论文、写代码、跑 R、存数据、学机制、练写作、问导师。
 
-- **在线地址**：（部署后填在这里）
+- **GitHub Pages**：https://bicheng2026.github.io/songshan1/
+- **WorkBuddy 托管**：https://songshan-lab.app.workbuddy.host/?sharecode=WMDSHJ4G7G
 - **本地运行**：双击 `启动工作站.bat`
 
 ## 它解决什么问题
