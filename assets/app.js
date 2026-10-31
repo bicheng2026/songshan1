@@ -7,6 +7,7 @@
   const NAV = [
     { id: "map", name: "修炼地图", fn: map },
     { id: "dojo", name: "代码道场", fn: () => window.SXViewDojo.render(document.getElementById("view")) },
+    { id: "course", name: "通用课程", fn: () => window.SXViewCourse.render(document.getElementById("view")) },
     { id: "codebank", name: "代码库", fn: () => window.SXViewLib.codebank(document.getElementById("view")) },
     { id: "papers", name: "论文库", fn: () => window.SXViewLib.papers(document.getElementById("view")) },
     { id: "digest", name: "文献汇总", fn: () => window.SXViewExtra.digest(document.getElementById("view")) },
