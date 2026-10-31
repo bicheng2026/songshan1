@@ -425,5 +425,236 @@ window.SX_EXAMPLES = {
       "r    <- rank(p); n1 <- sum(dat$label == 1); n0 <- sum(dat$label == 0)\n" +
       "(sum(r[dat$label == 1]) - n1 * (n1 + 1) / 2) / (n1 * n0)   # 0.95",
     tip: "训练集 AUC 0.95 是「回忆」，不是「预测」——下一关的交叉验证才是真实水平。另外 AUC 对类别不平衡不敏感，样本 40:20 时看着漂亮，不代表临床能用。"
+  },
+
+  "spatial-2": {
+    why: "先用 9 个格子把 Moran's I 的公式走一遍，再换成 484 个 spot 的真数据",
+    code:
+      "# 一、9 个 spot 摆成 3x3（真数据 484 个，道理一样）\n" +
+      "v <- matrix(c(1, 1, 2,\n" +
+      "              1, 9, 2,\n" +
+      "              1, 2, 2), nrow = 3, byrow = TRUE)\n" +
+      "v\n" +
+      "# 中间那个 9 被 1 包围 → 空间离群点，Moran's I 会被拉成负数\n" +
+      "\n" +
+      "# 二、把「谁是邻居」写成矩阵：上下左右算邻居，对角线不算\n" +
+      "nb  <- matrix(0, 9, 9)\n" +
+      "pos <- expand.grid(row = 1:3, col = 1:3)\n" +
+      "for (i in 1:9) for (j in 1:9) {\n" +
+      "  if (abs(pos$row[i] - pos$row[j]) + abs(pos$col[i] - pos$col[j]) == 1) nb[i, j] <- 1\n" +
+      "}\n" +
+      "sum(nb)     # 12 条有向边：四角各 2 条、边中各 3 条、中心 4 条\n" +
+      "\n" +
+      "# 三、Moran's I 只有一句定义：邻居乘积之和 / 离差平方和（再乘 n/S0）\n" +
+      "z <- as.numeric(v) - mean(as.numeric(v))\n" +
+      "I <- (9 / sum(nb)) * (t(z) %*% nb %*% z) / sum(z^2)\n" +
+      "I           # 负数：高值旁边全是低值，说明不是聚集而是离群\n" +
+      "\n" +
+      "# 四、换真数据：距离 <= 1.5 算邻居，其余照抄上面三行\n" +
+      "d  <- as.matrix(dist(spatial_spots[, c(\"x\", \"y\")]))\n" +
+      "W  <- (d <= 1.5) * 1; diag(W) <- 0\n" +
+      "z2 <- spatial_spots$COL1A1 - mean(spatial_spots$COL1A1)\n" +
+      "(484 / sum(W)) * (t(z2) %*% W %*% z2) / sum(z2^2)",
+    tip: "真数据 COL1A1 的 I 明显 > 0.3，是成片聚集而不是随机撒的；换 EPCAM 算一遍作对照，值会低一些（上皮标记更贴区位，但没胶原那么成片）。注意 W 一定要把对角线置 0，否则自己和自己算邻居，I 会被虚高。"
+  },
+
+  "mr-2": {
+    why: "IVW 说穿了就是「比值 + 加权平均」，先用 3 个 SNP 手算，再对每个基因 batch 一遍",
+    code:
+      "# 一、3 个 SNP 的玩具：bx 是工具变量对暴露的效应，by 是对结局的效应\n" +
+      "bx <- c(0.20, 0.10, 0.40)\n" +
+      "by <- c(0.10, 0.055, 0.18)\n" +
+      "sx <- c(0.02, 0.02, 0.04)\n" +
+      "sy <- c(0.03, 0.03, 0.05)\n" +
+      "\n" +
+      "ratio <- by / bx\n" +
+      "ratio        # 每个 SNP 各自给一个因果估计，三个都接近 0.5\n" +
+      "\n" +
+      "# 二、权重为什么是 1/se^2：se 用比值法的 Delta 近似\n" +
+      "se_r <- sqrt(sy^2 / bx^2 + by^2 * sx^2 / bx^4)\n" +
+      "w    <- 1 / se_r^2\n" +
+      "round(w, 1)  # bx 越大、se 越小，权重越高——大效应 SNP 说话更算数\n" +
+      "\n" +
+      "# 三、IVW = 加权平均，本质是固定效应 meta 分析\n" +
+      "sum(w * ratio) / sum(w)      # 合成后的因果估计\n" +
+      "1 / sqrt(sum(w))             # 合成估计的标准误\n" +
+      "\n" +
+      "# 四、真数据：同一套，只是先按基因分组\n" +
+      "d <- mr_dat[mr_dat$gene == \"SLC7A11\", ]\n" +
+      "r <- d$beta_outcome / d$beta_exposure\n" +
+      "w2 <- 1 / (d$se_outcome^2 / d$beta_exposure^2)\n" +
+      "b  <- sum(w2 * r) / sum(w2)\n" +
+      "c(b = b, se = 1 / sqrt(sum(w2)), p = 2 * pnorm(-abs(b * sqrt(sum(w2)))))",
+    tip: "真数据里 SLC7A11 和 PPARA 的 IVW 估计显著为负（保护因素），而 GPX4 / HMOX1 / CDKN1A 不显著——这是数据故意埋的坑：不显著不等于没关系，可能是工具变量太弱或真值为 0。判题要的是每基因一行，所以外层再套一层 lapply 走 split(mr_dat, mr_dat$gene)。"
+  },
+
+  "mr-3": {
+    why: "三个稳健性检验都只是一个 lm 或一个求和，先用 5 个 SNP 看清残差怎么用",
+    code:
+      "# 一、5 个 SNP 的玩具：故意让截距不为 0（存在定向多效性）\n" +
+      "bx <- c(0.10, 0.15, 0.20, 0.25, 0.30)\n" +
+      "by <- c(0.06, 0.09, 0.10, 0.14, 0.19)\n" +
+      "sy <- c(0.02, 0.02, 0.02, 0.02, 0.02)\n" +
+      "\n" +
+      "# 二、Egger：by 对 bx 做加权回归，看截距是否显著偏离 0\n" +
+      "fit <- lm(by ~ bx, weights = 1 / sy^2)\n" +
+      "summary(fit)$coefficients\n" +
+      "# 截距那一行的 p 值就是「有没有定向多效性」的答案\n" +
+      "\n" +
+      "# 三、Cochran's Q：残差按权重平方求和，自由度 = SNP 数 - 1\n" +
+      "res <- residuals(fit)\n" +
+      "Q   <- sum((res / sy)^2)\n" +
+      "c(Q = Q, df = length(bx) - 1, p = pchisq(Q, length(bx) - 1, lower.tail = FALSE))\n" +
+      "\n" +
+      "# 四、留一法：每次去掉一个 SNP，看合并方向会不会翻\n" +
+      "loo <- sapply(seq_along(bx), function(i) {\n" +
+      "  r <- by[-i] / bx[-i]; w <- 1 / (sy[-i]^2 / bx[-i]^2)\n" +
+      "  sum(w * r) / sum(w)\n" +
+      "})\n" +
+      "round(loo, 3)    # 五个值同号，才叫稳健；有一个翻号就要单独解释那个 SNP",
+    tip: "真数据把玩具换成 mr_dat[mr_dat$gene == \"PPARA\", ] 就能跑全套。Q 的 p < 0.05 说明 SNP 之间不一致（异质性），此时优先看 IVW 的随机效应版本或直接报 Egger；留一法只要方向一致，结论就能写。"
+  },
+
+  "mr-4": {
+    why: "共定位初筛不需要跑 colc，先把「两个性状都显著」这件事数清楚",
+    code:
+      "# 一、玩具：一个基因 6 个 SNP，两列 p 值\n" +
+      "toy <- data.frame(snp = paste0(\"rs\", 1:6),\n" +
+      "                  p1  = c(1e-9, 1e-10, 0.2, 3e-9, 0.4, 1e-12),\n" +
+      "                  p2  = c(1e-9, 0.3,   1e-11, 4e-9, 0.5, 0.2))\n" +
+      "toy$both <- toy$p1 < 5e-8 & toy$p2 < 5e-8\n" +
+      "toy\n" +
+      "sum(toy$both)     # 2 个位点两边都显著 → 有共享信号的迹象\n" +
+      "\n" +
+      "# 二、真数据的做法：按基因分组，数「双显著」的位点数\n" +
+      "cg <- split(coloc_dat, coloc_dat$gene)\n" +
+      "out <- do.call(rbind, lapply(cg, function(d) {\n" +
+      "  data.frame(gene = d$gene[1],\n" +
+      "             n_snp = nrow(d),\n" +
+      "             n_both_sig = sum(d$p_trait1 < 5e-8 & d$p_trait2 < 5e-8))\n" +
+      "}))\n" +
+      "out$flag <- out$n_both_sig > 0\n" +
+      "out[order(-out$n_both_sig), ]",
+    tip: "这是「初筛」不是「共定位」：p 值双显著只能说两个信号在同一区域，不能证明是同一个因果变异——真正的 PP.H4 要考虑 LD 和先验。真数据里每个基因都是 14 个 SNP，SLC7A11 有 2 个双显著、ACSL4 和 PPARA 各 3 个，GPX4 / YAP1 / HMOX1 是 0，正好对上「有信号 / 没信号」两组。"
+  },
+
+  "tox-1": {
+    why: "网络毒理学的核心只是一张「化合物 × 基因」的 0/1 表和一次按行求和",
+    code:
+      "# 一、玩具：3 个化合物 × 4 个基因的命中表\n" +
+      "toy <- data.frame(\n" +
+      "  chemical = c(\"BPA\", \"BPA\", \"Cd\", \"Cd\", \"DEHP\"),\n" +
+      "  gene     = c(\"GPX4\", \"ACSL4\", \"GPX4\", \"SLC7A11\", \"ACSL4\"))\n" +
+      "toy\n" +
+      "\n" +
+      "# 二、按化合物数「打到几个候选基因」\n" +
+      "n_tar <- tapply(toy$gene, toy$chemical, function(g) length(unique(g)))\n" +
+      "n_tar                 # BPA 2、Cd 2、DEHP 1\n" +
+      "\n" +
+      "# 三、把基因名也拼进去，方便直接看是哪几个\n" +
+      "agg <- do.call(rbind, lapply(split(toy, toy$chemical), function(d) {\n" +
+      "  data.frame(chemical = d$chemical[1],\n" +
+      "             n_target = length(unique(d$gene)),\n" +
+      "             genes    = paste(sort(unique(d$gene)), collapse = \"/\"))\n" +
+      "}))\n" +
+      "agg[order(-agg$n_target), ]\n" +
+      "\n" +
+      "# 四、真数据：同一套逻辑，只是表更大（30 个基因 × 15 个化合物）\n" +
+      "nrow(ctd_edc); length(unique(ctd_edc$gene)); length(unique(ctd_edc$chemical))",
+    tip: "真数据里 15 个化合物中有 11 个同时打到 >= 3 个候选基因，排前三的是 Bisphenol A、Cadmium chloride、DEHP——这类「多靶点化合物」才是网络毒理学要重点讨论的对象。注意先去重再计数，同一化合物—基因对在 ctd_edc 里可能重复出现。"
+  },
+
+  "ml-2": {
+    why: "交叉验证就是把「切一刀」重复 5 次，先用 12 个样本手切一遍看清折是怎么分的",
+    code:
+      "# 一、12 个样本，手工标 5 折（真数据按 sample 取模就行）\n" +
+      "set.seed(1)\n" +
+      "y   <- rep(c(0, 1), 6)\n" +
+      "fold <- rep(1:5, length.out = 12)\n" +
+      "table(fold, y)     # 先确认每一折里正负样本都有，否则该折 AUC 无意义\n" +
+      "\n" +
+      "# 二、一折长什么样：第 1 折当测试集，其余当训练集\n" +
+      "te <- which(fold == 1); tr <- setdiff(seq_along(y), te)\n" +
+      "length(tr); length(te)\n" +
+      "\n" +
+      "# 三、循环 5 次，每次记一个测试集 AUC\n" +
+      "x  <- c(1.2, 0.4, 1.5, 0.6, 1.1, 0.5, 1.4, 0.3, 1.3, 0.55, 1.6, 0.45)\n" +
+      "auc1 <- function(score, label) {\n" +
+      "  pos <- score[label == 1]; neg <- score[label == 0]\n" +
+      "  mean(outer(pos, neg, \">\") + 0.5 * outer(pos, neg, \"==\"))\n" +
+      "}\n" +
+      "sapply(1:5, function(k) {\n" +
+      "  tr2 <- fold != k\n" +
+      "  fit <- glm(y[tr2] ~ x[tr2], family = binomial)\n" +
+      "  pr  <- predict(fit, newdata = data.frame(x = x[!tr2]), type = \"response\")\n" +
+      "  auc1(pr, y[!tr2])\n" +
+      "})",
+    tip: "真数据的关键差别只有一处：预测变量是基因表达（可能几十个），所以训练集里一定要用 scale() 的参数去 transform 测试集，不能各算各的——这就是数据泄漏，也是「训练集 AUC 0.99、测试集 0.6」的元凶。5 折平均 AUC 与 ml-1 的训练集 AUC 差在 0.15 以内，说明没过拟合。"
+  },
+
+  "wrt-1": {
+    why: "投稿表格的规矩是「数字由代码生成」，先用 3 行小表把 sprintf 拼表头这一步走通",
+    code:
+      "# 一、3 行小结果表\n" +
+      "res <- data.frame(gene = c(\"TFRC\", \"SPP1\", \"YAP1\"),\n" +
+      "                  logFC = c(3.069, 3.432, 3.070),\n" +
+      "                  p = c(8.4e-12, 2.2e-10, 1.8e-10),\n" +
+      "                  adj = c(2.3e-09, 2.1e-08, 2.1e-08))\n" +
+      "\n" +
+      "# 二、Markdown 表格 = 表头 + 分隔行 + 每行数据\n" +
+      "tbl <- c(\"| Gene | logFC | P | adj.P |\",\n" +
+      "         \"|---|---:|---:|---:|\",\n" +
+      "         sprintf(\"| %s | %.3f | %.2e | %.2e |\", res$gene, res$logFC, res$p, res$adj))\n" +
+      "cat(tbl, sep = \"\\n\")\n" +
+      "\n" +
+      "# 三、想直接贴进 Word：分隔行换成空行，制表符隔开\n" +
+      "write.table(res, \"top_deg.tsv\", sep = \"\\t\", quote = FALSE, row.names = FALSE)",
+    tip: "真数据要先把 deg 按 adj.P 排序取前 10，再走同样的 sprintf。三个格式符记牢：%.3f 给 logFC、%.2e 给 p 值（写成 2.3e-09 比 0.0000000023 干净）、%s 给基因名。表格数字手抄一次，后面改分析就得改三处，迟早对不上。"
+  },
+
+  "wrt-2": {
+    why: "图注是可以模板化的：把「样本量、统计方法、显著性标记」做成变量，正文就永远不会和图注打架",
+    code:
+      "# 一、把图注里会变的数字先存成变量\n" +
+      "n_tumor  <- sum(lihc_clin$group == \"Tumor\")\n" +
+      "n_normal <- sum(lihc_clin$group == \"Normal\")\n" +
+      "method   <- \"two-sided Welch t-test with Benjamini-Hochberg correction\"\n" +
+      "\n" +
+      "# 二、模板：panel 说明 + 统计方法 + 样本量 + 显著性含义，四件套缺一不可\n" +
+      "legend_text <- paste0(\n" +
+      "  \"Figure 1. Differential expression between tumour and adjacent normal liver. \",\n" +
+      "  \"(A) Volcano plot of all genes; dashed lines mark |logFC| > 1 and adjusted P < 0.05. \",\n" +
+      "  \"(B) Heatmap of the top 50 genes ranked by adjusted P. \",\n" +
+      "  \"n = \", n_tumor, \" tumour and \", n_normal, \" adjacent normal samples. \",\n" +
+      "  \"P values were calculated by \", method, \". \",\n" +
+      "  \"* adjusted P < 0.05; ** < 0.01; *** < 0.001; ns, not significant.\"\n" +
+      ")\n" +
+      "nchar(legend_text)      # 一段话，控制在 60 词以内，审稿人不会嫌长\n" +
+      "cat(legend_text)",
+    tip: "真数据是 40 个肿瘤 + 20 个癌旁，所以 n = 40 / 20 这两个数由变量算出来，别手打。图注最容易犯的错是写「n = 60 patients」——样本是 60 个，但病人只有 40 个（癌旁不是另一个病人），这种错审稿人一眼就看出来。"
+  },
+
+  "boss-1": {
+    why: "终章没有新知识，就是把前面几关的输出接起来：DEG → 富集 → 药物匹配，20 行串完",
+    code:
+      "# 第一步：DEG（Zone3 照后 28 天 vs 对照），就是 bulk-2 那套\n" +
+      "treat <- rild_meta$sample[rild_meta$zone == 3 & rild_meta$time == 28]\n" +
+      "ctrl  <- rild_meta$sample[rild_meta$group == \"Sham\"]\n" +
+      "p  <- apply(rild_expr, 1, function(x) t.test(x[treat], x[ctrl])$p.value)\n" +
+      "fc <- rowMeans(rild_expr[, treat]) - rowMeans(rild_expr[, ctrl])\n" +
+      "deg <- data.frame(gene = rownames(rild_expr), logFC = fc,\n" +
+      "                  adj.P = p.adjust(p, \"BH\"), stringsAsFactors = FALSE)\n" +
+      "up  <- deg$gene[deg$adj.P < 0.05 & deg$logFC > 1]\n" +
+      "length(up)          # 这一步的输出，就是下一步的输入\n" +
+      "\n" +
+      "# 第二步：富集（bulk-4 的 phyper 套到每个基因集上，这里只看候选基因落没落在集合里）\n" +
+      "hit <- sapply(gmt, function(g) sum(up %in% g))\n" +
+      "head(sort(hit, decreasing = TRUE), 3)\n" +
+      "\n" +
+      "# 第三步：药物匹配（drug-1 的 merge），只要已获批的\n" +
+      "cand <- merge(data.frame(gene = up), drug_targets, by = \"gene\")\n" +
+      "cand <- cand[cand$status == \"Approved\", ]\n" +
+      "cand[order(cand$gene), c(\"gene\", \"drug\", \"mechanism\")]",
+    tip: "这一关判的是「链路通不通」而不是「结果漂不漂亮」：step1 的 deg 必须是 data.frame 且含 adj.P，step2 的富集要基于 step1 的 up 基因（不能另起炉灶），step3 的候选清单必须来自 step2/step1 的基因。三段之间只要有一处手工抄数字，整条链路就断了。"
   }
 };
