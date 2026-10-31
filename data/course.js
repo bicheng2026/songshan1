@@ -1,527 +1,790 @@
-/* 嵩山一号 · 工作站 —— 通用课程（不依赖本课题数据，任何人拿 mtcars/iris 就能从头学） */
+/* 嵩山一号 · 工作站 —— 通用课程
+   结构参照本地 10 讲录播课（50 个视频 / 342 个代码与课件文件）重排。
+   每节两段代码：一段 base R 能在站内直接跑（讲原理），一段标了包名的真实写法（讲实战）。
+   不依赖本课题数据。 */
 window.SX_COURSE = {
-  intro: "这门课和「代码道场」是两条路：道场是挂在本课题真数据上的练习题，这门课是通用基础——只用 R 自带的数据集，从「1+1 怎么写」讲到「怎么把结果整理成能投的表格」。26 节，每节三段：为什么、要点、能直接跑的代码。看懂一节就去道场找对应的关卡练手。",
+  intro: "这门课按「一篇生信文章从数据到成图」的顺序排，10 讲：第 1 讲讲清 counts 矩阵是什么，第 2 讲跑通差异分析，3-4 讲把基因变成通路和细胞，5-6 讲把结果变成临床结论，7-10 讲网络、GEO 实战、模型和复现。每节都分两段代码：一段只用 base R，能在本页直接点「运行」看到结果（讲原理）；另一段标了真实包名的写法，讲真正做分析时怎么写。看懂原理再去跑真包，顺序反了只会抄代码。",
+  resources: [
+    {
+      g: "视频课（B 站，都已核对过能打开）",
+      items: [
+        { n: "生信技能树《生信人应该这样学 R 语言》", m: "590 分钟 · 55.1 万播放", u: "https://www.bilibili.com/video/BV1cs411j75B", d: "R 基础最系统的一套中文课，讲第 1 讲之前先看这个" },
+        { n: "生信技能树《转录组测序数据分析》", m: "331 分钟 · 54.9 万播放", u: "https://www.bilibili.com/video/BV12s41137HY", d: "对应第 2-4 讲：差异分析、富集、免疫浸润" },
+        { n: "Biomamba《手把手教你做单细胞转录组测序数据分析》", m: "约 17 小时 · 50.8 万播放", u: "https://www.bilibili.com/video/BV1S44y1b76Z", d: "单细胞最全的一套，配合单细胞专题看" },
+        { n: "生信幻想家《单细胞数据分析 标准分析流程》", m: "293 分钟 · 29.1 万播放", u: "https://www.bilibili.com/video/BV1Ct421j7X3", d: "2026 年更新版，流程完整、节奏比上一套快" },
+        { n: "生信幻想家《空间转录组（结合单细胞）》", m: "284 分钟 · 3.1 万播放", u: "https://www.bilibili.com/video/BV1To6FB1Ewm", d: "单细胞之后再上空间，先看这套建立直觉" },
+        { n: "未名阿《保姆级单细胞代码分析（1）质控·降维·聚类》", m: "29 分钟 · 5.8 万播放", u: "https://www.bilibili.com/video/BV1yR4y1q7X4", d: "短，适合先跑通一遍再回头看长课" },
+        { n: "富贵 pic《单细胞测序 01 入门：数据读取与分析》", m: "18 分钟 · 1.3 万播放", u: "https://www.bilibili.com/video/BV1Dh4y1D7m6", d: "最短的入门，看完知道单细胞在干什么" },
+        { n: "生信技能树-jimmy《单细胞亚群注释》", m: "21 分钟", u: "https://www.bilibili.com/video/BV1mE421w7Te", d: "注释这一步最容易做错，专门看这一集" }
+      ]
+    },
+    {
+      g: "单细胞专项（官方教程，长期有效）",
+      items: [
+        { n: "Seurat 官网", m: "satijalab.org", u: "https://satijalab.org/seurat/", d: "所有 Seurat 教程的入口，版本更新都在这" },
+        { n: "Seurat PBMC3K 标准流程", m: "官方 vignette", u: "https://satijalab.org/seurat/articles/pbmc3k_tutorial", d: "单细胞的「Hello World」，必须亲手敲一遍" },
+        { n: "Seurat 常用命令速查", m: "官方 vignette", u: "https://satijalab.org/seurat/articles/essential_commands", d: "对象结构、取子集、改 metadata 都在这里" },
+        { n: "OSCA：单细胞分析 Bioconductor 书", m: "bioconductor.org/books", u: "https://bioconductor.org/books/release/OSCA/", d: "最完整的免费单细胞教材，质量高于绝大多数中文课" },
+        { n: "sc-best-practices", m: "sc-best-practices.org", u: "https://www.sc-best-practices.org/", d: "专门讲「这一步为什么这么做、什么时候会错」" },
+        { n: "Galaxy 单细胞专题", m: "training.galaxyproject.org", u: "https://training.galaxyproject.org/training-material/topics/single-cell/", d: "不写代码也能跑全流程，用来理解每一步在做什么" },
+        { n: "Monocle3 官网", m: "拟时序", u: "https://cole-trapnell-lab.github.io/monocle3/", d: "轨迹推断的标准工具" },
+        { n: "Harmony 快速上手", m: "去批次", u: "https://portals.broadinstitute.org/harmony/articles/quickstart.html", d: "多样本整合最常用的方法之一" },
+        { n: "CellChat 官方仓库", m: "细胞通讯", u: "https://github.com/jinworks/CellChat", d: "细胞通讯分析，vignette 在仓库 README 里" }
+      ]
+    },
+    {
+      g: "Bulk 与差异分析",
+      items: [
+        { n: "DESeq2 官方 vignette", m: "bioconductor", u: "https://bioconductor.org/packages/release/bioc/vignettes/DESeq2/inst/doc/DESeq2.html", d: "差异分析的事实标准，方法段照它写" },
+        { n: "clusterProfiler 配套书", m: "yulab-smu.top", u: "https://yulab-smu.top/biomedical-knowledge-mining-book/", d: "富集分析最权威的中文作者原书，含背景集怎么选" },
+        { n: "GSVA 官方 vignette", m: "bioconductor", u: "https://bioconductor.org/packages/release/bioc/vignettes/GSVA/inst/doc/GSVA.html", d: "通路打分和 ssGSEA 的原始实现" },
+        { n: "WGCNA（CRAN）", m: "cran.r-project.org", u: "https://cran.r-project.org/web/packages/WGCNA/index.html", d: "共表达网络，教程 PDF 在包主页" },
+        { n: "survival 包", m: "cran.r-project.org", u: "https://cran.r-project.org/web/packages/survival/index.html", d: "KM、coxph、log-rank 全在这" }
+      ]
+    },
+    {
+      g: "R 语言基础",
+      items: [
+        { n: "R 官方入门手册", m: "cran.r-project.org", u: "https://cran.r-project.org/doc/manuals/r-release/R-intro.html", d: "遇到语法歧义时查这里，比搜索引擎准" },
+        { n: "R for Data Science（2 版）", m: "r4ds.hadley.nz", u: "https://r4ds.hadley.nz/", d: "dplyr/ggplot 的正统教材，免费在线" }
+      ]
+    },
+    {
+      g: "数据入口",
+      items: [
+        { n: "GDC（TCGA 官方门户）", m: "portal.gdc.cancer.gov", u: "https://portal.gdc.cancer.gov/", d: "TCGA 唯一的官方来源，别用二手整理版" },
+        { n: "GEO", m: "ncbi.nlm.nih.gov/geo", u: "https://www.ncbi.nlm.nih.gov/geo/", d: "查 GSE 号、下表达矩阵和临床信息" },
+        { n: "UCSC Xena", m: "xenabrowser.net", u: "https://xenabrowser.net/", d: "同一队列的 TCGA 标准化数据，省掉一半预处理" },
+        { n: "TIMER2.0", m: "timer.cistrome.org", u: "http://timer.cistrome.org/", d: "不写代码就能看免疫浸润，用来对结论" },
+        { n: "cBioPortal", m: "cbioportal.org", u: "https://www.cbioportal.org/", d: "突变、拷贝数、生存一起查" }
+      ]
+    }
+  ],
   chapters: [
     {
-      id: "c1", title: "第 1 章 从零开始",
+      id: "k1",
+      title: "第 1 讲　生信是什么：counts 矩阵、Bulk 与单细胞",
+      goal: "搞清「你拿到的到底是什么数」，后面的归一化、差异分析才有意义。",
+      watch: [
+        { n: "生信技能树《生信人应该这样学 R 语言》", u: "https://www.bilibili.com/video/BV1cs411j75B" }
+      ],
       subs: [
         {
-          t: "1.1 代码就是命令，回车就执行",
-          why: "R 没有「编译」这一步，你写一行它算一行。所以学 R 最快的办法不是背语法，是把每一行都跑一遍、看它吐出什么。",
+          t: "1.1 一次转录组测序在测什么：counts 不是表达量",
+          why: "你下载到的 counts 矩阵里，每个格子是「数到多少条 reads」，不是「这个基因表达多高」。理解这一点，后面所有归一化才有意义。",
           pts: [
-            "`<-` 是赋值，意思是「把右边算出来的东西存到左边这个名字里」；`=` 也能用，但在函数参数里含义不同，初学一律用 `<-`。",
-            "井号 `#` 后面是注释，R 不会执行——写给人看的。",
-            "报错不要慌，读最后一行：它一般直接告诉你「哪个对象不存在」或「哪个参数没给」。"
-          ],
-          code: `1 + 1                 # 算术：结果直接打印
-sqrt(16)              # 函数调用：函数名(参数)
-x <- 5                # 赋值，屏幕上什么都不出现
-x * 2                 # 用的时候才出现
-x <- 6                # 再赋值就覆盖了，R 不会问你
-c(x, x * 2, sqrt(x))  # c() 把几个值拼成一个向量`
-        },
-        {
-          t: "1.2 名字怎么起、什么时候会被覆盖",
-          why: "R 的工作环境里所有东西都有名字。你起错名字不会报错，只会让你后面找不到东西——这是新手最常见的耗时点。",
-          pts: [
-            "名字只能由字母、数字、下划线、点组成，不能以数字开头，区分大小写（`X` 和 `x` 是两个东西）。",
-            "不要用 `c`、`t`、`data`、`mean` 这类已经存在的函数名当变量名，会把函数盖掉。",
-            "`ls()` 看当前有哪些对象，`rm(x)` 删掉一个——环境脏了先清，比debug快。"
-          ],
-          code: `a <- 1; A <- 2
-a; A                  # 区分大小写
-
-ls()                  # 当前环境里有哪些对象
-
-y <- 10
-y <- y + 1            # 右边先算，再赋回左边
-y                     # 11
-
-rm(y)                 # 删掉
-exists("y")           # FALSE`
-        },
-        {
-          t: "1.3 卡住了怎么查",
-          why: "九成的卡壳不是逻辑难，是「不知道这个函数要什么参数」。查文档这件事必须变成肌肉记忆。",
-          pts: [
-            "`?函数名` 看帮助；`args(函数名)` 只看参数列表，比翻整页文档快。",
-            "不确定类型时用 `class()` / `str()`，比猜快十倍。",
-            "三个高频报错：`object not found`（名字拼错或没赋值）、`argument ... is missing`（少给参数）、`non-numeric argument`（把字符当数字算了）。"
-          ],
-          code: `args(mean)            # 看 mean 要哪些参数
-# ?mean               # 交互式 R 里打开帮助页；写进脚本时留成注释
-
-class(1:3)            # integer
-class("a")            # character
-class(TRUE)           # logical
-str(mtcars)           # 一个数据框的结构，一眼看清每列类型
-
-mean(c(1, 2, NA))     # NA 会污染结果 → NA
-mean(c(1, 2, NA), na.rm = TRUE)   # 加参数才算出 1.5`
-        }
-      ]
-    },
-    {
-      id: "c2", title: "第 2 章 数据结构：五种容器",
-      subs: [
-        {
-          t: "2.1 向量：最基本的一串数",
-          why: "R 里几乎所有运算都是「对整个向量一起算」，不用写循环。理解这一点，后面所有代码都能看懂。",
-          pts: [
-            "一个向量只能有一种类型；`c(1, \"a\")` 会把数字强制变成字符。",
-            "`NA` 是缺失值，参与运算会传染；`NaN` 是「算不出来」（如 0/0）。",
-            "向量化：`x * 2` 是对每个元素各乘 2，不需要 for 循环。"
-          ],
-          code: `x <- c(3, 1, 4, 1, 5)
-x * 2                 # 每个元素都乘 2
-length(x); sum(x); mean(x)
-sort(x); rev(sort(x)) # 排序、倒序
-x[x > 2]              # 逻辑筛选，只要大于 2 的
-
-c(1, "a")             # 全变字符了，注意
-class(c(1, "a"))`
-        },
-        {
-          t: "2.2 矩阵：按列存的二维表",
-          why: "表达矩阵、距离矩阵、邻接矩阵都是矩阵。R 默认**按列**填充，这是最容易搞错方向的一处。",
-          pts: [
-            "`matrix(1:6, nrow = 2)` 得到 2 行 3 列，填的顺序是「先填满第 1 列，再填第 2 列」。",
-            "取元素用 `m[行, 列]`，逗号前空着表示所有行，逗号后空着表示所有列。",
-            "`t(m)` 转置；`rowMeans` / `colMeans` 按行/按列求均值，比 `apply` 快。"
-          ],
-          code: `m <- matrix(1:6, nrow = 2)
-m                     # 第 1 列是 1,2；第 2 列是 3,4
-dim(m)                # 2 行 3 列
-m[1, ]                # 第 1 行
-m[, 2]                # 第 2 列
-m[1, 2]               # 单个元素
-
-t(m)                  # 转置，2x3 变 3x2
-rowMeans(m); colMeans(m)
-
-rownames(m) <- c("g1", "g2")
-colnames(m) <- c("s1", "s2", "s3")
-m["g1", "s2"]`
-        },
-        {
-          t: "2.3 数据框：一张表，每列一个向量",
-          why: "你 90% 的时间在处理数据框。它是「列可以不同类型」的二维表，也是所有统计函数的输入格式。",
-          pts: [
-            "`df$列名` 取一列（得到向量）；`df[\"列名\"]` 取一列（得到数据框），两者差一对方括号，结果类型不同。",
-            "`head()` / `str()` / `summary()` 三件套，拿到任何新表先跑这三个。",
-            "新建列直接赋值：`df$new <- ...`，长度必须等于行数或为 1。"
-          ],
-          code: `d <- data.frame(gene = c("A", "B", "C"),
-                logFC = c(1.2, -0.8, 0.3),
-                p = c(0.01, 0.2, 0.04))
-d
-str(d)                # 3 个观测、3 个变量，类型一目了然
-d$logFC               # 向量
-d["logFC"]            # 数据框（一列的表）
-d$sig <- d$p < 0.05   # 加一列逻辑值
-d[order(d$p), ]       # 按 p 排序`
-        },
-        {
-          t: "2.4 列表与因子：装杂物的箱子、带顺序的标签",
-          why: "列表能装任何东西（模型结果、多个表）；因子决定分组顺序和图上的排列——这两样不会，后面画图和建模都会卡。",
-          pts: [
-            "`list()` 里每样东西可以有名字，用 `l$名字` 或 `l[[\"名字\"]]` 取；`[[ ]]` 取出的是原件，`[ ]` 取出的还是列表。",
-            "`factor()` 有「水平（levels）」，默认按字母排；想按大小排就显式给 `levels=`。",
-            "画箱线图、做分组统计时，顺序错了图就错了，所以因子顺序要专门检查一次。"
-          ],
-          code: `l <- list(a = 1:3, b = "文本", c = data.frame(x = 1))
-l$a                   # 向量
-l[["a"]]              # 同上
-class(l["a"])         # 还是 list，注意区别
-
-g <- c("高", "低", "中", "高")
-factor(g)             # 水平按拼音/字母排
-factor(g, levels = c("低", "中", "高"))   # 显式指定顺序
-table(factor(g, levels = c("低", "中", "高")))`
-        }
-      ]
-    },
-    {
-      id: "c3", title: "第 3 章 取子集与分组计算",
-      subs: [
-        {
-          t: "3.1 逻辑筛选：== & | 与 %in%",
-          why: "「把符合条件的那部分挑出来」是数据分析里最高频的动作，写法就一种：方括号里放逻辑向量。",
-          pts: [
-            "比较用 `==`（两个等号），`=` 是赋值，混用是新手第一大错。",
-            "多个条件用 `&`（且）和 `|`（或），不要用 `&&`（那是给单个值用的）。",
-            "「属于某个集合」用 `%in%`，比写一长串 `|` 干净。"
-          ],
-          code: `d <- mtcars
-d[d$mpg > 25, c("mpg", "cyl")]        # 油耗大于 25 的车
-d[d$cyl == 4 & d$hp > 100, ]          # 两个条件同时满足
-d[d$cyl %in% c(6, 8), "mpg"]          # 属于集合就选中
-sum(d$mpg > 25)                       # 逻辑值求和 = 计数
-mean(d$cyl == 4)                      # 占比，TRUE 当 1`
-        },
-        {
-          t: "3.2 按位置、按名字取",
-          why: "真实数据里列的顺序会变、列名可能带空格，所以「按名字取」比「按第几列取」稳。",
-          pts: [
-            "`d[, 1]` 按位置取第 1 列；`d[, \"mpg\"]` 按名字取，列顺序变了也不会错。",
-            "`d[1:5, ]` 取前 5 行；`d[-1, ]` 去掉第 1 行。",
-            "取列名带空格的要用反引号或 `[[\"名字\"]]`，所以第一件事是把列名洗干净。"
-          ],
-          code: `d <- mtcars
-d[1:3, 1:2]                 # 前 3 行、前 2 列
-d[, "mpg"][1:5]             # 按名字取列，再取前 5 个值
-names(d)                    # 所有列名
-names(d)[1] <- "miles"      # 改列名
-d[, c("miles", "cyl")][1:3, ]`
-        },
-        {
-          t: "3.3 分组计算三件套",
-          why: "「按组求均值」是生信里出现最多的操作。三种写法都要会，因为它们分别适合「一组一个数」「一组一张表」「一组一个模型」。",
-          pts: [
-            "`tapply(值, 分组, 函数)`：一组一个数，最短。",
-            "`aggregate(值 ~ 分组, data, 函数)`：一组一行，返回数据框，方便继续处理。",
-            "`split(数据, 分组)` + `lapply()`：一组一个任意结果，最灵活（比如每组跑一个模型）。"
-          ],
-          code: `tapply(mtcars$mpg, mtcars$cyl, mean)          # 一组一个均值
-
-aggregate(mpg ~ cyl, data = mtcars, FUN = mean)  # 一组一行
-aggregate(cbind(mpg, hp) ~ cyl, data = mtcars,   # 多列一起汇总
-          FUN = mean)
-
-sp <- split(mtcars, mtcars$cyl)                  # 一组一张表
-length(sp)                                       # 3 组
-lapply(sp, function(x) range(x$mpg))             # 每组油耗范围`
-        },
-        {
-          t: "3.4 apply 家族：什么时候用哪个",
-          why: "这三兄弟是「不用写循环」的关键。记一句就够：按行/列算用 apply，返回同长度向量用 sapply，返回列表用 lapply。",
-          pts: [
-            "`apply(矩阵, 1, 函数)` 的 1 表示按行，2 表示按列——和 `[行, 列]` 的顺序一致。",
-            "`sapply` 会尽量把结果简化成向量/矩阵，方便直接进 `data.frame()`。",
-            "结果长度不一致（比如每组基因数不同）时只能用 `lapply`，它会老实返回列表。"
-          ],
-          code: `m <- as.matrix(mtcars[, c("mpg", "hp", "wt")])
-apply(m, 2, mean)              # 按列（每个变量）求均值
-apply(m, 1, sum)[1:5]          # 按行（每辆车）求和
-
-sapply(1:3, function(i) i^2)   # 简化成向量
-lapply(1:3, function(i) i^2)   # 返回列表
-sapply(split(mtcars$mpg, mtcars$cyl), mean)   # 分组 + 简化`
-        }
-      ]
-    },
-    {
-      id: "c4", title: "第 4 章 读数据与清洗",
-      subs: [
-        {
-          t: "4.1 read.csv 的四个关键参数",
-          why: "读进来就错了，后面全错。四个参数能挡掉八成问题。",
-          pts: [
-            "`header = TRUE` 表示第一行是列名；`row.names = 1` 把第一列当作行名（表达矩阵常用）。",
-            "`check.names = FALSE` 保住带连字符的列名，否则 `TCGA-T1` 会被改成 `TCGA.T1`。",
-            "`stringsAsFactors = FALSE` 让字符保持字符（老版本 R 默认转因子）。"
-          ],
-          code: `# 先在本地写一个 csv，再读回来，看清参数的作用
-tmp <- tempfile(fileext = ".csv")
-write.csv(data.frame(id = c("A-1", "B-2"), v = c(1, 2)),
-          tmp, row.names = FALSE)
-read.csv(tmp)                          # 正常读
-read.csv(tmp, check.names = FALSE)     # 保住列名里的连字符
-
-d <- read.csv(tmp, stringsAsFactors = FALSE)
-str(d)                                 # 确认 id 是 character`
-        },
-        {
-          t: "4.2 类型转换与缺失值",
-          why: "「明明是数字却算不了」几乎全是类型问题；「算出来是 NA」几乎全是缺失值没处理。",
-          pts: [
-            "`as.numeric()` 遇到非数字会变 NA 并给警告——警告要看，它告诉你哪几个值坏了。",
-            "`is.na()` 判断缺失，`sum(is.na(x))` 数有几个，`na.omit()` 整行删。",
-            "不要无脑删缺失：先想清楚这列缺失是「没测」还是「没有」，两者处理方式不同。"
-          ],
-          code: `v <- c("1", "2", "x", "4")
-as.numeric(v)                  # 第 3 个变 NA，并给警告
-sum(is.na(as.numeric(v)))      # 有几个坏了
-
-d <- data.frame(a = c(1, NA, 3), b = c("x", "y", NA))
-is.na(d$b)
-colSums(is.na(d))              # 每列缺几个
-d[complete.cases(d), ]         # 只留完整的行
-mean(d$a, na.rm = TRUE)`
-        },
-        {
-          t: "4.3 合并与宽长转换",
-          why: "把「表达矩阵」变成「一行一个观测的长表」，是画图和建模的前提；把两张表按共同列拼起来，是整合数据的前提。",
-          pts: [
-            "`merge(x, y, by = \"列名\")` 相当于 SQL 的 join，默认取交集（inner join）。",
-            "宽转长的核心是「骨架顺序」和「取值顺序」对上：`expand.grid` 让第一个变量变最快，`as.vector(矩阵)` 按列展开也是第一个变量变最快。",
-            "合并前先确认两边「共同的列」名字是否一样、有没有重复值，否则行数会暴涨。"
-          ],
-          code: `expr <- data.frame(gene = c("g1", "g2"),
-                   s1 = c(5, 6), s2 = c(7, 8))
-meta <- data.frame(sample = c("s1", "s2"),
-                   group = c("ctrl", "trt"))
-
-long <- expand.grid(gene = expr$gene, sample = c("s1", "s2"))
-long$value <- as.vector(as.matrix(expr[, c("s1", "s2")]))
-long
-merge(long, meta, by = "sample")     # 拼上分组信息`
-        }
-      ]
-    },
-    {
-      id: "c5", title: "第 5 章 统计基本功",
-      subs: [
-        {
-          t: "5.1 先看分布，再选方法",
-          why: "所有检验都有前提。不看分布直接跑 t 检验，是最常见的「结果不可信」来源。",
-          pts: [
-            "`summary()` 给五数概括；`sd()` 是标准差，`var()` 是方差（注意 n-1）。",
-            "偏态明显（均值远离中位数、长尾巴）就该考虑秩和检验或先做变换。",
-            "`shapiro.test()` 检验正态性，但样本量一大就过度敏感——别把它当唯一标准，看图更靠谱。"
-          ],
-          code: `x <- mtcars$mpg
-summary(x)                 # 最小/四分位/中位/均值/最大
-sd(x); var(x)
-hist(x)                    # 先看图，别只看数字
-shapiro.test(x)            # p 小 → 偏离正态（样本大时慎用）
-
-y <- mtcars$wt
-cor(x, y)                  # 相关系数
-cor.test(x, y, method = "spearman")   # 秩相关，抗离群`
-        },
-        {
-          t: "5.2 两组比较：t 还是 Wilcoxon",
-          why: "这两者回答的是同一个问题（两组有没有差别），区别在于「信不信正态」。选错的代价是结论站不住。",
-          pts: [
-            "`t.test()` 默认是 Welch 版本（不假设方差齐），样本小又明显偏态时别用。",
-            "`wilcox.test()` 比的是中位数/秩，抗离群值，代价是效能低一些。",
-            "报告要写清：用了哪个检验、单双侧、n 是多少——这三样缺一个都复现不了。"
-          ],
-          code: `a <- mtcars$mpg[mtcars$cyl == 4]
-b <- mtcars$mpg[mtcars$cyl == 8]
-
-t.test(a, b)                       # Welch t 检验
-t.test(a, b, var.equal = TRUE)     # 假设方差齐的版本
-wilcox.test(a, b)                  # 秩和检验
-
-c(n1 = length(a), n2 = length(b),
-  diff = mean(a) - mean(b))        # 报结果必备的三样`
-        },
-        {
-          t: "5.3 多组比较：ANOVA 与事后检验",
-          why: "三组以上反复做 t 检验会把假阳性率越推越高，正确做法是先用方差分析看整体，再做两两比较并校正。",
-          pts: [
-            "`aov(值 ~ 分组, data)` 做方差分析，`summary()` 看整体 p 值。",
-            "`TukeyHSD()` 做所有两两比较并自带校正，比手工做多次 t 检验稳。",
-            "分组必须先是因子，否则 `aov` 会把它当连续变量——这是最常见的翻车点。"
-          ],
-          code: `d <- mtcars
-d$cyl <- factor(d$cyl)             # 关键一步
-fit <- aov(mpg ~ cyl, data = d)
-summary(fit)                       # 整体有没有差别
-TukeyHSD(fit)                      # 哪两组有差别
-
-table(d$cyl)                       # 每组样本量，差太多要谨慎`
-        },
-        {
-          t: "5.4 多重检验与相关矩阵",
-          why: "一次检验 1 万个基因，按 p<0.05 会白捡 500 个「显著」。校正不是可选项，是必做项。",
-          pts: [
-            "`p.adjust(p, \"BH\")` 控制 FDR，是转录组的标准做法；Bonferroni 太保守，会杀掉真信号。",
-            "校正后要报的是 `adj.P`，图上标的也是它——正文里偷偷报原始 p 是学术不端。",
-            "相关分析同理：算几百个基因与临床指标的相关，必须校正，并说明用了 Pearson 还是 Spearman。"
-          ],
-          code: `p <- c(0.001, 0.01, 0.03, 0.2, 0.6)
-p.adjust(p, "BH")                  # FDR 校正
-p.adjust(p, "bonferroni")          # 除以检验次数
-
-m <- cor(mtcars[, c("mpg", "hp", "wt", "qsec")])
-round(m, 2)
-m[upper.tri(m)] <- NA              # 只留下三角，看着清爽
-round(m, 2)`
-        }
-      ]
-    },
-    {
-      id: "c6", title: "第 6 章 绘图：先把图画对，再谈好看",
-      subs: [
-        {
-          t: "6.1 base plot：一张图的最小构成",
-          why: "散点图是所有图的祖先。会画散点，就会改造坐标轴、标题、点样式——其他图都是它的变体。",
-          pts: [
-            "`plot(x, y)` 画散点；`type = \"l\"` 改成线，`pch` 改点形状，`col` 改颜色。",
-            "`main` 标题、`xlab`/`ylab` 轴标题——英文图里单位要写进轴标题，不要写进图注。",
-            "`par(mfrow = c(1, 2))` 一页放两张图，出多面板图必备。"
-          ],
-          code: `plot(mtcars$wt, mtcars$mpg,
-     pch = 19, col = "steelblue",
-     xlab = "Weight (1000 lbs)", ylab = "MPG",
-     main = "Weight vs fuel economy")
-abline(lm(mpg ~ wt, data = mtcars), col = "red", lty = 2)
-
-par(mfrow = c(1, 2))               # 一页两图
-hist(mtcars$mpg, main = "MPG")
-boxplot(mpg ~ cyl, data = mtcars, main = "MPG by cylinder")
-par(mfrow = c(1, 1))               # 记得改回来`
-        },
-        {
-          t: "6.2 三类主图：箱线、直方、热图",
-          why: "生信论文里九成的图就是这三类加一个散点。每类解决一个特定问题，选错了图，读者就看不出你想说的。",
-          pts: [
-            "箱线图看「组间分布差异」，但它藏住了样本量和双峰——样本少时把点叠上去（`stripchart`）。",
-            "直方图看「一个变量的形状」；`breaks` 决定分箱，分箱一改观感全变，别只画一版就下结论。",
-            "热图看「矩阵里的模式」；一定要有行/列聚类和颜色条，否则读者无法判断尺度。"
-          ],
-          code: `boxplot(mpg ~ cyl, data = mtcars, col = "grey90",
-        xlab = "Cylinder", ylab = "MPG")
-stripchart(mpg ~ cyl, data = mtcars, vertical = TRUE,
-           method = "jitter", add = TRUE, pch = 19, cex = 0.6)
-
-hist(mtcars$mpg, breaks = 10, col = "grey80", main = "")
-
-m <- as.matrix(mtcars[, c("mpg", "hp", "wt", "qsec")])
-heatmap(scale(m), scale = "none", margins = c(6, 8))`
-        },
-        {
-          t: "6.3 图注与配色：让图自己说清楚",
-          why: "审稿人先看图注再决定要不要看图。图注写不清，图等于没画；配色乱，读者找不到重点。",
-          pts: [
-            "图注四件套：画的是什么（panel 说明）、样本量 n、统计方法、显著性标记含义。",
-            "配色只做一件事：区分组别。别用彩虹色，别用红绿对立（色盲看不出）。",
-            "字号不要小于 7 pt，导出时用矢量（PDF）——位图放大会糊，返修时被要求重做很常见。"
-          ],
-          code: `legend_text <- paste0(
-  "Figure 1. Fuel economy across cylinder groups. ",
-  "Boxes show median and interquartile range; n = ",
-  paste(tapply(mtcars$mpg, mtcars$cyl, length), collapse = " / "),
-  " cars for 4 / 6 / 8 cylinders. ",
-  "P values from one-way ANOVA with Tukey correction. ",
-  "* adjusted P < 0.05; ** < 0.01; ns, not significant.")
-cat(legend_text, sep = "\n")`
-        }
-      ]
-    },
-    {
-      id: "c7", title: "第 7 章 生信通用流程：四步走到终点",
-      subs: [
-        {
-          t: "7.1 表达矩阵长什么样",
-          why: "所有转录组分析的输入都是同一张表：行是基因、列是样本、值是表达量。搞清它，换任何数据集都只是换文件名。",
-          pts: [
-            "原始 count 是整数、方差随均值增大；log2 之后才近似正态，才适合 t 检验这类方法。",
-            "TPM/FPKM 已按长度和深度归一，跨样本可比；count 不能直接跨样本比，要交给 DESeq2 这类模型。",
-            "行名必须是基因、列名必须是样本——一旦转置，后面全错，而报错往往很晚才出现。"
+            "行是基因，列是样本，格子里是**整数 count**。不同样本的列和差别可以到十倍，因为测序深度不同。",
+            "归一化只做一件事：把「测得多」和「表达高」分开。CPM 除文库大小，TPM/FPKM 再除基因长度。",
+            "counts 给 DESeq2/edgeR 用（它们要整数），log2(TPM+1) 给热图和相关分析用。两者不能混着喂。"
           ],
           code: `set.seed(1)
-expr <- matrix(rpois(20, lambda = 50), nrow = 5,
-               dimnames = list(paste0("g", 1:5), paste0("s", 1:4)))
-expr                                # 整数 count，行=基因、列=样本
-dim(expr)
+# 6 个基因 x 4 个样本，格子里的数是 reads 条数
+cnt <- matrix(c(120, 40, 8, 300, 15, 2,
+                130, 35, 11, 290, 18, 3,
+                118, 44, 9, 310, 12, 4,
+                125, 38, 10, 295, 16, 2), nrow = 6,
+              dimnames = list(paste0("G", 1:6), paste0("S", 1:4)))
+cnt
 
-log2(expr + 1)                      # 加 1 避免 log(0)
-rowMeans(expr); colSums(expr)       # 每个基因均值、每个样本测序深度
+lib <- colSums(cnt)                       # 每个样本的文库大小
+lib
 
-# 转置是灾难的开始：转完行就变成样本了
-dim(t(expr))`
+round(sweep(cnt, 2, lib, "/") * 1e6, 1)   # CPM
+round(log2(sweep(cnt, 2, lib, "/") * 1e6 + 1), 2)   # log2CPM，画图用这个`
         },
         {
-          t: "7.2 差异分析到底在算什么",
-          why: "不论用 DESeq2 还是 limma，本质都是三件事：算倍数变化、算这个变化可不可信、对成千上万次检验做校正。",
+          t: "1.2 Bulk 和单细胞的区别，决定你能问什么问题",
+          why: "同样是「表达矩阵」，Bulk 的一列是一个组织，单细胞的一列是一个细胞。这个差别决定了你只能回答哪一类问题。",
           pts: [
-            "`logFC = 处理组均值 - 对照组均值`（log2 尺度下），所以 logFC=1 就是翻倍。",
-            "p 值回答「这个差是不是偶然」，不回答「这个差大不大」——两个都要看。",
-            "`adj.P` 才是能写进论文的那个；阈值要事先定好，不能看完结果再调。"
+            "Bulk 一列 = 上千个细胞的平均值。异质性被平均掉，只能回答「这块组织整体怎么样」。",
+            "单细胞一列 = 一个细胞。行数从「2 万基因 x 几十样本」变成「2 万基因 x 几万细胞」，而且极度稀疏。",
+            "所以：组间比较、预后模型用 Bulk；哪类细胞在变、细胞之间怎么通讯用单细胞。两者不能互相替代。"
           ],
           code: `set.seed(2)
-x <- matrix(rnorm(200, 8, 1), nrow = 20,
-            dimnames = list(paste0("g", 1:20), paste0("s", 1:10)))
-x[1, 6:10] <- x[1, 6:10] + 2      # 第 1 个基因人为上调 2 倍
+# Bulk：6 基因 x 4 样本
+bulk <- matrix(rpois(24, 50), nrow = 6,
+               dimnames = list(paste0("G", 1:6), paste0("S", 1:4)))
+dim(bulk)
+mean(bulk == 0)
 
-trt <- 6:10; ctl <- 1:5
-lfc <- rowMeans(x[, trt]) - rowMeans(x[, ctl])
-p <- apply(x, 1, function(v) t.test(v[trt], v[ctl])$p.value)
-deg <- data.frame(gene = rownames(x), logFC = lfc, p = p)
-deg$adj.P <- p.adjust(deg$p, "BH")
-deg[order(deg$adj.P), ][1:3, ]`
+# 单细胞：同一个组织拆成 200 个细胞
+sc <- matrix(rpois(6 * 200, 0.8), nrow = 6,
+             dimnames = list(paste0("G", 1:6), paste0("C", 1:200)))
+dim(sc)
+mean(sc == 0)      # 稀疏度，真实数据常在 0.9 以上
+
+rowMeans(bulk)     # Bulk 里每个基因的均值
+rowMeans(sc)       # 单细胞 200 个细胞的均值，量级完全不同`
         },
         {
-          t: "7.3 富集与生存：两个高频下游",
-          why: "拿到差异基因之后，几乎必然要做两件事：这些基因挤在哪些通路里（富集）、表达高低和结局有没有关系（生存）。",
+          t: "1.3 为什么这条流程非得用 R",
+          why: "生信不是写软件，是「把统计方法接到数据上，再解释结果」。R 的包生态在这件事上仍然最全，而且论文方法段写的就是包名。",
           pts: [
-            "富集分析的数学是超几何分布：从背景里随机抽这么多基因，恰好抽中通路里这么多个的概率。",
-            "KM 曲线是「每遇到一次事件，生存率乘一次当时未发生比例」；log-rank 检验两组曲线是否整体不同。",
-            "富集要写清背景基因集（是全部基因还是检测到的基因），生存要写清随访时间单位与删失处理。"
+            "Bioconductor 上两千多个包，DESeq2、edgeR、limma、Seurat、GSVA、CellChat 全在里面。",
+            "一篇生信文章的方法段，本质就是一段 R 代码说明（包名 + 版本 + 参数 + 阈值）。复现别人的文章，就是把这些抄对。",
+            "R 的短板是工程（大数据、并行、部署），但 Bulk 和单细胞这个数据量用不着。"
           ],
-          code: `# 富集：4 个数字的超几何检验
-# 背景 100 个基因，通路 10 个，候选 20 个里命中 4 个
-phyper(4 - 1, 10, 100 - 10, 20, lower.tail = FALSE)
+          code: `df <- data.frame(group = rep(c("tumor", "normal"), each = 3),
+                 expr  = c(9.1, 8.7, 9.4, 6.2, 6.8, 6.1))
+df
 
-# 生存：手写乘积限估计
-tm <- c(2, 4, 6, 8, 10, 12); st <- c(1, 0, 1, 1, 0, 1)
-km <- function(tm, st) {
-  s <- 1; out <- data.frame(time = 0, surv = 1)
-  for (t in sort(unique(tm[st == 1]))) {
-    n <- sum(tm >= t); d <- sum(tm == t & st == 1)
-    s <- s * (1 - d / n)
-    out <- rbind(out, data.frame(time = t, surv = s))
+t.test(expr ~ group, data = df)              # 一行完成分组检验
+aggregate(expr ~ group, data = df, mean)     # 分组均值
+aggregate(expr ~ group, data = df, sd)       # 分组标准差`
+        }
+      ]
+    },
+    {
+      id: "k2",
+      title: "第 2 讲　TCGA 下载与差异分析",
+      goal: "把「哪些基因变了」这件事算出来，并且知道每个数字是怎么来的。",
+      watch: [
+        { n: "生信技能树《转录组测序数据分析》", u: "https://www.bilibili.com/video/BV12s41137HY" },
+        { n: "DESeq2 官方 vignette", u: "https://bioconductor.org/packages/release/bioc/vignettes/DESeq2/inst/doc/DESeq2.html" }
+      ],
+      subs: [
+        {
+          t: "2.1 TCGA 里到底有哪几套数：counts / FPKM / TPM",
+          why: "同一个基因在 TCGA 里有三套数。拿错一套，整个下游都偏，而且错得很隐蔽——因为图还是画得出来。",
+          pts: [
+            "counts：整数，DESeq2/edgeR 的输入。FPKM/TPM：已经按长度和深度归一过，**不能**直接进 DESeq2。",
+            "TPM 的好处是每个样本的 TPM 加起来一样，跨样本可比；FPKM 不是，所以现在基本被 TPM 取代。",
+            "样本类型看 barcode 第 14-15 位：`01` 原发肿瘤、`11` 正常组织、`06` 转移。写筛选条件时按这个来。"
+          ],
+          code: `barcodes <- c("TCGA-05-4384-01A-01R-1755-07",
+              "TCGA-05-4384-11A-01R-1755-07",
+              "TCGA-05-4244-01A-01R-1107-07")
+substr(barcodes, 14, 15)             # "01" 肿瘤 / "11" 正常
+table(substr(barcodes, 14, 15))
+
+# 从 counts 手算 TPM（原理演示，实际直接用现成 TPM）
+cnt <- matrix(c(100, 300, 50, 20, 60, 400), nrow = 3,
+              dimnames = list(paste0("G", 1:3), c("S1", "S2")))
+len  <- c(1000, 2000, 500)           # 基因长度，单位 bp
+rate <- cnt / len                    # 每 bp 的 reads
+tpm  <- sweep(rate, 2, colSums(rate), "/") * 1e6
+round(tpm, 1)
+colSums(tpm)                         # 每个样本加起来都是 1e6`,
+          real: {
+            pkg: "DESeq2",
+            code: `dds <- DESeqDataSetFromMatrix(countData = cnt, colData = coldata, design = ~ group)
+dds <- DESeq(dds)
+res <- results(dds, contrast = c("group", "tumor", "normal"))
+res <- lfcShrink(dds, coef = "group_tumor_vs_normal", type = "apeglm")`
+          }
+        },
+        {
+          t: "2.2 差异分析到底在算什么",
+          why: "logFC 是「两组平均表达差几倍」，p 值是「这个差相对于组内波动显不显眼」。两件事，回答两个不同问题。",
+          pts: [
+            "每组 3 例时，一个离群样本就能把 logFC 拉翻倍。所以必须同时看每组中位数和离散度，不能只看 p。",
+            "低表达基因方差估不稳，会产生大量假阳性。DESeq2 用收缩（shrinkage）把它们的 logFC 往 0 拉，这就是 `lfcShrink` 那一步的意义。",
+            "差异基因数量完全取决于阈值。写文章必须写清楚，常见写法是 |logFC| > 1 且 adj.P < 0.05。"
+          ],
+          code: `set.seed(3)
+g1 <- c(9.2, 8.8, 9.5)                 # 肿瘤组 3 例
+g2 <- c(6.1, 6.4, 5.9)                 # 正常组 3 例
+log2(mean(g1) / mean(g2))              # logFC
+t.test(g1, g2)$p.value
+
+g1b <- c(9.2, 8.8, 11.5)               # 只把第三例换成离群值
+log2(mean(g1b) / mean(g2))             # logFC 变了多少
+t.test(g1b, g2)$p.value                # p 变了多少`
+        },
+        {
+          t: "2.3 多重检验与 FDR：为什么 adj.P 比 P 大那么多",
+          why: "一次检验两万个基因，就算一个都没差异，p < 0.05 也天然会给你一千个「显著」。FDR 就是把这条线重新画。",
+          pts: [
+            "Bonferroni：p 乘以检验次数。控「一个假阳性都不许有」，代价是几乎什么都检不出。",
+            "BH（Benjamini-Hochberg）：把 p 排序后按秩次缩放，控「报出来的里面假的比例」。生信默认用它。",
+            "p 值分布能自查：没有差异时 p 应均匀分布在 0-1；如果 0 附近堆成一座山，说明有真信号。"
+          ],
+          code: `set.seed(4)
+p <- c(runif(90), runif(10, 0, 0.001))   # 90 个无差异 + 10 个真差异
+sum(p < 0.05)                            # 朴素阈值抓到的
+sum(p.adjust(p, method = "BH") < 0.05)   # BH 校正后剩下的
+sum(p.adjust(p, method = "bonferroni") < 0.05)
+
+hist(p, breaks = 20, main = "p 值分布自查", xlab = "p")`
+        },
+        {
+          t: "2.4 火山图和热图，画的其实就是那几列数",
+          why: "火山图横轴是效应量、纵轴是显著性；热图是标准化后的表达值。它们都不产生新信息，只是把上面算好的数换个坐标看。",
+          pts: [
+            "火山图纵轴用 `-log10(adj.P)`（越小越往上），横轴用 logFC（对称才有意义）。",
+            "热图一定要先按行（基因）标准化，否则高表达基因吃掉整个色阶，别的基因全是一个色。",
+            "聚类树本身就是结果：它告诉你哪些样本像、哪些基因同起同落。不要把它当装饰删掉。"
+          ],
+          code: `res <- data.frame(gene = paste0("G", 1:6),
+                  logFC = c(3.1, -2.4, 0.3, 4.2, -0.2, 1.8),
+                  padj  = c(1e-9, 1e-4, 0.7, 1e-12, 0.9, 0.02))
+res$neglog <- -log10(res$padj)
+res$dir <- ifelse(res$padj < 0.05 & abs(res$logFC) > 1,
+                  ifelse(res$logFC > 0, "up", "down"), "ns")
+res[order(-res$logFC), ]
+
+# 热图的输入：按行做 z 标准化
+m <- matrix(c(9,8,9,6,6,5,  3,4,3,7,8,7), nrow = 2, byrow = TRUE,
+            dimnames = list(c("G1","G2"), paste0("S",1:6)))
+round(t(scale(t(m))), 2)`
+        }
+      ]
+    },
+    {
+      id: "k3",
+      title: "第 3 讲　富集分析：ORA、背景集与 GSEA",
+      goal: "知道富集 p 值是怎么算出来的，以及为什么你和别人算的不一样。",
+      watch: [
+        { n: "clusterProfiler 配套书", u: "https://yulab-smu.top/biomedical-knowledge-mining-book/" }
+      ],
+      subs: [
+        {
+          t: "3.1 ORA 就是一个超几何检验",
+          why: "富集分析听起来玄，落到公式上只有四个数：通路里共几个、差异基因几个、交集几个、全基因组几个。",
+          pts: [
+            "富集 p 值回答的是：从全基因组里随机抓这么多差异基因，落进这个通路 ≥ 现在这个数的概率有多大。",
+            "四个数分别是 `M`（通路基因数）、`n`（差异基因数）、`k`（交集）、`N`（背景基因数）。",
+            "通路大小会带偏：大通路天然容易显著，所以必须同时看 GeneRatio 和 BgRatio，不能只看 p。"
+          ],
+          code: `N <- 20000; M <- 200; n <- 500; k <- 25     # 背景 / 通路 / 差异 / 交集
+phyper(k - 1, M, N - M, n, lower.tail = FALSE)
+
+# 数字小的时候，用 2x2 列联表的 Fisher 精确检验算，结果一样
+tiny <- matrix(c(3, 7, 5, 85), 2)
+rownames(tiny) <- c("in_pathway", "not_in_pathway")
+colnames(tiny) <- c("deg", "not_deg")
+tiny
+fisher.test(tiny)$p.value`
+        },
+        {
+          t: "3.2 背景集选错，p 值能差几个数量级",
+          why: "同一个差异基因列表，换个背景，p 值能从 1e-8 变成 0.3。这就是「复现不出别人富集结果」最常见的原因。",
+          pts: [
+            "背景应该是「这次实验里有机会被测到的基因」，也就是表达过滤后的基因，不是全基因组。",
+            "物种注释版本（org.Hs.eg.db 的版本）不同，通路里的基因数会变，写文章要记版本号。",
+            "clusterProfiler 里 `universe = rownames(expr)` 这一句最常被漏掉，漏了就等于用全基因组当背景。"
+          ],
+          code: `k <- 25; n <- 500; M <- 200
+for (N in c(20000, 15000, 12000)) {
+  p <- phyper(k - 1, M, N - M, n, lower.tail = FALSE)
+  cat(sprintf("背景 %5d 个基因 -> p = %.3g\\n", N, p))
+}`
+        },
+        {
+          t: "3.3 GSEA 和 ORA 的本质差别",
+          why: "ORA 先把基因砍成「显著/不显著」两堆，砍的那一刀就把信息丢了。GSEA 不砍，直接问「这个通路是不是集中在列表顶端」。",
+          pts: [
+            "GSEA 的输入是排好序的全基因列表（按 logFC 或 signal2noise），不需要定阈值。",
+            "核心输出是 ES（富集分数）和 NES（校正通路大小之后）。NES 正 = 上调富集，负 = 下调富集。",
+            "没有显著差异基因也能跑 GSEA。反过来，ORA 一旦阈值卡死，可能一个通路都得不到。"
+          ],
+          code: `set.seed(5)
+genes <- paste0("G", 1:200)
+stat  <- rnorm(200); names(stat) <- genes
+stat  <- sort(stat, decreasing = TRUE)      # 按统计量排序的全基因列表
+pathway <- sample(genes, 20)                # 假设的通路基因
+
+hit <- names(stat) %in% pathway
+w   <- abs(stat)                            # 加权：越靠两端的基因权重越大
+es  <- cumsum(ifelse(hit, w, 0) / sum(w[hit]) -
+              ifelse(hit, 0, 1) / sum(!hit))
+max(es); min(es)                            # 偏离 0 最远的那一点就是 ES
+which.max(abs(es))                          # 峰值出现在第几位`,
+          real: {
+            pkg: "clusterProfiler / fgsea",
+            code: `gl <- sort(setNames(res$log2FoldChange, rownames(res)), decreasing = TRUE)
+eg <- enrichGO(gene = deg, universe = rownames(expr), OrgDb = org.Hs.eg.db,
+               keyType = "SYMBOL", ont = "BP", pAdjustMethod = "BH")
+fg <- fgsea(pathways = msigdb_list, stats = gl, minSize = 15, maxSize = 500)`
+          }
+        }
+      ]
+    },
+    {
+      id: "k4",
+      title: "第 4 讲　免疫浸润：反卷积、ssGSEA 与三种方法的坑",
+      goal: "知道「免疫浸润」这三个字背后是三个完全不同的东西，不能混着说。",
+      watch: [
+        { n: "GSVA 官方 vignette", u: "https://bioconductor.org/packages/release/bioc/vignettes/GSVA/inst/doc/GSVA.html" },
+        { n: "TIMER2.0（不写代码也能对结论）", u: "http://timer.cistrome.org/" }
+      ],
+      subs: [
+        {
+          t: "4.1 反卷积：把一个数拆回几种细胞",
+          why: "一块肿瘤里混着肿瘤细胞、免疫细胞、成纤维细胞。测序只给你「整块的平均表达」，反卷积就是把一个数拆回几份。",
+          pts: [
+            "数学上是个线性方程组：整块表达 = Σ(细胞比例 × 该细胞在该基因上的表达)。解出来的系数就是比例。",
+            "参考矩阵决定一切：CIBERSORT 用 LM22（22 种免疫细胞），xCell 用基因集打分。两者的结果**不能直接比较**。",
+            "输出的是估计值，绝对值不可信，只有组间相对高低有意义。"
+          ],
+          code: `# 参考矩阵：两种细胞在 3 个标志基因上的表达
+ref <- matrix(c(10, 1, 8,
+                1, 12, 2), nrow = 3,
+              dimnames = list(c("CD3D", "CD19", "LYZ"), c("Tcell", "Bcell")))
+ref
+
+obs <- c(6.1, 6.5, 5.2)                    # 观测到的一块组织的整块表达
+fit <- lm(obs ~ ref[, 1] + ref[, 2] - 1)   # 无截距，解两个比例
+coef(fit)
+round(coef(fit) / sum(coef(fit)), 3)       # 归一成比例`
+        },
+        {
+          t: "4.2 ssGSEA 不打分比例，只打「整体偏高还是偏低」",
+          why: "ssGSEA 不算细胞比例。它看的是：这个细胞类型的标志基因，在这份样本里是不是整体排在前面。",
+          pts: [
+            "做法：样本内所有基因按表达排秩，看基因集成员落在秩里的位置是否系统性偏前或偏后，累加得到富集分。",
+            "分数是相对的。同一批样本内可比，跨数据集（不同平台、不同归一化方式）不可比。",
+            "关键坑：基因集之间高度重叠时分数会一起动。别把「免疫都高」解释成「每种免疫细胞都多」。"
+          ],
+          code: `set.seed(6)
+expr <- setNames(rnorm(1000), paste0("G", 1:1000))
+expr[c("G1","G5","G9","G20")] <- expr[c("G1","G5","G9","G20")] + 1.5
+
+r   <- rank(expr)                  # 样本内排秩
+set <- c("G1","G5","G9","G20")     # 假设的 T 细胞标志基因
+mean(r[set])                       # 集合平均秩：越小说明越靠前
+mean(r)                            # 对照：全体平均秩（应为 500 左右）`
+        },
+        {
+          t: "4.3 三种方法各自的假设，混用就会写错结论",
+          why: "ESTIMATE 给的是「浸润程度」的分，CIBERSORT 给的是比例，ssGSEA 给的是富集分。三样东西写在同一句结论里，审稿人一眼看出来。",
+          pts: [
+            "ESTIMATE：基于免疫/基质特征基因做单样本 GSEA，输出 ImmuneScore / StromalScore。只能排序，不能当比例。",
+            "CIBERSORT：必须看置换检验的 PV 值。PV > 0.05 的样本其比例不可用，这一步很多人直接跳过。",
+            "所有反卷积都假设「参考矩阵覆盖了实际存在的细胞类型」。缺一类，它的表达会被摊到其他类上，表现是「比例都很平均」。"
+          ],
+          code: `s <- data.frame(sample = paste0("S", 1:5),
+                ESTIMATE = c(1200, 800, 1500, 400, 950),
+                CIB_T    = c(0.31, 0.12, 0.45, 0.05, 0.22),
+                ssGSEA_T = c(0.62, 0.28, 0.71, 0.11, 0.40))
+round(cor(s[, -1]), 2)      # 三者相关性往往只有 0.5-0.7
+rank(s$ESTIMATE); rank(s$CIB_T)   # 排序也不完全一致`
+        }
+      ]
+    },
+    {
+      id: "k5",
+      title: "第 5 讲　临床预后：生存数据、KM、COX 与 ROC",
+      goal: "把表达数据变成「高危/低危」，并且知道 HR、AUC 各自能说明什么、不能说明什么。",
+      watch: [
+        { n: "survival 包（CRAN）", u: "https://cran.r-project.org/web/packages/survival/index.html" }
+      ],
+      subs: [
+        {
+          t: "5.1 生存数据永远是两列：time 和 status",
+          why: "status 里 1 是「死了/复发了」，0 是「随访结束时还活着」。这一列搞错，后面所有结论全反。",
+          pts: [
+            "time 的起点必须统一（确诊日或手术日），终点是事件发生或最后一次随访。起点不统一，整列时间都废。",
+            "status = 0 叫删失：不是「没事件」，是「我们不知道后来怎样」。把它丢掉，等于把随访短的人当成活得好。",
+            "最常见的错：把 days_to_death 的 NA 填成 0，于是一大批病人被当成「当天死亡」。"
+          ],
+          code: `surv <- data.frame(id = paste0("P", 1:6),
+                   time = c(12, 30, 8, 60, 25, 45),
+                   status = c(1, 0, 1, 0, 1, 0))
+surv
+mean(surv$status)                                    # 事件率 0.5
+
+bad <- surv
+bad$time[bad$status == 0] <- 0                       # 错误做法：删失填 0
+mean(surv$time); mean(bad$time)                      # 差多少一目了然`
+        },
+        {
+          t: "5.2 KM 曲线与 log-rank，手算一遍就懂了",
+          why: "KM 曲线的做法很朴素：在每个事件时点，用「当时还在的人」算一次生存率，然后乘起来。删失者从这个时点之后退出风险集。",
+          pts: [
+            "中位生存时间 = 生存率跌破 0.5 的那个时点，不是平均时间。",
+            "log-rank 比较的是两条曲线整段的「期望事件数 vs 实际事件数」，不是比较某个时间点的生存率。",
+            "log-rank 的前提是风险比例大致恒定（PH 假设）。曲线交叉时它失效，应改用 RMST 或分段分析。"
+          ],
+          code: `km <- function(time, status) {
+  t <- sort(unique(time[status == 1]))
+  S <- 1
+  out <- data.frame(t = t, nrisk = NA, d = NA, S = NA)
+  for (i in seq_along(t)) {
+    atrisk <- sum(time >= t[i])                  # 这个时点还在风险集里的人数
+    d      <- sum(time == t[i] & status == 1)    # 这个时点发生事件的人数
+    S      <- S * (1 - d / atrisk)               # 生存率乘一个因子
+    out[i, ] <- list(t[i], atrisk, d, S)
   }
   out
 }
-km(tm, st)`
+km(c(12, 30, 8, 60, 25, 45), c(1, 0, 1, 0, 1, 0))`
+        },
+        {
+          t: "5.3 COX 给的是 HR，不是「生存时间缩几倍」",
+          why: "HR = 2 意思是「风险翻倍」，不是「活得短一半」。这两件事只有生存分布刚好是指数分布时才等价。",
+          pts: [
+            "HR 是「任一时刻的事件风险乘几倍」，它是整条风险曲线一起乘，不改变曲线形状（这就是 PH 假设）。",
+            "多因素 COX 才能说「独立预后因素」。单因素显著、多因素不显著，说明它是被别的变量带出来的。",
+            "PH 假设要检验（`cox.zph`）。p < 0.05 说明 HR 随时间在变，这时报一个固定 HR 是错的。"
+          ],
+          code: `risk <- data.frame(group = c("high","high","high","low","low","low"),
+                   event = c(1, 1, 0, 1, 0, 0))
+tab <- table(risk$group, risk$event)
+tab
+# 粗略风险比：高组事件率 / 低组事件率（真正的 COX 用 partial likelihood）
+(tab[1, 2] / sum(tab[1, ])) / (tab[2, 2] / sum(tab[2, ]))`,
+          real: {
+            pkg: "survival",
+            code: `fit <- coxph(Surv(time, status) ~ risk_score + age + stage, data = d)
+summary(fit)          # exp(coef) 就是 HR
+cox.zph(fit)          # PH 假设检验，p 要 > 0.05
+survdiff(Surv(time, status) ~ group, data = d)   # log-rank`
+          }
+        },
+        {
+          t: "5.4 AUC 是区分度，不是准确率，更不是校准度",
+          why: "AUC 的意思是：随机抽一个阳性、一个阴性，模型给阳性打分更高的概率。它完全不告诉你「预测 80% 的人里实际是不是 80%」——那是校准。",
+          pts: [
+            "AUC = 0.75 已经是中等偏好。临床模型 0.65-0.75 很常见，出现 0.95 基本意味着过拟合或数据泄漏。",
+            "普通 ROC 把「3 年时仍存活」当阴性，忽略了随访长度。生存数据要用时间依赖 ROC。",
+            "C-index 是 AUC 在生存数据上的推广。训练集 0.85、验证集 0.62 是典型的过拟合形状。"
+          ],
+          code: `score <- c(9, 8, 7, 6, 5, 4, 3, 2)
+truth <- c(1, 1, 0, 1, 1, 0, 0, 0)
+
+auc <- function(s, y) {
+  pos <- s[y == 1]; neg <- s[y == 0]
+  mean(outer(pos, neg, ">") + 0.5 * outer(pos, neg, "=="))
+}
+auc(score, truth)          # 全部阳性对都排对的概率
+
+for (th in sort(unique(score))) {
+  tpr <- mean(score[truth == 1] >= th)
+  fpr <- mean(score[truth == 0] >= th)
+  cat(sprintf("阈值 %d -> TPR %.2f  FPR %.2f\\n", th, tpr, fpr))
+}`
         }
       ]
     },
     {
-      id: "c8", title: "第 8 章 可复现与交付",
+      id: "k6",
+      title: "第 6 讲　一致性聚类、TMB 与基线资料表",
+      goal: "把「分型」「突变负荷」「Table 1」这三件常被糊弄过去的事做扎实。",
+      watch: [
+        { n: "cBioPortal（查突变和拷贝数）", u: "https://www.cbioportal.org/" }
+      ],
       subs: [
         {
-          t: "8.1 项目结构与脚本规范",
-          why: "半年后回来看自己的代码，能一眼跑通，靠的不是记性，是结构。这也是导师和审稿人判断你靠不靠谱的第一眼。",
+          t: "6.1 一致性聚类在评估「稳定性」",
+          why: "普通聚类每换一次随机种子，分组就可能变。一致性聚类跑几百次重抽样，看「这两个样本有多少次被分到一起」，用稳定性反过来定 k。",
           pts: [
-            "目录分三层：`data/`（只读原始数据，永不覆盖）、`analysis/`（按 01、02 编号的脚本）、`result/`（脚本产物，可随时删了重跑）。",
-            "**绝不用 `setwd()`**：路径从项目根目录出发，换台电脑才不会崩。",
-            "每个脚本开头写清「输入什么、输出什么、依赖什么包、跑多久」，这一段比代码本身更值钱。"
+            "输入是「样本 x 样本」的一致性矩阵（共同出现的比例），不是表达矩阵。",
+            "k 的选择看一致性矩阵有多「块状」——块内偏红、块间偏蓝、边界清晰，就说明这个 k 稳。",
+            "k=2 和 k=3 都说得通时不要硬选。审稿人一定会问「你这个分型的生物学解释是什么」。"
           ],
-          code: `# 先在临时目录造出 data/raw 下那两个文件，这样这段代码能直接跑通
-d <- file.path(tempdir(), "data", "raw")
-dir.create(d, recursive = TRUE, showWarnings = FALSE)
-e0 <- data.frame(g1 = c(5, 6), g2 = c(7, 8), row.names = c("A", "B"))
-write.csv(e0, file.path(d, "expr.csv"))
-write.csv(data.frame(sample = c("g1", "g2"), group = c("ctrl", "trt")),
-          file.path(d, "meta.csv"), row.names = FALSE)
+          code: `set.seed(7)
+x  <- matrix(rnorm(20 * 30), nrow = 20)      # 30 个样本 x 20 个基因
+co <- matrix(0, 30, 30)
+rownames(co) <- colnames(co) <- paste0("S", 1:30)
 
-# ---- 下面是任何分析脚本都该有的开头（照抄改路径） ----
-# 输入：data/raw/expr.csv, data/raw/meta.csv
-# 输出：result/tables/deg.csv
-# 依赖：base R
-expr <- read.csv(file.path(d, "expr.csv"), row.names = 1, check.names = FALSE)
-meta <- read.csv(file.path(d, "meta.csv"), stringsAsFactors = FALSE)
-
-# 检查（永远先检查再分析，不要跳过）
-stopifnot(ncol(expr) == nrow(meta),
-          all(colnames(expr) == meta$sample))
-dim(expr)
-meta$group`
+for (b in 1:100) {
+  idx <- sample(30, 24)                      # 每次抽 80% 的样本
+  cl  <- cutree(hclust(dist(t(x[, idx]))), k = 2)
+  lab <- rep(NA, 30); lab[idx] <- cl
+  for (i in 1:30) for (j in 1:30)
+    if (!is.na(lab[i]) && !is.na(lab[j]))
+      co[i, j] <- co[i, j] + (lab[i] == lab[j])
+}
+round(co[1:6, 1:6] / 100, 2)                 # 越接近 1 越常被分到一起`
         },
         {
-          t: "8.2 表格与图注：把结果整理成能投的样子",
-          why: "分析做完只是半成品。数字靠手抄进 Word，改一次分析就得改三处，迟早对不上——所以表格必须由代码生成。",
+          t: "6.2 TMB = 非同义突变数 / 外显子长度",
+          why: "公式只有一行，但分子分母各有坑。分子算了同义突变、分母写错，TMB 能差一倍。",
           pts: [
-            "`sprintf()` 控制小数位：`%.3f` 三位小数、`%.2e` 科学计数法、`%s` 字符。",
-            "Markdown 表格 = 表头 + 分隔行 + 数据行，三部分用 `c()` 拼起来，`cat(sep = \"\\n\")` 输出。",
-            "图注里所有会变的数字（n、p 值、阈值）都用变量拼，别手打——这是「数字永远同步」的唯一办法。"
+            "只算体细胞突变（somatic），胚系不算。MAF 里要按 Variant_Classification 过滤掉 Silent / Intron / UTR。",
+            "分母是外显子总长约 30-38 Mb（WES）。不同 panel 的基因数不同，panel-TMB 和 WES-TMB 不能直接比。",
+            "TMB 高不等于免疫治疗一定有效。它是伴随诊断指标，不是疗效保证。"
           ],
-          code: `res <- data.frame(gene = c("TFRC", "SPP1", "YAP1"),
-                  logFC = c(3.069, 3.432, 3.070),
-                  adj = c(2.3e-09, 2.1e-08, 2.1e-08))
-tbl <- c("| Gene | logFC | adj.P |",
-         "|---|---:|---:|",
-         sprintf("| %s | %.3f | %.2e |", res$gene, res$logFC, res$adj))
-cat(tbl, sep = "\\n")
+          code: `maf <- data.frame(
+  sample = c("S1","S1","S1","S1","S2","S2"),
+  class  = c("Missense_Mutation","Silent","Nonsense_Mutation",
+             "Intron","Missense_Mutation","Frame_Shift_Del"))
 
-n <- nrow(res)
-cat(sprintf("Table 1. Top %d genes ranked by adjusted P.\\n", n))`
+nonsyn <- c("Missense_Mutation","Nonsense_Mutation","Frame_Shift_Del",
+            "Splice_Site","In_Frame_Del","In_Frame_Ins")
+tmb <- sapply(split(maf, maf$sample), function(d)
+  sum(d$class %in% nonsyn) / 38)       # 38 Mb 外显子
+tmb`
+        },
+        {
+          t: "6.3 基线资料表：目的是展示差异，不是证明可比",
+          why: "Table 1 是给读者看「两组本来就不一样」，不是用 p 值证明「两组可以比」。只放 p 值不放原始数字，是最常见的低级错误。",
+          pts: [
+            "连续变量写 mean±SD 或 median(IQR)，必须说明用的是哪个；分类变量写 n(%)。",
+            "组间比较：连续变量按正态性选 t 或 Wilcoxon，分类变量用卡方或 Fisher。别一律上 t 检验。",
+            "标准化差异（SMD）比 p 值更适合看平衡，因为 p 值受样本量影响太大——大样本里 1 岁的差别也「显著」。"
+          ],
+          code: `set.seed(8)
+d <- data.frame(arm = rep(c("A", "B"), each = 20),
+                age = c(rnorm(20, 58, 9), rnorm(20, 61, 10)),
+                sex = sample(c("M", "F"), 40, TRUE))
+
+aggregate(age ~ arm, d, function(x) sprintf("%.1f±%.1f", mean(x), sd(x)))
+tab <- table(d$arm, d$sex); tab
+chisq.test(tab)$p.value
+
+mA <- mean(d$age[d$arm == "A"]); mB <- mean(d$age[d$arm == "B"])
+sA <- sd(d$age[d$arm == "A"]);   sB <- sd(d$age[d$arm == "B"])
+(mA - mB) / sqrt((sA^2 + sB^2) / 2)      # SMD，|SMD| < 0.1 算平衡`
+        }
+      ]
+    },
+    {
+      id: "k7",
+      title: "第 7 讲　共表达网络、PPI 与 hub 基因",
+      goal: "知道 WGCNA 的软阈值在干什么，以及为什么 hub 基因不等于关键基因。",
+      watch: [
+        { n: "WGCNA（CRAN 包主页，教程 PDF 在里面）", u: "https://cran.r-project.org/web/packages/WGCNA/index.html" }
+      ],
+      subs: [
+        {
+          t: "7.1 软阈值 β：把「相关强弱」按幂次放大",
+          why: "共表达网络不该用「相关 > 0.8 就画条边」这种硬阈值——阈值一动网络就变。β 的作用是把连续的相关值映射成权重，保留强弱而不是一刀切。",
+          pts: [
+            "目标是把网络变成无标度网络：少数基因连很多边，多数基因连很少。生物网络确实长这样。",
+            "选 β 的标准是「无标度拓扑拟合 R² 首次 ≥ 0.8（或 0.9）的最小幂次」。样本少时 β 会被迫取很大。",
+            "β 越大，强相关被放大得越厉害，弱相关被压得越接近 0。这就是它替代硬阈值的方式。"
+          ],
+          code: `set.seed(9)
+x <- matrix(rnorm(20 * 50), nrow = 20)          # 20 基因 x 50 样本
+x[2, ] <- x[1, ] * 0.9 + rnorm(50, 0, 0.2)      # 人为造一对强相关基因
+
+r <- cor(t(x)); diag(r) <- 0
+for (b in c(1, 3, 6, 12)) {
+  kk <- colSums(abs(r)^b)                       # β 次幂后的连通度
+  cat(sprintf("β=%2d  最大 %.1f  中位 %.2f  最大/中位 %.1f\\n",
+              b, max(kk), median(kk), max(kk) / median(kk)))
+}`
+        },
+        {
+          t: "7.2 模块 = 聚类 + 剪枝 + 合并",
+          why: "WGCNA 的模块不是什么新东西：先按 TOM 相似度做层次聚类，再用动态剪枝把形状不稳的枝剪掉，最后把太像的模块合并。",
+          pts: [
+            "流程：TOM 相似度 → 层次聚类 → 动态剪枝（dynamic tree cut）→ 合并相似模块（`mergeCutHeight` 默认 0.25）。",
+            "模块和表型的关联，用的是模块特征基因（ME，该模块的第一主成分）做相关，不是把模块里每个基因单独做。",
+            "灰色模块（grey）是「没归进任何模块的」，不要在文章里当成一个模块来报。"
+          ],
+          code: `hc <- hclust(dist(x))      # 对基因聚类：行是基因，所以用 dist(x) 不是 dist(t(x))
+cl <- cutree(hc, k = 3)
+table(cl)
+
+# 模块特征基因：该模块内基因的第一主成分
+me <- sapply(sort(unique(cl)), function(g)
+  prcomp(t(x[cl == g, , drop = FALSE]))$x[, 1])
+colnames(me) <- paste0("ME", sort(unique(cl)))
+round(cor(me), 2)      # 模块之间相关太高，说明该合并`
+        },
+        {
+          t: "7.3 PPI 的 degree 高，只说明「被研究得多」",
+          why: "STRING 的边是证据汇总分，不是实验测出来的亲和力。degree 高往往意味着这个基因热门、被报道得多，不等于它是因果驱动者。",
+          pts: [
+            "STRING 置信度 0.4 是低置信、0.7 是高置信。阈值不同，hub 名单就不同，文章必须写清楚用的是哪个。",
+            "Cytoscape 的 cytoHubba 有十二种算法，会给你十二份 hub 名单。选哪个要有理由，不能挑最好看的。",
+            "hub 基因必须回到表达数据里验证：它在差异基因里吗？它和预后相关吗？否则它只是网络图上的一个点。"
+          ],
+          code: `edges <- data.frame(
+  a = c("YAP1","YAP1","CTNNB1","CTNNB1","SPP1","TFRC"),
+  b = c("CTNNB1","TEAD1","AXIN2","TEAD1","CD44","ATF4"),
+  score = c(0.91, 0.88, 0.77, 0.65, 0.72, 0.40))
+
+sort(table(c(edges$a, edges$b)), decreasing = TRUE)   # 度中心性
+nrow(subset(edges, score >= 0.7))                     # 换阈值，边数就变
+nrow(subset(edges, score >= 0.4))`
+        }
+      ]
+    },
+    {
+      id: "k8",
+      title: "第 8 讲　GEO 实战：从 GSE 号到能分析的矩阵",
+      goal: "拿到一个 GSE 号之后，知道按什么顺序把它变成干净的表达矩阵。",
+      watch: [
+        { n: "GEO 首页", u: "https://www.ncbi.nlm.nih.gov/geo/" },
+        { n: "UCSC Xena（TCGA 标准化数据）", u: "https://xenabrowser.net/" }
+      ],
+      subs: [
+        {
+          t: "8.1 先看清这个 GSE 是什么结构",
+          why: "复现别人的文章，第一步不是下数据，是搞清他用了哪几个号、什么平台、有没有生存信息。这一步做错，后面全白干。",
+          pts: [
+            "每个 GSE 都要问三件事：平台是什么（Affy / Agilent / RNA-seq）、有没有配对癌旁、有没有随访时间。",
+            "平台不同 → 探针 ID 不同 → 必须用各自的注释包（hgu133a.db / hgu133plus2.db），不能按 ID 直接合并。",
+            "有生存信息才能做预后模型；只有分组没随访的，只能做差异和富集。"
+          ],
+          code: `# 一个基因对应多个探针时的常规处理：保留表达均值最大的那个
+probe <- data.frame(
+  probe = c("1007_s_at","1053_at","117_at","121_at","1255_g_at"),
+  gene  = c("DDR1","RFC2","HSPA6","PAX8","GUCA1A"),
+  mean  = c(9.8, 7.1, 6.4, 8.9, 3.2))
+probe[order(probe$gene, -probe$mean), ]
+probe <- probe[!duplicated(probe$gene), ]   # 每个基因留一行
+probe`
+        },
+        {
+          t: "8.2 批次效应：PC1 常常就是「来自哪个数据集」",
+          why: "两个数据集拼一起，前几个主成分里最大的那个往往不是生物学差异，而是「这批样本来自哪个 GSE」。不处理，聚类会先按数据集分开。",
+          pts: [
+            "先看：PCA 图上按数据集着色，如果完全分开就是有批次。再看批次是否和分组混杂。",
+            "处理工具：ComBat（sva）、removeBatchEffect（limma）、Harmony（单细胞）。不能用 t 检验前「顺手」做一个。",
+            "最危险的情况是「批次和分组完全重合」（A 全是肿瘤、B 全是正常）。这时任何校正都救不了，只能分开分析。"
+          ],
+          code: `set.seed(10)
+a <- matrix(rnorm(100), nrow = 10) + 2      # 数据集 A，整体偏高 2
+b <- matrix(rnorm(100), nrow = 10)          # 数据集 B
+batch <- rep(c("A", "B"), each = 10)
+
+pc <- prcomp(t(cbind(a, b)))$x
+tapply(pc[, 1], batch, mean)                # PC1 上的批次差异
+
+center_to <- function(m, target) m - apply(m, 1, median) + target
+tgt <- median(apply(cbind(a, b), 1, median))
+bc  <- cbind(center_to(a, tgt), center_to(b, tgt))
+tapply(prcomp(t(bc))$x[, 1], batch, mean)   # 差异被压掉`
+        },
+        {
+          t: "8.3 合并两个数据集前必须做的三件事",
+          why: "合并不是 rbind。基因 ID、样本类型、表达尺度三样对不上，合出来的矩阵就是垃圾，而且照样能跑出结果。",
+          pts: [
+            "基因取**交集**不是并集，并确认 symbol 版本（别把新旧 symbol 当成两个不同基因）。",
+            "尺度统一：都在 log2(TPM+1)，或都在 log2(RMA) 上。一个原始值一个 log 值，合起来全是假差异。",
+            "去重样本：同一病人多次取样、同一数据重复上传，必须查 sample title 才能发现。"
+          ],
+          code: `a <- data.frame(gene = c("TP53","EGFR","MYC"), v = c(9, 8, 7))
+b <- data.frame(gene = c("TP53","MYC","KRAS"), v = c(3, 5, 6))
+
+intersect(a$gene, b$gene)          # 取交集，不是并集
+m <- merge(a, b, by = "gene")
+m
+rownames(m) <- m$gene
+m$gene <- NULL
+as.matrix(m)`
+        }
+      ]
+    },
+    {
+      id: "k9",
+      title: "第 9 讲　LASSO 预后模型与数据泄漏",
+      goal: "知道 LASSO 为什么能选基因，以及最容易把结果做废的那几个操作。",
+      watch: [
+        { n: "OSCA（第 5 章讲特征选择，通用）", u: "https://bioconductor.org/books/release/OSCA/" }
+      ],
+      subs: [
+        {
+          t: "9.1 LASSO 就是在回归上加一个 Σ|β| 惩罚",
+          why: "几百个候选基因、几十个病人，普通回归会把答案背下来。LASSO 加一个惩罚，逼大部分系数变成 0，剩下的才是「被逼着留下来」的。",
+          pts: [
+            "λ 越大，留下的基因越少。λ = 0 就是普通回归。每个系数的解是「软阈值」：小于 λ 的直接归零。",
+            "LASSO 在一组高度相关的基因里只会随机留一个。所以结果不稳定，要报「被选中频率」（bootstrapped LASSO）。",
+            "别先从差异基因里挑 top10 再做模型——那是人为选择偏倚，不是 LASSO。"
+          ],
+          code: `soft <- function(z, l) sign(z) * max(abs(z) - l, 0)   # 软阈值
+for (l in c(0, 0.5, 1, 2)) {
+  cat(sprintf("λ=%.1f -> 系数 %.2f %.2f %.2f\\n",
+              l, soft(3, l), soft(0.8, l), soft(-1.5, l)))
+}`,
+          real: {
+            pkg: "glmnet",
+            code: `set.seed(1)
+cv <- cv.glmnet(x = t(expr_train), y = Surv(time, status),
+                family = "cox", nfolds = 10)
+plot(cv)
+coef(cv, s = "lambda.min")     # 或 "lambda.1se"，更简的模型`
+          }
+        },
+        {
+          t: "9.2 λ 怎么选：lambda.min 还是 lambda.1se",
+          why: "λ 不能拍脑袋。交叉验证会给你一条误差曲线，lambda.min 是误差最小的点，lambda.1se 是「误差在最小值一个标准误内、模型最简单的点」。",
+          pts: [
+            "lambda.min 拟合最好但基因多、容易过拟合；lambda.1se 基因少、更稳。临床模型一般报 1se。",
+            "交叉验证必须在**训练集内部**做，绝不能包括验证集。否则 λ 是偷看答案选出来的。",
+            "报告里要写：随机种子、fold 数、选了哪个 λ、最终几个基因。少一项都复现不了。"
+          ],
+          code: `set.seed(11)
+lam <- 10^seq(-4, 1, length = 12)
+err <- 0.6 + 0.3 * exp(-lam * 3) + 0.05 * lam + rnorm(12, 0, 0.01)
+res <- data.frame(lambda = round(lam, 4), cv_err = round(err, 4))
+res
+
+res$lambda[which.min(res$cv_err)]                            # lambda.min
+res$lambda[which(res$cv_err <= min(res$cv_err) + 0.01)][1]   # 更简的模型`
+        },
+        {
+          t: "9.3 风险评分与数据泄漏",
+          why: "风险评分 = Σ(系数 × 表达)。所有步骤——标准化、选基因、定系数、定切点——都必须在训练集里学出来，再原封不动套到验证集。",
+          pts: [
+            "最常见的泄漏：用全部样本做 scale 再拆分；用全部样本做差异分析再拆分；用验证集反复调阈值。",
+            "验证集只做一次预测，不参与任何参数选择。「调了二十次报最好的一次」就是过拟合。",
+            "结果要报：训练/验证各自的高危 vs 低危 HR、95%CI、log-rank p，加上 1/3/5 年时间依赖 AUC。缺一不可。"
+          ],
+          code: `coef <- c(TP53 = 0.31, MYC = 0.22, CTNNB1 = -0.18)
+expr <- matrix(c(9, 8, 7,
+                 10, 6, 8,
+                 7, 9, 5), ncol = 3, byrow = TRUE,
+               dimnames = list(paste0("P", 1:3), names(coef)))
+expr
+
+risk <- as.vector(expr %*% coef)      # 风险评分 = 表达 x 系数
+names(risk) <- rownames(expr)
+round(risk, 3)
+ifelse(risk > median(risk), "high", "low")   # 常用切点：中位数`
+        }
+      ]
+    },
+    {
+      id: "k10",
+      title: "第 10 讲　文章复现：把上面九讲串成一篇",
+      goal: "知道一篇生信文章的骨架长什么样，复现时按什么顺序对数字。",
+      watch: [
+        { n: "Biomamba《手把手教你做单细胞转录组分析》", u: "https://www.bilibili.com/video/BV1S44y1b76Z" }
+      ],
+      subs: [
+        {
+          t: "10.1 九成生信文章是同一套骨架",
+          why: "差异 → 富集 → 分型/免疫 → 预后模型 → 外部验证（可选加细胞实验）。看懂骨架，就知道自己现在做到第几步、下一步该干什么。",
+          pts: [
+            "Figure 1 通常是「数据来源 + 差异分析」；Figure 2-3 富集和通路；Figure 4 免疫或分型；Figure 5 预后模型；Figure 6 外部验证或细胞实验。",
+            "每张图的卖点必须出现在标题里。图注要能独立读懂——不看正文也知道这张图在说什么。",
+            "方法段要能让人照着做：包名 + 版本 + 参数 + 阈值。缺一项就算不合格。"
+          ],
+          code: `outline <- data.frame(
+  fig = paste0("Fig", 1:6),
+  job = c("数据与差异分析","富集与通路","免疫浸润与分型",
+          "预后模型构建","外部验证","细胞/动物验证"),
+  need = c("counts + 分组","差异基因","表达矩阵","生存数据","独立队列","实验"))
+outline`
+        },
+        {
+          t: "10.2 没有外部验证的模型，等于没做",
+          why: "训练集 AUC 0.9 一点意义都没有——那是模型把自己的训练数据记住了。能说明问题的是：这套系数拿到另一个数据集、另一家医院，还灵不灵。",
+          pts: [
+            "外部验证必须是独立样本（不同数据集或不同中心），不能是同一批数据换个随机种子。",
+            "验证要验三件事：风险分层还分得开吗（log-rank）、AUC 还在 0.6 以上吗、系数方向一致吗。",
+            "临床意义比统计显著重要。高危组 5 年生存 30% vs 60% 才有用；差 0.1% 的「显著」没有意义。"
+          ],
+          code: `train_auc <- 0.86; valid_auc <- 0.64
+gap <- train_auc - valid_auc
+cat(sprintf("训练集 AUC %.2f，验证集 AUC %.2f，掉了 %.2f\\n", train_auc, valid_auc, gap))
+if (gap > 0.15) cat("-> 典型过拟合，先减变量数再重做\\n")
+
+c_train <- c(TP53 = 0.31, MYC = 0.22, CTNNB1 = -0.18)
+c_valid <- c(TP53 = 0.28, MYC = 0.05, CTNNB1 = -0.11)
+sign(c_train) == sign(c_valid)          # 方向必须一致`
+        },
+        {
+          t: "10.3 复现清单：按这个顺序对数字",
+          why: "复现不是「跑通就算」，是「每一个数字都能对上原文输出的那一行」。顺序反了会浪费大量时间在画图上。",
+          pts: [
+            "顺序：先 Table 1（样本数和基线），再差异基因数，再富集通路数，最后才碰图。",
+            "原文没写参数时，用他报告的数字（基因数、p 值）做反向约束，一点点逼参数。",
+            "复现失败最常见三个原因：数据版本不同、注释包版本不同、阈值没写清楚。"
+          ],
+          code: `ck <- data.frame(
+  step  = c("Table1 样本数","差异基因数","富集通路数","模型基因数","外部验证 AUC"),
+  paper = c(365, 1247, 38, 9, 0.71),
+  mine  = c(365, 1180, 41, 9, 0.68))
+ck$ok <- ck$paper == ck$mine
+ck
+cat(sprintf("对上的 %d / %d 项\\n", sum(ck$ok), nrow(ck)))`
         }
       ]
     }

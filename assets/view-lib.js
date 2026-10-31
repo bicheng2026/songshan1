@@ -150,7 +150,7 @@
       const shown = list.slice(0, limit);
       root.innerHTML =
         head("论文库",
-          "共 " + ps.length + " 篇，按方法标签反查「这一类题是怎么搭的」。来源：Europe PMC 分主题检索 + 泰山一号每日精读日报。" +
+          "共 " + ps.length + " 篇，按方法标签反查「这一类题是怎么搭的」。来源：Europe PMC 分主题检索 + 论文订阅每日精读日报。" +
           "立场不变 —— 学方法，不学做法。") +
         '<div class="card" style="margin-bottom:16px">' +
         '<div class="small"><b>' + ps.length + "</b> 篇 · 合计被引 <b>" + totalCited.toLocaleString() +
@@ -252,8 +252,28 @@
     ensure("SX_KNOWLEDGE2", "data/knowledge2.js").then(() => knowledgeDraw(root));
   }
 
+  /* 机制条目的真实参考文献：data/know_cite.js（Europe PMC 检索所得）*/
+  function refsOf(id) {
+    const C = window.SX_KNOW_CITE || {};
+    return C[id] || [];
+  }
+  function refsHtml(id) {
+    const rs = refsOf(id);
+    if (!rs.length) return "";
+    return '<div class="note info" style="margin-top:10px"><b class="small">参考文献（真实可查）</b>' +
+      rs.map(r => {
+        const link = r.doi ? "https://doi.org/" + r.doi
+          : (r.pmid ? "https://pubmed.ncbi.nlm.nih.gov/" + r.pmid + "/" : "");
+        const t = E(r.title || "").replace(/\.$/, "");
+        const meta = [r.journal, r.year, r.cited ? "被引 " + r.cited : ""].filter(Boolean).join(" · ");
+        return '<div class="small" style="margin-top:4px">· ' +
+          (link ? '<a href="' + E(link) + '" target="_blank" rel="noopener">' + t + "</a>" : t) +
+          '<span class="muted"> — ' + E(meta) + "</span></div>";
+      }).join("") + "</div>";
+  }
+
   function knowledgeDraw(root) {
-    const K = (window.SX_KNOWLEDGE || []).concat(window.SX_KNOWLEDGE2 || []);
+    const K = (window.SX_KNOWLEDGE || []).concat(window.SX_KNOWLEDGE2 || [], window.SX_KNOWLEDGE3 || []);
     const dom = {};
     K.forEach(x => dom[x.domainName || x.domain] = x.domain);
     let curDom = "ALL", q = "", openId = null;
@@ -274,7 +294,8 @@
         '<div class="card" data-id="' + E(x.id) + '">' +
         '<div style="display:flex;justify-content:space-between;gap:8px;align-items:flex-start">' +
         "<b style=\"font-size:14px\">" + E(x.title) + "</b>" +
-        '<span class="tag n">' + E(x.level || "") + "</span></div>" +
+        '<span class="tag n">' + E(x.level || "") + "</span>" +
+        (refsOf(x.id).length ? '<span class="tag g" title="已挂真实文献">文献</span>' : "") + "</div>" +
         '<div class="small" style="margin:4px 0;color:var(--brand)">' + E(x.summary || "") + "</div>" +
         '<div class="small muted">' + (x.tags || []).map(t => '<span class="tag">' + E(t) + "</span>").join(" ") + "</div>" +
         (openId === x.id ?
@@ -282,6 +303,7 @@
           (x.keyPoints ? '<div style="margin-top:8px"><b class="small">要点</b>' +
             x.keyPoints.map(k => '<div class="small">· ' + E(k) + "</div>").join("") + "</div>" : "") +
           (x.testYourself ? '<div class="note" style="margin-top:8px"><b class="small">自测：</b>' + E(x.testYourself) + "</div>" : "") +
+          refsHtml(x.id) +
           '<button class="btn sm ghost" data-close="1">收起</button>'
           : '<button class="btn sm" data-open="' + E(x.id) + '" style="margin-top:8px">展开全文</button>') +
         "</div>").join("") || '<div class="card muted">没有匹配条目。</div>';

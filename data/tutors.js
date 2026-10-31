@@ -3,7 +3,7 @@ window.SX_PROVIDERS = [
   { id: "deepseek", name: "DeepSeek（默认）", base: "https://api.deepseek.com/v1",
     models: ["deepseek-chat", "deepseek-reasoner"], defaultModel: "deepseek-chat",
     keyUrl: "https://platform.deepseek.com/api_keys", note: "deepseek-chat = DeepSeek-V3 通用对话；deepseek-reasoner = 推理型，适合改代码与推演机制（会输出思维链）" },
-  { id: "xianfeng", name: "先锋一号本机网关", base: "http://localhost:8899/v1",
+  { id: "xianfeng", name: "AI 网关本机网关", base: "http://localhost:8899/v1",
     models: ["（填网关里的模型名）"], defaultModel: "",
     keyUrl: "", note: "你本机 localhost:8899 的 OpenAI 兼容网关，免费用；模型名按网关实际配置填" },
   { id: "zhipu", name: "智谱 GLM", base: "https://open.bigmodel.cn/api/paas/v4",
