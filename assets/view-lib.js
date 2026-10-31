@@ -11,9 +11,37 @@
     return '<div class="search-bar"><input type="search" id="' + id + '" placeholder="' + ph + '"></div>';
   }
 
+  /* 大块数据懒加载：进入对应页面时才拉，首屏保持轻 */
+  const lazyCache = {};
+  function ensure(globalName, src) {
+    if (window[globalName] !== undefined) return Promise.resolve();
+    if (!lazyCache[globalName]) {
+      lazyCache[globalName] = new Promise(resolve => {
+        const s = document.createElement("script");
+        s.src = src;
+        s.onload = () => resolve();
+        s.onerror = () => { window[globalName] = []; resolve(); };
+        document.head.appendChild(s);
+      });
+    }
+    return lazyCache[globalName];
+  }
+
   /* ==================== 代码库 ==================== */
   function codebank(root) {
-    const all = window.SX_CODEBANK || [];
+    root.innerHTML = head("代码库", "正在载入代码模板…");
+    ensure("SX_CODEBANK2", "data/codebank2.js").then(() => codebankDraw(root));
+  }
+
+  function codebankDraw(root) {
+    const A = window.SX_CODEBANK || [];
+    const B = window.SX_CODEBANK2 || [];
+    const seen = {};
+    const all = [];
+    A.concat(B).forEach(x => {
+      if (seen[x.id]) return;
+      seen[x.id] = 1; all.push(x);
+    });
     const tk = {};
     all.forEach(x => tk[x.trackName || x.track] = (tk[x.trackName || x.track] || 0) + 1);
     let filt = "ALL", q = "";
@@ -78,65 +106,115 @@
 
   /* ==================== 论文库 ==================== */
   function papers(root) {
-    const ps = window.SX_PAPERS || [];
-    const stat = window.SX_PAPER_STAT || {};
-    let q = "", tag = "ALL", field = "ALL", onlyArticle = false;
+    root.innerHTML = head("论文库", "正在载入论文库（3000+ 篇，首次约 1-2 秒）…");
+    ensure("SX_PAPERS2", "data/papers2.js").then(() => papersDraw(root));
+  }
 
-    const tags = {};
-    ps.forEach(p => (p.tags || []).forEach(t => tags[t] = (tags[t] || 0) + 1));
+  function papersDraw(root) {
+    // 两批合并：第一批是洪扬刚论文全清单，第二批是分主题检索的扩充库
+    const A = window.SX_PAPERS || [];
+    const B = window.SX_PAPERS2 || [];
+    const seen = {};
+    const ps = [];
+    A.concat(B).forEach(p => {
+      const k = (p.doi || p.title || "").toLowerCase();
+      if (!k || seen[k]) return;
+      seen[k] = 1;
+      ps.push(p);
+    });
+
+    let q = "", tag = "ALL", field = "ALL", onlyArticle = false, sortBy = "cited", limit = 300, years = 0;
+
+    const tags = {}, fields = {};
+    ps.forEach(p => {
+      (p.tags || []).forEach(t => tags[t] = (tags[t] || 0) + 1);
+      fields[p.field] = (fields[p.field] || 0) + 1;
+    });
     const tagList = Object.keys(tags).sort((a, b) => tags[b] - tags[a]);
-    const fields = {};
-    ps.forEach(p => fields[p.field] = (fields[p.field] || 0) + 1);
     const fieldList = Object.keys(fields).sort((a, b) => fields[b] - fields[a]);
+    const totalCited = ps.reduce((a, b) => a + (b.cited || 0), 0);
 
     function draw() {
-      const list = ps.filter(p =>
-        (!q || (p.title + " " + p.titleCn + " " + p.journal + " " + p.authors).toLowerCase().indexOf(q) >= 0) &&
+      let list = ps.filter(p =>
+        (!q || (p.title + " " + (p.titleCn || "") + " " + (p.journal || "") + " " + (p.authors || "") +
+          " " + (p.tags || []).join(" ")).toLowerCase().indexOf(q) >= 0) &&
         (tag === "ALL" || (p.tags || []).indexOf(tag) >= 0) &&
         (field === "ALL" || p.field === field) &&
+        (!years || (p.year && (2026 - p.year) <= years)) &&
         (!onlyArticle || p.type === "Article"));
+
+      if (sortBy === "cited") list = list.slice().sort((a, b) => (b.cited || 0) - (a.cited || 0));
+      else if (sortBy === "year") list = list.slice().sort((a, b) => (b.year || 0) - (a.year || 0));
+      else if (sortBy === "if") list = list.slice().sort((a, b) => (b.ifValue || 0) - (a.ifValue || 0));
+
+      const shown = list.slice(0, limit);
       root.innerHTML =
-        head("论文库 · 洪扬刚论文全清单",
-          "共 " + ps.length + " 篇（Europe PMC 检索式 \"Yanggang Hong\"）。这份清单的价值不在数量，而在于：你可以按方法标签反查「这一类题是怎么搭的」。" +
-          "注意本模块的立场 —— 学方法，不学做法。") +
-        '<div class="card" style="margin-bottom:12px">' +
-        "<b>方法频次</b><div style=\"margin-top:6px\">" +
-        Object.entries(stat.methodFreq || {}).slice(0, 12).map(([k, v]) =>
-          '<span class="tag g">' + E(k) + " ×" + v + "</span>").join(" ") + "</div>" +
-        '<div class="small muted" style="margin-top:6px">合计被引 ' +
-        ps.reduce((a, b) => a + (b.cited || 0), 0) + " 次；其中通信/述评类 " +
-        ps.filter(p => p.type === "Letter/Comment").length + " 篇，Article " +
-        ps.filter(p => p.type === "Article").length + " 篇。</div></div>" +
+        head("论文库",
+          "共 " + ps.length + " 篇，按方法标签反查「这一类题是怎么搭的」。来源：Europe PMC 分主题检索 + 泰山一号每日精读日报。" +
+          "立场不变 —— 学方法，不学做法。") +
+        '<div class="card" style="margin-bottom:16px">' +
+        '<div class="small"><b>' + ps.length + "</b> 篇 · 合计被引 <b>" + totalCited.toLocaleString() +
+        "</b> 次 · " + fieldList.length + " 个领域 · " + tagList.length + " 个方法标签</div>" +
+        '<div style="margin-top:10px">' +
+        tagList.slice(0, 18).map(k =>
+          '<span class="tag g">' + E(k) + " ×" + tags[k] + "</span>").join(" ") + "</div></div>" +
         '<div class="search-bar">' +
-        '<input type="search" id="qP" placeholder="搜索标题中文/英文、期刊、作者">' +
+        '<input type="search" id="qP" placeholder="搜索标题、期刊、作者、方法关键词，例如 ferroptosis、spatial、J Hepatol">' +
         '<select id="fTag"><option value="ALL">全部方法</option>' +
         tagList.map(t => '<option value="' + E(t) + '"' + (tag === t ? " selected" : "") + ">" + E(t) + " (" + tags[t] + ")</option>").join("") +
         "</select>" +
         '<select id="fField"><option value="ALL">全部领域</option>' +
         fieldList.map(t => '<option value="' + E(t) + '"' + (field === t ? " selected" : "") + ">" + E(t) + " (" + fields[t] + ")</option>").join("") +
         "</select>" +
+        '<select id="fSort">' +
+        '<option value="cited"' + (sortBy === "cited" ? " selected" : "") + ">按被引排序</option>" +
+        '<option value="year"' + (sortBy === "year" ? " selected" : "") + ">按年份排序</option>" +
+        '<option value="if"' + (sortBy === "if" ? " selected" : "") + ">按 IF 排序</option>" +
+        "</select>" +
+        '<select id="fYear">' +
+        '<option value="0"' + (years === 0 ? " selected" : "") + ">全部年份</option>" +
+        '<option value="1"' + (years === 1 ? " selected" : "") + ">今年</option>" +
+        '<option value="3"' + (years === 3 ? " selected" : "") + ">近 3 年</option>" +
+        '<option value="5"' + (years === 5 ? " selected" : "") + ">近 5 年</option>" +
+        '<option value="10"' + (years === 10 ? " selected" : "") + ">近 10 年</option>" +
+        "</select>" +
         '<label class="small"><input type="checkbox" id="fArt"' + (onlyArticle ? " checked" : "") + "> 只看研究论文</label>" +
         "</div>" +
+        '<div class="small muted" style="margin-bottom:8px">命中 <b>' + list.length + "</b> 篇，当前显示前 " +
+        Math.min(limit, list.length) + " 篇。" +
+        (list.length > limit ? "筛选更细一点能看全。" : "") + "</div>" +
         '<div class="scroll"><table class="tbl" id="pTbl"></table></div>' +
-        '<div class="small muted" style="margin-top:6px">IF 一栏只对有把握的期刊填了值，其余显示 —，不做猜测。</div>';
+        (list.length > limit ? '<button class="btn" id="moreBtn" style="margin-top:12px">再显示 300 篇</button>' : "") +
+        '<div class="small muted" style="margin-top:8px">IF 只对确有把握的期刊填了值，其余显示 —，不做猜测。</div>';
 
       const t = document.getElementById("pTbl");
-      t.innerHTML = "<thead><tr><th style=\"width:34%\">标题</th><th>中文</th><th>期刊</th><th>年</th><th>被引</th><th>IF</th><th>类型</th><th>方法标签</th></tr></thead><tbody>" +
-        list.map(p => "<tr>" +
-          '<td><a href="https://doi.org/' + E(p.doi) + '" target="_blank" rel="noopener">' + E(p.title.length > 95 ? p.title.slice(0, 95) + "…" : p.title) + "</a></td>" +
-          "<td>" + E(p.titleCn || "") + "</td>" +
-          "<td>" + E(p.journal) + "</td><td>" + p.year + "</td><td>" + p.cited + "</td>" +
-          "<td>" + (p.ifValue ? p.ifValue : "—") + "</td>" +
-          '<td><span class="tag ' + (p.type === "Article" ? "g" : (p.type === "Letter/Comment" ? "n" : "y")) + '">' + E(p.type) + "</span></td>" +
-          "<td>" + (p.tags || []).map(x => '<span class="tag n">' + E(x) + "</span>").join(" ") + "</td>" +
-          "</tr>").join("") + "</tbody>";
+      t.innerHTML = '<thead><tr><th style="width:44%">标题</th><th>期刊</th><th>年</th><th>被引</th><th>IF</th><th>领域</th><th>方法标签</th></tr></thead><tbody>' +
+        shown.map(p => {
+          const link = p.doi ? "https://doi.org/" + p.doi : "https://pubmed.ncbi.nlm.nih.gov/?term=" + encodeURIComponent(p.title);
+          return "<tr>" +
+            '<td><a href="' + E(link) + '" target="_blank" rel="noopener">' + E(p.title.length > 120 ? p.title.slice(0, 120) + "…" : p.title) + "</a></td>" +
+            "<td>" + E(p.journal || "—") + "</td><td>" + (p.year || "—") + "</td>" +
+            "<td>" + (p.cited || 0) + "</td><td>" + (p.ifValue || "—") + "</td>" +
+            '<td><span class="tag n">' + E(p.field || "—") + "</span></td>" +
+            "<td>" + (p.tags || []).map(x => '<span class="tag">' + E(x) + "</span>").join(" ") + "</td>" +
+            "</tr>";
+        }).join("") + "</tbody>";
 
-      document.getElementById("qP").oninput = SX.debounce(() => {
-        q = document.getElementById("qP").value.trim().toLowerCase(); draw();
-      }, 250);
-      document.getElementById("fTag").onchange = e => { tag = e.target.value; draw(); };
-      document.getElementById("fField").onchange = e => { field = e.target.value; draw(); };
-      document.getElementById("fArt").onchange = e => { onlyArticle = e.target.checked; draw(); };
+      const qi = document.getElementById("qP");
+      if (qi) {
+        qi.value = q;
+        qi.oninput = SX.debounce(() => {
+          q = document.getElementById("qP").value.trim().toLowerCase(); limit = 300; draw();
+          const el = document.getElementById("qP"); if (el) el.focus();
+        }, 300);
+      }
+      document.getElementById("fTag").onchange = e => { tag = e.target.value; limit = 300; draw(); };
+      document.getElementById("fField").onchange = e => { field = e.target.value; limit = 300; draw(); };
+      document.getElementById("fSort").onchange = e => { sortBy = e.target.value; draw(); };
+      document.getElementById("fYear").onchange = e => { years = +e.target.value; limit = 300; draw(); };
+      document.getElementById("fArt").onchange = e => { onlyArticle = e.target.checked; limit = 300; draw(); };
+      const mb = document.getElementById("moreBtn");
+      if (mb) mb.onclick = () => { limit += 300; draw(); };
     }
     draw();
   }
@@ -170,7 +248,12 @@
 
   /* ==================== 知识库 ==================== */
   function knowledge(root) {
-    const K = window.SX_KNOWLEDGE || [];
+    root.innerHTML = head("知识库", "正在载入机制条目…");
+    ensure("SX_KNOWLEDGE2", "data/knowledge2.js").then(() => knowledgeDraw(root));
+  }
+
+  function knowledgeDraw(root) {
+    const K = (window.SX_KNOWLEDGE || []).concat(window.SX_KNOWLEDGE2 || []);
     const dom = {};
     K.forEach(x => dom[x.domainName || x.domain] = x.domain);
     let curDom = "ALL", q = "", openId = null;
@@ -257,86 +340,98 @@
   }
 
   /* ==================== 数据中心 ==================== */
-  const SOURCES = [
-    { g: "公共表达数据", items: [
-      { n: "GEO（NCBI）", u: "https://www.ncbi.nlm.nih.gov/geo/", d: "芯片与测序表达谱最大仓库；用 GEOquery 或手动下 series matrix", r: "library(GEOquery)\ngset <- getGSEDataTables(\"GSE149614\")  # 或直接下 series matrix\n# 单细胞原始：GEO 页面上取 10x 三件套（barcodes/features/matrix）" },
-      { n: "TCGA / GDC", u: "https://portal.gdc.cancer.gov/", d: "肿瘤多组学，含临床随访；TCGAbiolinks 是 R 里最顺手的方式", r: "library(TCGAbiolinks)\nquery <- GDCquery(project = \"TCGA-LIHC\", data.category = \"Transcriptome Profiling\",\n                  data.type = \"Gene Expression Quantification\",\n                  workflow.type = \"STAR - Counts\")\nGDCdownload(query); data <- GDCprepare(query)" },
-      { n: "UCSC Xena", u: "https://xenabrowser.net/", d: "TCGA/GTEx 已整理好的矩阵，下载快，适合快速验证", r: "# 浏览器下载后读入\n.read <- function(f) read.csv(f, sep = \"\\t\", row.names = 1)" },
-      { n: "Zenodo", u: "https://zenodo.org/", d: "你导师团队的大鼠 RILD 单细胞数据就存在这里", r: "# 从 Zenodo 下载 10x 三件套后\nlibrary(Seurat)\nobj <- Read10X(\"path/to/filtered_feature_bc_matrix/\")\nseu <- CreateSeuratObject(obj, project = \"RILD\", min.cells = 3, min.features = 200)" },
-      { n: "GTEx", u: "https://gtexportal.org/", d: "正常组织表达，作为肿瘤分析的对照", r: "" }
-    ]},
-    { g: "遗传与因果推断", items: [
-      { n: "FinnGen", u: "https://www.finngen.fi/en/access_results", d: "芬兰人群 GWAS 汇总统计，MR 结局常用", r: "library(TwoSampleMR)\nao <- available_outcomes()\nhead(subset(ao, grepl(\"liver|cancer\", trait, ignore.case = TRUE)))" },
-      { n: "eQTLGen", u: "https://www.eqtlgen.org/", d: "血液 cis-eQTL，MR 暴露的常用来源", r: "# 下载 cis-eQTL 全量后按基因筛选\nexp <- read.csv(\"2019-12-11-cis-eQTLsFDR0.05-ProbeLevel-CohortsInfo.tsv\", sep = \"\\t\")" },
-      { n: "IEU OpenGWAS", u: "https://gwas-api.mrcieu.ac.uk/", d: "MR Base，TwoSampleMR 直接对接", r: "library(TwoSampleMR)\nexp <- extract_instruments(outcomes = \"eqtl-a-ENSG000001...\")\nout <- extract_outcome_data(snps = exp$SNP, outcomes = \"ieu-b-4965\")" },
-      { n: "OneK1K", u: "https://onek1k.org/", d: "14 类免疫细胞的单细胞 eQTL，做 sc-eQTL MR 的来源", r: "" },
-      { n: "UK Biobank", u: "https://www.ukbiobank.ac.uk/", d: "大规模表型 GWAS；需申请", r: "" },
-      { n: "AstraZeneca PheWAS", u: "https://azphewas.com/", d: "约 50 万外显子数据的全表型关联扫描，用于排脱靶风险", r: "" }
-    ]},
-    { g: "毒理与药物", items: [
-      { n: "CTD 比较毒理基因组学", u: "https://ctdbase.org/", d: "化学品—基因—疾病互作，网络毒理学的核心数据源；支持从基因反查化学物", r: "# 下载 CTD 的 chem-gene 互作文件后\nedc <- read.csv(\"CTD_chem_gene_ixns.tsv\", sep = \"\\t\", comment.char = \"#\")" },
-      { n: "TEDX 内分泌干扰物库", u: "https://endocrinedisruption.org/", d: "内分泌干扰物清单，网络毒理学常用起点", r: "" },
-      { n: "DGIdb", u: "https://www.dgidb.org/", d: "药物—基因互作，老药新用匹配", r: "" },
-      { n: "DrugBank", u: "https://go.drugbank.com/", d: "药物详细信息与适应症，投稿前核实用", r: "" },
-      { n: "Open Targets", u: "https://platform.opentargets.org/", d: "靶点—疾病证据评分，给候选基因排优先级", r: "" },
-      { n: "PubChem", u: "https://pubchem.ncbi.nlm.nih.gov/", d: "小分子结构与 SMILES，分子对接取配体", r: "" },
-      { n: "RCSB PDB", u: "https://www.rcsb.org/", d: "蛋白结构，对接取受体。注意核对 UniProt 与物种", r: "" },
-      { n: "CMap / LINCS L1000", u: "https://clue.io/", d: "药物扰动表达谱，用于「疾病签名反向匹配」", r: "" }
-    ]}
-  ];
-
+  // 数据源清单已外置到 data/sources.js（window.SX_SOURCES），便于持续扩充
+  const SOURCES = window.SX_SOURCES || [];
   function data(root) {
     const D = window.SX_DATA || {};
     const keys = window.SX_DATA_KEYS || Object.keys(D);
-    root.innerHTML = head("数据中心",
-      "站内内置 " + keys.length + " 个练习数据集（离线可跑），以及常用公共数据源的入口与 R 读取代码。") +
-      '<div class="card"><b>内置练习数据集</b>' +
-      keys.map(k => {
-        const csv = D[k].csv || "";
-        const rows = csv.split("\n").length - 1;
-        return '<div class="ds-row">' +
-          "<div><b>" + E(k) + "</b>" +
-          '<div class="tiny muted">' + E(D[k].desc) + " · " + rows + " 行</div></div>" +
-          '<div class="toolbar">' +
-          '<button class="btn sm" data-prev="' + E(k) + '">预览</button>' +
-          '<button class="btn sm" data-dl="' + E(k) + '">下载 CSV</button>' +
-          '<button class="btn sm" data-code="' + E(k) + '">R 读取代码</button>' +
-          "</div></div>";
-      }).join("") +
-      '<div id="dsPrev"></div></div>' +
-      SOURCES.map(g => '<div class="card" style="margin-top:12px"><b>' + E(g.g) + "</b>" +
-        g.items.map(it => '<div class="ds-row">' +
-          "<div><b>" + E(it.n) + "</b>" +
-          '<div class="tiny muted">' + E(it.d) + "</div>" +
-          '<div class="tiny"><a href="' + E(it.u) + '" target="_blank" rel="noopener">' + E(it.u) + "</a></div></div>" +
-          '<div class="toolbar">' +
-          '<a class="btn sm" href="' + E(it.u) + '" target="_blank" rel="noopener">打开</a>' +
-          (it.r ? '<button class="btn sm" data-rcode="' + E(it.n) + '">R 代码</button>' : "") +
-          "</div></div>").join("") + "</div>").join("");
+    const totalSrc = SOURCES.reduce((a, g) => a + g.items.length, 0);
+    let q = "", openG = {};
 
-    const prev = document.getElementById("dsPrev");
-    document.querySelectorAll("[data-prev]").forEach(b => b.onclick = () => {
-      const k = b.getAttribute("data-prev");
-      const lines = (D[k].csv || "").split("\n").slice(0, 6);
-      prev.innerHTML = '<div class="small" style="margin-top:8px"><b>' + E(k) + "</b> 前 5 行：" +
-        "<pre class='code' style=\"max-height:180px\">" + E(lines.join("\n")) + "</pre></div>";
-    });
-    document.querySelectorAll("[data-dl]").forEach(b => b.onclick = () => {
-      const k = b.getAttribute("data-dl");
-      SX.download(k + ".csv", D[k].csv, "text/csv;charset=utf-8");
-    });
-    document.querySelectorAll("[data-code]").forEach(b => b.onclick = () => {
-      const k = b.getAttribute("data-code");
-      const rn = k.indexOf("_expr") >= 0 ? ", row.names = 1" : "";
-      SX.copy(k + " <- read.csv(\"data/" + k + ".csv\", stringsAsFactors = FALSE" + rn + ")");
-      SX.toast("读取代码已复制");
-    });
-    document.querySelectorAll("[data-rcode]").forEach(b => b.onclick = () => {
-      const n = b.getAttribute("data-rcode");
-      let code = "";
-      SOURCES.forEach(g => g.items.forEach(it => { if (it.n === n) code = it.r; }));
-      SX.copy(code); SX.toast("R 代码已复制");
-    });
+    function draw() {
+      const ql = q.trim().toLowerCase();
+      const hit = (it) => !ql || (it.n + " " + it.d + " " + it.u).toLowerCase().indexOf(ql) >= 0;
+
+      const srcHtml = SOURCES.map((g, gi) => {
+        const items = g.items.filter(hit);
+        if (!items.length) return "";
+        const open = ql ? true : openG[gi] !== false;
+        return '<div class="card" style="margin-top:16px">' +
+          '<div class="src-head" data-g="' + gi + '">' +
+          "<b>" + E(g.g) + '</b><span class="tiny muted">' + items.length + " 个</span>" +
+          '<span class="tiny muted">' + (open ? "收起" : "展开") + "</span></div>" +
+          '<div class="src-body"' + (open ? "" : ' style="display:none"') + ">" +
+          items.map(it => '<div class="ds-row">' +
+            "<div><b>" + E(it.n) + "</b>" +
+            '<div class="small muted">' + E(it.d) + "</div>" +
+            '<div class="tiny"><a href="' + E(it.u) + '" target="_blank" rel="noopener">' + E(it.u) + "</a></div></div>" +
+            '<div class="toolbar">' +
+            '<a class="btn sm" href="' + E(it.u) + '" target="_blank" rel="noopener">打开</a>' +
+            (it.r ? '<button class="btn sm" data-rcode="' + E(it.n) + '">R 代码</button>' : "") +
+            "</div></div>").join("") + "</div></div>";
+      }).join("");
+
+      root.innerHTML = head("数据中心",
+        "站内内置 " + keys.length + " 个练习数据集（离线可跑，直接下载），以及 " + totalSrc +
+        " 个公共数据源入口（给链接和 R 读取代码，不预下载）。") +
+        '<div class="card"><b>内置练习数据集</b>' +
+        '<div class="small muted" style="margin:4px 0 10px">这些是造出来的教学数据，结构和真实数据一致，可以离线跑。</div>' +
+        keys.map(k => {
+          const rows = (D[k].csv || "").split("\n").length - 1;
+          return '<div class="ds-row">' +
+            "<div><b>" + E(k) + "</b>" +
+            '<div class="small muted">' + E(D[k].desc) + " · " + rows + " 行</div></div>" +
+            '<div class="toolbar">' +
+            '<button class="btn sm" data-prev="' + E(k) + '">预览</button>' +
+            '<button class="btn sm" data-dl="' + E(k) + '">下载 CSV</button>' +
+            '<button class="btn sm" data-code="' + E(k) + '">R 读取代码</button>' +
+            "</div></div>";
+        }).join("") +
+        '<div id="dsPrev"></div></div>' +
+        '<div class="search-bar" style="margin-top:20px">' +
+        '<input type="search" id="qSrc" placeholder="搜数据源，例如 单细胞、甲基化、药物敏感、肝癌、eQTL">' +
+        "</div>" + srcHtml;
+
+      const qi = document.getElementById("qSrc");
+      qi.value = q;
+      qi.oninput = SX.debounce(() => {
+        q = document.getElementById("qSrc").value;
+        draw();
+        const el = document.getElementById("qSrc");
+        if (el) { el.focus(); el.setSelectionRange(el.value.length, el.value.length); }
+      }, 300);
+
+      root.querySelectorAll(".src-head").forEach(h => h.onclick = () => {
+        const gi = +h.getAttribute("data-g");
+        openG[gi] = openG[gi] === false;
+        draw();
+      });
+
+      const prev = document.getElementById("dsPrev");
+      root.querySelectorAll("[data-prev]").forEach(b => b.onclick = () => {
+        const k = b.getAttribute("data-prev");
+        const lines = (D[k].csv || "").split("\n").slice(0, 6);
+        prev.innerHTML = '<div class="small" style="margin-top:8px"><b>' + E(k) + "</b> 前 5 行：" +
+          "<pre class='code' style=\"max-height:200px\">" + E(lines.join("\n")) + "</pre></div>";
+      });
+      root.querySelectorAll("[data-dl]").forEach(b => b.onclick = () => {
+        const k = b.getAttribute("data-dl");
+        SX.download(k + ".csv", D[k].csv, "text/csv;charset=utf-8");
+      });
+      root.querySelectorAll("[data-code]").forEach(b => b.onclick = () => {
+        const k = b.getAttribute("data-code");
+        const rn = k.indexOf("_expr") >= 0 ? ", row.names = 1" : "";
+        SX.copy(k + " <- read.csv(\"data/" + k + ".csv\", stringsAsFactors = FALSE, check.names = FALSE" + rn + ")");
+        SX.toast("读取代码已复制");
+      });
+      root.querySelectorAll("[data-rcode]").forEach(b => b.onclick = () => {
+        const n = b.getAttribute("data-rcode");
+        let code = "";
+        SOURCES.forEach(g => g.items.forEach(it => { if (it.n === n) code = it.r; }));
+        SX.copy(code); SX.toast("R 代码已复制");
+      });
+    }
+    draw();
   }
 
   /* ==================== 数据仓库 ==================== */

@@ -134,7 +134,7 @@ window.SX_LEVELS = [
       "阈值：|logFC| > 1 且 adj.P.Val < 0.05"
     ],
     datasets: ["lihc_expr", "lihc_clin"],
-    starter: "# lihc_expr：72 个基因 x 60 个样本；lihc_clin：分组与随访\ntumor  <- lihc_clin$sample[lihc_clin$group == \"Tumor\"]\nnormal <- lihc_clin$sample[lihc_clin$group == \"Normal\"]\nvol <- ...\n",
+    starter: "# lihc_expr：275 个基因 x 60 个样本；lihc_clin：分组与随访\ntumor  <- lihc_clin$sample[lihc_clin$group == \"Tumor\"]\nnormal <- lihc_clin$sample[lihc_clin$group == \"Normal\"]\nvol <- ...\n",
     hints: [
       "这一步和上一关完全一样，区别在于样本更多（40 vs 20）。",
       "分类用 cut() 或 ifelse 嵌套；最清晰的写法是先用 ifelse 判显著性，再判方向。",
