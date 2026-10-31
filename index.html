@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>嵩山一号 · 科研工作站</title>
+<link rel="stylesheet" href="assets/theme.css">
+</head>
+<body>
+
+<header class="topbar">
+  <div class="brand">
+    <b>嵩山一号</b><span>科研工作站</span>
+  </div>
+  <nav class="nav" id="nav"></nav>
+  <div class="hud">
+    <span class="chip xp" id="hudXp">0 XP</span>
+    <span class="chip" id="hudLevel">Lv.1 入门学徒</span>
+    <span class="chip" id="hudStreak" title="连续学习天数">0 天</span>
+  </div>
+</header>
+
+<main class="wrap">
+  <div class="page" id="view"></div>
+</main>
+
+<div class="toast" id="toast" style="display:none"></div>
+
+<!-- 数据层 -->
+<script src="data/data.js"></script>
+<script src="data/papers.js"></script>
+<script src="data/codebank.js"></script>
+<script src="data/knowledge.js"></script>
+<script src="data/myscripts.js"></script>
+<script src="data/levels_core.js"></script>
+<script src="data/levels_adv.js"></script>
+<script src="data/writing.js"></script>
+<script src="data/tutors.js"></script>
+
+<!-- 逻辑层 -->
+<script src="assets/store.js"></script>
+<script src="assets/webr.js"></script>
+<script src="assets/view-dojo.js"></script>
+<script src="assets/view-lib.js"></script>
+<script src="assets/view-write.js"></script>
+<script src="assets/app.js"></script>
+</body>
+</html>
