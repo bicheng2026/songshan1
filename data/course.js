@@ -64,6 +64,7 @@ window.SX_COURSE = {
     {
       id: "k1",
       title: "第 1 讲　生信是什么：counts 矩阵、Bulk 与单细胞",
+      plain: "你下载到的那个大表格，格子里其实是「数到几条」，不是「表达高不高」。这讲只说清这一件事——搞明白了，后面的归一化、差异分析才不会越看越糊涂。",
       goal: "搞清「你拿到的到底是什么数」，后面的归一化、差异分析才有意义。",
       watch: [
         { n: "生信技能树《生信人应该这样学 R 语言》", u: "https://www.bilibili.com/video/BV1cs411j75B" }
@@ -137,6 +138,7 @@ aggregate(expr ~ group, data = df, sd)       # 分组标准差`
     {
       id: "k2",
       title: "第 2 讲　TCGA 下载与差异分析",
+      plain: "想知道「哪些基因变了」，就得会算这一笔。这讲不套包，先用手算的方式把 logFC 和 p 值算一遍，以后看到别人表里的数字，你能自己复算核对。",
       goal: "把「哪些基因变了」这件事算出来，并且知道每个数字是怎么来的。",
       watch: [
         { n: "生信技能树《转录组测序数据分析》", u: "https://www.bilibili.com/video/BV12s41137HY" },
@@ -233,6 +235,7 @@ round(t(scale(t(m))), 2)`
     {
       id: "k3",
       title: "第 3 讲　富集分析：ORA、背景集与 GSEA",
+      plain: "一长串基因名看着头大，它其实只在说一件事：这些基因全挤在同一个功能上。这讲把富集 p 值拆成四个数，顺便解释为什么你和别人算出来的对不上。",
       goal: "知道富集 p 值是怎么算出来的，以及为什么你和别人算的不一样。",
       watch: [
         { n: "clusterProfiler 配套书", u: "https://yulab-smu.top/biomedical-knowledge-mining-book/" }
@@ -303,6 +306,7 @@ fg <- fgsea(pathways = msigdb_list, stats = gl, minSize = 15, maxSize = 500)`
     {
       id: "k4",
       title: "第 4 讲　免疫浸润：反卷积、ssGSEA 与三种方法的坑",
+      plain: "一块肿瘤里混着肿瘤细胞、免疫细胞、成纤维细胞，而测序只给你「整块的平均值」。这讲讲怎么把一个数拆回几份，以及为什么三种方法给出的根本不是同一样东西。",
       goal: "知道「免疫浸润」这三个字背后是三个完全不同的东西，不能混着说。",
       watch: [
         { n: "GSVA 官方 vignette", u: "https://bioconductor.org/packages/release/bioc/vignettes/GSVA/inst/doc/GSVA.html" },
@@ -365,6 +369,7 @@ rank(s$ESTIMATE); rank(s$CIB_T)   # 排序也不完全一致`
     {
       id: "k5",
       title: "第 5 讲　临床预后：生存数据、KM、COX 与 ROC",
+      plain: "把表达量变成「高危 / 低危」，再画一条生存曲线。这讲会说明白 HR 和 AUC 各能说明什么、不能说明什么——这两句话写错，审稿人一眼就看出来。",
       goal: "把表达数据变成「高危/低危」，并且知道 HR、AUC 各自能说明什么、不能说明什么。",
       watch: [
         { n: "survival 包（CRAN）", u: "https://cran.r-project.org/web/packages/survival/index.html" }
@@ -460,6 +465,7 @@ for (th in sort(unique(score))) {
     {
       id: "k6",
       title: "第 6 讲　一致性聚类、TMB 与基线资料表",
+      plain: "分型、突变负荷、基线资料表，这三件事最容易被糊弄过去。这讲把它们做实：分型要稳得住、TMB 别算错分子分母、Table 1 不能只放 p 值。",
       goal: "把「分型」「突变负荷」「Table 1」这三件常被糊弄过去的事做扎实。",
       watch: [
         { n: "cBioPortal（查突变和拷贝数）", u: "https://www.cbioportal.org/" }
@@ -533,6 +539,7 @@ sA <- sd(d$age[d$arm == "A"]);   sB <- sd(d$age[d$arm == "B"])
     {
       id: "k7",
       title: "第 7 讲　共表达网络、PPI 与 hub 基因",
+      plain: "基因不是各干各的，是一群一群一起动。这讲讲清 WGCNA 里那个软阈值到底在干什么，以及为什么 hub 基因（连接最多的）不等于关键基因。",
       goal: "知道 WGCNA 的软阈值在干什么，以及为什么 hub 基因不等于关键基因。",
       watch: [
         { n: "WGCNA（CRAN 包主页，教程 PDF 在里面）", u: "https://cran.r-project.org/web/packages/WGCNA/index.html" }
@@ -597,6 +604,7 @@ nrow(subset(edges, score >= 0.4))`
     {
       id: "k8",
       title: "第 8 讲　GEO 实战：从 GSE 号到能分析的矩阵",
+      plain: "手里只有一个 GSE 号，怎么把它变成一张能分析的干净矩阵。这讲给的是顺序——先查什么、再下什么、什么时候该停，别自己乱试。",
       goal: "拿到一个 GSE 号之后，知道按什么顺序把它变成干净的表达矩阵。",
       watch: [
         { n: "GEO 首页", u: "https://www.ncbi.nlm.nih.gov/geo/" },
@@ -664,6 +672,7 @@ as.matrix(m)`
     {
       id: "k9",
       title: "第 9 讲　LASSO 预后模型与数据泄漏",
+      plain: "几百个候选基因、几十个病人，普通回归会把答案直接背下来。这讲讲 LASSO 怎么逼它只留几个，以及最容易让整个结果作废的那几个操作。",
       goal: "知道 LASSO 为什么能选基因，以及最容易把结果做废的那几个操作。",
       watch: [
         { n: "OSCA（第 5 章讲特征选择，通用）", u: "https://bioconductor.org/books/release/OSCA/" }
@@ -733,6 +742,7 @@ ifelse(risk > median(risk), "high", "low")   # 常用切点：中位数`
     {
       id: "k10",
       title: "第 10 讲　文章复现：把上面九讲串成一篇",
+      plain: "前面九讲都是零件，这一讲把它们拼成一篇论文的骨架。看完你会知道自己现在做到第几步、下一幅图该画什么、哪些数字必须对得上。",
       goal: "知道一篇生信文章的骨架长什么样，复现时按什么顺序对数字。",
       watch: [
         { n: "Biomamba《手把手教你做单细胞转录组分析》", u: "https://www.bilibili.com/video/BV1S44y1b76Z" }

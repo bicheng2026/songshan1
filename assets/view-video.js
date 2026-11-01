@@ -45,6 +45,7 @@
         (v.tier ? '<span class="vtier">' + E(v.tier) + "</span>" : "") + "</div>" +
         '<div class="vmeta">' + E(v.up) + " · " + mins(v.mins) + " · " + plays(v.plays) + "</div>" +
         '<div class="vwhy">' + E(v.why) + "</div>" +
+        '<a class="vurl" href="' + av(v.bv) + '" target="_blank" rel="noopener">bilibili.com/video/' + E(v.bv) + "</a>" +
         "</div>" +
         '<div class="vact"><a class="btn sm" href="' + av(v.bv) + '" target="_blank" rel="noopener">去 B 站看</a>' +
         '<span class="vwatch">' + E(v.watch || "") + "</span></div>" +
