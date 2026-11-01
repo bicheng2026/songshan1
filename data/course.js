@@ -21,7 +21,10 @@ window.SX_COURSE = {
         { n: "Biomamba《手把手教你做单细胞转录组测序数据分析》", u: "https://www.bilibili.com/video/BV1S44y1b76Z" },
         { n: "生信幻想家《单细胞数据分析 标准分析流程》", u: "https://www.bilibili.com/video/BV1Ct421j7X3" },
         { n: "未名阿《保姆级单细胞代码分析（1）质控·降维·聚类》", u: "https://www.bilibili.com/video/BV1yR4y1q7X4" },
-        { n: "生信技能树-jimmy《单细胞亚群注释》", u: "https://www.bilibili.com/video/BV1mE421w7Te" }
+        { n: "生信技能树-jimmy《单细胞亚群注释》", u: "https://www.bilibili.com/video/BV1mE421w7Te" },
+        { n: "生信技能树《细胞通讯 CellChat 系列》", u: "https://www.bilibili.com/video/BV1Ab4y1W7qx" },
+        { n: "生信基地《Seurat V5 标准流程 + Harmony 多样本实战》", u: "https://www.bilibili.com/video/BV1Yz4216787" },
+        { n: "生信技能树《拟时序分析 monocle 系列》", u: "https://www.bilibili.com/video/BV1br4y1x7Hf" }
       ],
       refs: [
         { n: "Seurat 官网", u: "https://satijalab.org/seurat/", d: "所有 Seurat 教程入口，版本更新都在这", t: "doc" },
@@ -453,6 +456,8 @@ round(t(scale(t(m))), 2)`
       plain: "一长串基因名看着头大，它其实只在说一件事：这些基因全挤在同一个功能上。这讲把富集 p 值拆成四个数，顺便解释为什么你和别人算出来的对不上。",
       goal: "知道富集 p 值是怎么算出来的，以及为什么你和别人算的不一样。",
       watch: [
+        { n: "微生信：clusterProfiler / GSEA 实操（B 站）", u: "https://www.bilibili.com/video/BV12X4y117ob" },
+        { n: "通路富集可视化（B 站）", u: "https://www.bilibili.com/video/BV1CZ421H7u3" },
         { n: "clusterProfiler 配套书", u: "https://yulab-smu.top/biomedical-knowledge-mining-book/" }
       ],
       rec: {
@@ -544,6 +549,7 @@ fg <- fgsea(pathways = msigdb_list, stats = gl, minSize = 15, maxSize = 500)`
       plain: "一块肿瘤里混着肿瘤细胞、免疫细胞、成纤维细胞，而测序只给你「整块的平均值」。这讲讲怎么把一个数拆回几份，以及为什么三种方法给出的根本不是同一样东西。",
       goal: "知道「免疫浸润」这三个字背后是三个完全不同的东西，不能混着说。",
       watch: [
+        { n: "免疫细胞浸润分析 CIBERSORT 法（B 站）", u: "https://www.bilibili.com/video/BV1ud4y1e7kH" },
         { n: "GSVA 官方 vignette", u: "https://bioconductor.org/packages/release/bioc/vignettes/GSVA/inst/doc/GSVA.html" },
         { n: "TIMER2.0（不写代码也能对结论）", u: "http://timer.cistrome.org/" }
       ],
@@ -627,6 +633,8 @@ rank(s$ESTIMATE); rank(s$CIB_T)   # 排序也不完全一致`
       plain: "把表达量变成「高危 / 低危」，再画一条生存曲线。这讲会说明白 HR 和 AUC 各能说明什么、不能说明什么——这两句话写错，审稿人一眼就看出来。",
       goal: "把表达数据变成「高危/低危」，并且知道 HR、AUC 各自能说明什么、不能说明什么。",
       watch: [
+        { n: "列线图 / Nomogram 绘制细节（B 站）", u: "https://www.bilibili.com/video/BV1HP1FBSE6q" },
+        { n: "【麦子】Cox 回归 R 操作（B 站）", u: "https://www.bilibili.com/video/av18918951" },
         { n: "survival 包（CRAN）", u: "https://cran.r-project.org/web/packages/survival/index.html" }
       ],
       rec: {
@@ -743,6 +751,7 @@ for (th in sort(unique(score))) {
       plain: "分型、突变负荷、基线资料表，这三件事最容易被糊弄过去。这讲把它们做实：分型要稳得住、TMB 别算错分子分母、Table 1 不能只放 p 值。",
       goal: "把「分型」「突变负荷」「Table 1」这三件常被糊弄过去的事做扎实。",
       watch: [
+        { n: "肿瘤突变数据分析：maftools / TMB / 突变全景图（B 站）", u: "https://www.bilibili.com/video/BV1Sy4y1S7pz" },
         { n: "cBioPortal（查突变和拷贝数）", u: "https://www.cbioportal.org/" }
       ],
       rec: {
@@ -836,6 +845,8 @@ sA <- sd(d$age[d$arm == "A"]);   sB <- sd(d$age[d$arm == "B"])
       plain: "基因不是各干各的，是一群一群一起动。这讲讲清 WGCNA 里那个软阈值到底在干什么，以及为什么 hub 基因（连接最多的）不等于关键基因。",
       goal: "知道 WGCNA 的软阈值在干什么，以及为什么 hub 基因不等于关键基因。",
       watch: [
+        { n: "WGCNA 加权共表达网络全流程（B 站）", u: "https://www.bilibili.com/video/BV1aT421v7kZ" },
+        { n: "高级转录组分析与 R 可视化（含 WGCNA，B 站）", u: "https://www.bilibili.com/video/BV1rD4y1272a" },
         { n: "WGCNA（CRAN 包主页，教程 PDF 在里面）", u: "https://cran.r-project.org/web/packages/WGCNA/index.html" }
       ],
       rec: {
@@ -921,6 +932,8 @@ nrow(subset(edges, score >= 0.4))`
       plain: "手里只有一个 GSE 号，怎么把它变成一张能分析的干净矩阵。这讲给的是顺序——先查什么、再下什么、什么时候该停，别自己乱试。",
       goal: "拿到一个 GSE 号之后，知道按什么顺序把它变成干净的表达矩阵。",
       watch: [
+        { n: "jimmy：GEO 数据挖掘实战（三阴性乳腺癌，B 站）", u: "https://www.bilibili.com/video/BV1dy4y1C7jz" },
+        { n: "GEO 表达芯片数据处理（B 站）", u: "https://www.bilibili.com/video/av26731585" },
         { n: "GEO 首页", u: "https://www.ncbi.nlm.nih.gov/geo/" },
         { n: "UCSC Xena（TCGA 标准化数据）", u: "https://xenabrowser.net/" }
       ],
@@ -1008,6 +1021,8 @@ as.matrix(m)`
       plain: "几百个候选基因、几十个病人，普通回归会把答案直接背下来。这讲讲 LASSO 怎么逼它只留几个，以及最容易让整个结果作废的那几个操作。",
       goal: "知道 LASSO 为什么能选基因，以及最容易把结果做废的那几个操作。",
       watch: [
+        { n: "列线图 / LASSO / Cox 预测模型（B 站）", u: "https://www.bilibili.com/video/BV1HP1FBSE6q" },
+        { n: "【麦子】Cox 回归 R 操作（B 站）", u: "https://www.bilibili.com/video/av18918951" },
         { n: "OSCA（第 5 章讲特征选择，通用）", u: "https://bioconductor.org/books/release/OSCA/" }
       ],
       rec: {

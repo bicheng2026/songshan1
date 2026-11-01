@@ -9,7 +9,7 @@
     lh: { min: 150, max: 240, def: 205 },
     sp: { min: 80, max: 200, def: 140 },
     /* 宽度到顶就是铺满，中间值是内容区最大宽度（px） */
-    w: { min: 900, max: 2400, def: 1280 }
+    w: { min: 860, max: 2400, def: 1180 }
   };
   var PRESETS = [
     { name: "紧凑", fs: 100, lh: 175, sp: 100, w: 1200 },
