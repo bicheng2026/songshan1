@@ -1,102 +1,117 @@
-/* 嵩山一号 · 工作站 —— 通用课程（10 讲，参照本地录播课结构重排）
-   每节：为什么 → 要点 → base R 可跑代码（+ 真实包写法）*/
+/* 嵩山一号 · 工作站 —— 通用课程
+   第 0 讲从「1+1 怎么写」开始；每节默认折叠，点开才展开。
+   每节两段代码：base R 能在本页直接跑（讲原理）；标了包名的「真实写法」讲实战。 */
 (function () {
   "use strict";
   const SX = window.SX;
   const E = SX.esc;
 
+  function chapters() {
+    const C = window.SX_COURSE || { chapters: [], resources: [] };
+    const all = (window.SX_COURSE0 ? [window.SX_COURSE0] : []).concat(C.chapters || []);
+    return { list: all, resources: C.resources || [], intro: C.intro || "" };
+  }
+
   function render(root) {
-    const C = window.SX_COURSE;
-    if (!C) { root.innerHTML = '<div class="card">课程数据没加载。</div>'; return; }
+    const { list: CH, resources: RES, intro } = chapters();
+    if (!CH.length) { root.innerHTML = '<div class="card">课程数据没加载。</div>'; return; }
 
-    const total = C.chapters.reduce((a, c) => a + c.subs.length, 0);
-    const nRes = (C.resources || []).reduce((a, g) => a + g.items.length, 0);
+    const total = CH.reduce((a, c) => a + c.subs.length, 0);
+    const nVid = (window.SX_VIDEOS && window.SX_VIDEOS.items || []).length;
 
-    /* ---------- 左侧目录 ---------- */
-    let side = '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">' +
-      "<b>目录</b><span class='tiny muted'>" + C.chapters.length + " 讲 / " + total + " 节</span></div>";
-    C.chapters.forEach((ch, ci) => {
-      side += '<div class="tk">' + E(ch.title.replace(/^第 \d+ 讲　/, "")) + "</div>";
+    /* ---------- 侧栏 ---------- */
+    let side = '<div class="sidehead"><b>目录</b><span class="tiny muted">' +
+      CH.length + " 讲 / " + total + " 节</span></div>";
+    CH.forEach((ch, ci) => {
+      side += '<div class="tk">' + E(shortTitle(ch.title)) + "</div>";
       ch.subs.forEach((s, si) => {
-        side += '<div class="lvrow" data-go="c' + ci + "-" + si + '"><span>&#9675;</span><span>' +
+        side += '<div class="lvrow" data-go="' + ci + "-" + si + '"><span class="dot-s"></span><span>' +
           E(s.t.replace(/^\d+\.\d+\s*/, "")) + "</span></div>";
       });
     });
-    side += '<div class="tk" style="margin-top:10px">资源</div>' +
-      '<div class="lvrow" data-go="res"><span>&#9675;</span><span>在线课程与文档（' + nRes + '）</span></div>';
 
-    /* ---------- 顶部说明 ---------- */
-    let main = '<div class="card"><b>这门课怎么用</b><div class="small" style="margin-top:8px">' +
-      E(C.intro) + "</div>" +
-      '<div class="note info" style="margin-top:10px">每节的灰框代码<b>只用 base R</b>，点按钮就能在本页跑出结果，用来把原理看明白。' +
-      "标了「真实写法」的折叠块是装了包之后真正做分析时的代码，本站跑不了，但它才是你要写进脚本里的东西。" +
-      "原理看过一遍，就去「代码道场」找同主题的关卡自己写——看懂 ≠ 会写。</div>" +
-      '<div class="toolbar" style="margin-top:8px">' +
-      '<a class="btn sm" href="#/dojo">去代码道场练手</a>' +
-      '<a class="btn sm ghost" href="#/knowledge">查生物学机制</a></div></div>';
+    /* ---------- 顶部 ---------- */
+    let main = '<div class="hero">' +
+      '<div class="hero-k">零基础 · 从第一行代码开始</div>' +
+      "<h2>通用课程</h2>" +
+      '<p class="hero-sub">' + E(intro.split("。")[0]) + "。</p>" +
+      '<div class="hero-acts">' +
+      (nVid ? '<a class="btn primary" href="#/video">先看视频（' + nVid + " 套，按顺序排好）</a>" : "") +
+      '<a class="btn" href="#/dojo">去代码道场动手</a>' +
+      '<a class="btn ghost" href="#/knowledge">查机制词典</a>' +
+      "</div>" +
+      '<div class="hero-tip">每节都收起来了，<b>点标题才展开</b>。灰框里的代码能直接点按钮跑；' +
+      "标了包名的那段是真实分析时的写法，本站跑不了，但它才是要写进脚本的东西。</div>" +
+      "</div>" +
+      '<div class="toolbar" style="margin:14px 0 0">' +
+      '<button class="btn sm ghost" id="expandAll">展开全部</button>' +
+      '<button class="btn sm ghost" id="collapseAll">收起全部</button></div>';
 
     /* ---------- 各讲 ---------- */
-    C.chapters.forEach((ch, ci) => {
-      main += '<div class="card" style="margin-top:16px"><h3 class="lv-title" style="margin:0 0 4px">' +
-        E(ch.title) + "</h3>";
-      if (ch.goal) main += '<div class="small muted" style="margin-bottom:6px">学完这讲：' + E(ch.goal) + "</div>";
-      if (ch.watch && ch.watch.length) {
-        main += '<div class="tiny" style="margin:6px 0 0">配套看：' +
-          ch.watch.map(w => '<a href="' + E(w.u) + '" target="_blank" rel="noopener" style="margin-right:10px">' +
-            E(w.n) + " &#8599;</a>").join("") + "</div>";
-      }
+    CH.forEach((ch, ci) => {
+      main += '<section class="lec" id="lec' + ci + '">' +
+        '<div class="lec-h"><span class="lec-no">' + pad(ci) + "</span>" +
+        '<div class="lec-t"><h3>' + E(ch.title.replace(/^第 \d+ 讲　?/, "")) + "</h3>" +
+        (ch.plain ? '<div class="lec-plain">' + E(ch.plain) + "</div>" : "") +
+        (ch.goal ? '<div class="lec-goal">学完这讲：' + E(ch.goal) + "</div>" : "") +
+        "</div></div>" +
+        (ch.watch && ch.watch.length
+          ? '<div class="lec-watch">配套看：' + ch.watch.map(w =>
+            '<a href="' + E(w.u) + '" target="_blank" rel="noopener">' + E(w.n) + " &#8599;</a>").join("") + "</div>"
+          : "");
+
       ch.subs.forEach((s, si) => {
         const id = "c" + ci + "-" + si;
-        main += '<div id="' + id + '" style="margin-top:18px;padding-top:12px;border-top:1px solid var(--line)">' +
-          "<b>" + E(s.t) + "</b>" +
-          '<div class="note" style="margin-top:8px">' + E(s.why) + "</div>" +
-          '<div class="margin-s"><b>要点</b><ol class="crit">' +
+        const open = (ci === 0 && si === 0) ? " open" : "";
+        main += '<details class="sec" id="' + id + '"' + open + ">" +
+          "<summary>" + E(s.t) + "</summary>" +
+          '<div class="sec-b">' +
+          '<div class="why">' + E(s.why) + "</div>" +
+          '<div class="pts"><div class="pts-h">要点</div><ol class="crit">' +
           s.pts.map(p => "<li>" + mdInline(p) + "</li>").join("") + "</ol></div>" +
           "<pre class='code'>" + E(s.code) + "</pre>" +
-          '<button class="btn sm" data-run="' + id + '">在 R 里跑这一节的代码</button>';
-        if (s.real) {
-          main += '<details class="real" style="margin-top:10px"><summary>真实写法（需要 ' +
-            E(s.real.pkg) + " 包，本站 R 跑不了）</summary>" +
-            "<pre class='code'>" + E(s.real.code) + "</pre></details>";
-        }
-        main += '<div class="out" id="out-' + id + '" hidden></div></div>';
+          '<button class="btn sm" data-run="' + id + '">在 R 里跑这一节</button>' +
+          (s.real ? '<details class="real"><summary>真实写法（需要 ' + E(s.real.pkg) +
+            " 包，本站跑不了）</summary><pre class='code'>" + E(s.real.code) + "</pre></details>" : "") +
+          '<div class="out" id="out-' + id + '" hidden></div>' +
+          "</div></details>";
       });
-      main += "</div>";
+      main += "</section>";
     });
 
-    /* ---------- 资源 ---------- */
-    main += '<div id="res" class="card" style="margin-top:20px"><h3 class="lv-title" style="margin:0 0 4px">' +
-      "在线课程与文档</h3><div class='small muted'>全部链接都是逐个打开验证过的（返回 200 才算进来）。" +
-      "视频课的标题、UP 主、播放量、时长取自 B 站接口，不是抄来的。</div>";
-    (C.resources || []).forEach(g => {
-      main += '<div style="margin-top:14px"><b style="color:var(--brand)">' + E(g.g) + "</b>" +
-        '<div class="grid g2" style="margin-top:8px">' +
-        g.items.map(it => '<div class="card" style="padding:10px">' +
-          '<a href="' + E(it.u) + '" target="_blank" rel="noopener"><b style="font-size:13.5px">' +
-          E(it.n) + "</b></a>" +
-          '<div class="tiny muted" style="font-family:var(--mono);word-break:break-all">' + E(it.m || it.u) + "</div>" +
-          (it.d ? '<div class="small" style="margin-top:4px">' + E(it.d) + "</div>" : "") +
-          "</div>").join("") + "</div></div>";
-    });
-    main += "</div>";
+    /* ---------- 资源（收起） ---------- */
+    if (RES.length) {
+      const n = RES.reduce((a, g) => a + g.items.length, 0);
+      main += '<details class="acc" style="margin-top:26px"><summary>全部在线课程与文档（' + n +
+        " 条，都已逐个打开验证过）</summary>";
+      RES.forEach(g => {
+        main += '<div class="resg"><div class="resg-h">' + E(g.g) + "</div>" +
+          g.items.map(it => '<div class="resi"><a href="' + E(it.u) + '" target="_blank" rel="noopener">' +
+            E(it.n) + "</a>" + (it.m ? '<span class="resi-m">' + E(it.m) + "</span>" : "") +
+            (it.d ? '<div class="resi-d">' + E(it.d) + "</div>" : "") + "</div>").join("") +
+          "</div>";
+      });
+      main += "</details>";
+    }
 
-    root.innerHTML =
-      '<div class="page-head"><h2>通用课程</h2>' +
-      "<p>按一篇生信文章的顺序排的 10 讲 " + total +
-      " 节：counts 矩阵 → 差异分析 → 富集 → 免疫浸润 → 预后 → 分型/突变负荷 → 网络 → GEO 实战 → LASSO → 复现。" +
-      "每节都有能在本页直接跑的 base R 版本，外加一段真实包写法。</p></div>" +
-      '<div class="layout-2"><aside class="side card">' + side + "</aside><section>" + main + "</section></div>";
+    root.innerHTML = '<div class="layout-2"><aside class="side card">' + side +
+      "</aside><div class='cmain'>" + main + "</div></div>";
 
     /* ---------- 交互 ---------- */
     root.querySelectorAll("[data-go]").forEach(el => {
       el.onclick = () => {
-        const t = document.getElementById(el.getAttribute("data-go"));
-        if (t) t.scrollIntoView({ behavior: "smooth", block: "start" });
+        const d = document.getElementById("c" + el.getAttribute("data-go"));
+        if (!d) return;
+        d.open = true;
+        d.scrollIntoView({ behavior: "smooth", block: "start" });
       };
     });
+    const ea = root.querySelector("#expandAll"), ca = root.querySelector("#collapseAll");
+    if (ea) ea.onclick = () => root.querySelectorAll("details.sec").forEach(d => d.open = true);
+    if (ca) ca.onclick = () => root.querySelectorAll("details.sec").forEach(d => d.open = false);
 
     const flat = {};
-    C.chapters.forEach((ch, ci) => ch.subs.forEach((s, si) => { flat["c" + ci + "-" + si] = s.code; }));
+    CH.forEach((ch, ci) => ch.subs.forEach((s, si) => { flat["c" + ci + "-" + si] = s.code; }));
 
     root.querySelectorAll("[data-run]").forEach(btn => {
       btn.onclick = async () => {
@@ -110,7 +125,7 @@
         box.innerHTML = "";
         const pre = document.createElement("pre");
         pre.className = "out-raw";
-        pre.textContent = (r.out && r.out.trim()) ? r.out : "（这段代码没有打印输出，R 只是执行了赋值）";
+        pre.textContent = (r.out && r.out.trim()) ? r.out : "（这段代码没有打印输出，只是执行了赋值）";
         box.appendChild(pre);
         if (r.msg) {
           const d = document.createElement("div");
@@ -122,7 +137,8 @@
     });
   }
 
-  /* 要点里的 `代码` 与 **加粗** 轻量渲染 */
+  function shortTitle(t) { return t.replace(/^第 (\d+) 讲　?/, "第 $1 讲 · "); }
+  function pad(i) { return i < 10 ? "0" + i : "" + i; }
   function mdInline(s) {
     return E(s)
       .replace(/`([^`]+)`/g, "<code class='inline'>$1</code>")

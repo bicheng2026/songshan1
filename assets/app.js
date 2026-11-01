@@ -5,20 +5,21 @@
   const E = SX.esc;
 
   const NAV = [
-    { id: "map", name: "修炼地图", fn: map },
-    { id: "dojo", name: "代码道场", fn: () => window.SXViewDojo.render(document.getElementById("view")) },
-    { id: "course", name: "通用课程", fn: () => window.SXViewCourse.render(document.getElementById("view")) },
-    { id: "codebank", name: "代码库", fn: () => window.SXViewLib.codebank(document.getElementById("view")) },
-    { id: "papers", name: "论文库", fn: () => window.SXViewLib.papers(document.getElementById("view")) },
-    { id: "digest", name: "文献汇总", fn: () => window.SXViewExtra.digest(document.getElementById("view")) },
-    { id: "playbook", name: "套路拆解", fn: () => window.SXViewLib.playbook(document.getElementById("view")) },
-    { id: "knowledge", name: "知识库", fn: () => window.SXViewLib.knowledge(document.getElementById("view")) },
-    { id: "refs", name: "对标与来源", fn: () => window.SXViewExtra.refs(document.getElementById("view")) },
-    { id: "scripts", name: "我的代码本", fn: () => window.SXViewLib.scripts(document.getElementById("view")) },
-    { id: "data", name: "数据中心", fn: () => window.SXViewLib.data(document.getElementById("view")) },
-    { id: "vault", name: "数据仓库", fn: () => window.SXViewLib.vault(document.getElementById("view")) },
-    { id: "write", name: "论文写作台", fn: () => window.SXViewWrite.write(document.getElementById("view")) },
-    { id: "tutor", name: "AI 导师", fn: () => window.SXViewWrite.tutor(document.getElementById("view")) }
+    { id: "map", name: "修炼地图", group: "main", fn: map },
+    { id: "video", name: "看视频", group: "main", fn: () => window.SXViewVideo.render(document.getElementById("view")) },
+    { id: "course", name: "通用课程", group: "main", fn: () => window.SXViewCourse.render(document.getElementById("view")) },
+    { id: "dojo", name: "代码道场", group: "main", fn: () => window.SXViewDojo.render(document.getElementById("view")) },
+    { id: "knowledge", name: "知识库", group: "main", fn: () => window.SXViewLib.knowledge(document.getElementById("view")) },
+    { id: "papers", name: "论文库", group: "main", fn: () => window.SXViewLib.papers(document.getElementById("view")) },
+    { id: "codebank", name: "代码库", group: "more", fn: () => window.SXViewLib.codebank(document.getElementById("view")) },
+    { id: "digest", name: "文献汇总", group: "more", fn: () => window.SXViewExtra.digest(document.getElementById("view")) },
+    { id: "playbook", name: "套路拆解", group: "more", fn: () => window.SXViewLib.playbook(document.getElementById("view")) },
+    { id: "refs", name: "对标与来源", group: "more", fn: () => window.SXViewExtra.refs(document.getElementById("view")) },
+    { id: "scripts", name: "我的代码本", group: "more", fn: () => window.SXViewLib.scripts(document.getElementById("view")) },
+    { id: "data", name: "数据中心", group: "more", fn: () => window.SXViewLib.data(document.getElementById("view")) },
+    { id: "vault", name: "数据仓库", group: "more", fn: () => window.SXViewLib.vault(document.getElementById("view")) },
+    { id: "write", name: "论文写作台", group: "more", fn: () => window.SXViewWrite.write(document.getElementById("view")) },
+    { id: "tutor", name: "AI 导师", group: "more", fn: () => window.SXViewWrite.tutor(document.getElementById("view")) }
   ];
 
   function go(id) {
@@ -31,6 +32,8 @@
     document.querySelectorAll("#nav a").forEach(a => {
       a.classList.toggle("on", a.getAttribute("data-id") === item.id);
     });
+    const mo = document.getElementById("navMore");
+    if (mo) mo.querySelector("[data-more]").classList.toggle("on", item.group === "more");
     const v = document.getElementById("view");
     v.innerHTML = "";
     try { item.fn(v); } catch (e) {
@@ -136,8 +139,28 @@
 
   /* ==================== 启动 ==================== */
   function boot() {
-    document.getElementById("nav").innerHTML = NAV.map(n =>
-      '<a href="#/' + n.id + '" data-id="' + n.id + '">' + E(n.name) + "</a>").join("");
+    const main = NAV.filter(n => n.group === "main");
+    const more = NAV.filter(n => n.group === "more");
+    document.getElementById("nav").innerHTML =
+      main.map(n => '<a href="#/' + n.id + '" data-id="' + n.id + '">' + E(n.name) + "</a>").join("") +
+      '<span class="more" id="navMore"><a data-more="1">更多 ▾</a><span class="morebox">' +
+      more.map(n => '<a href="#/' + n.id + '" data-id="' + n.id + '">' + E(n.name) + "</a>").join("") +
+      "</span></span>";
+    const mEl = document.getElementById("navMore");
+    mEl.querySelector("[data-more]").onclick = (e) => { e.stopPropagation(); mEl.classList.toggle("open"); };
+    document.addEventListener("click", () => mEl.classList.remove("open"));
+    // 主题：默认深色，可一键切换
+    const tb = document.getElementById("themeBtn");
+    if (tb) {
+      const set = (t) => {
+        document.documentElement.setAttribute("data-theme", t);
+        tb.textContent = t === "dark" ? "◐" : "◑";
+        tb.title = t === "dark" ? "切换到浅色" : "切换到深色";
+        try { localStorage.setItem("sx_theme", t); } catch (e) { }
+      };
+      set(localStorage.getItem("sx_theme") || "dark");
+      tb.onclick = () => set(document.documentElement.getAttribute("data-theme") === "dark" ? "light" : "dark");
+    }
     window.addEventListener("hashchange", route);
     route();
   }
