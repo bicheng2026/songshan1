@@ -159,7 +159,7 @@ window.SX_LEVELS = (window.SX_LEVELS || []).concat([
       "approved_hits：只保留已获批的匹配结果，并按 score 降序"
     ],
     datasets: ["drug_targets"],
-    starter: "# drug_targets：gene / drug / mechanism / status / source\n# candidate 用你在差异分析里得到的 Up 基因（这里给一批 RILD 相关基因）\ncandidate <- c(\"PPARA\", \"ACSL4\", \"HMOX1\", \"TGFB1\", \"YAP1\", \"TEAD1\", \"MET\", \"MERTK\", \"SLC7A11\", \"GPX4\", \"PTGS2\", \"CDKN1A\", \"TP53\", \"MDM2\")\n\nhits <- ...\napproved_hits <- ...\n",
+    starter: "# drug_targets：gene / drug / mechanism / status / source\n# candidate 用你在差异分析里得到的 Up 基因（这里给一批候选基因）\ncandidate <- c(\"PPARA\", \"ACSL4\", \"HMOX1\", \"TGFB1\", \"YAP1\", \"TEAD1\", \"MET\", \"MERTK\", \"SLC7A11\", \"GPX4\", \"PTGS2\", \"CDKN1A\", \"TP53\", \"MDM2\")\n\nhits <- ...\napproved_hits <- ...\n",
     hints: [
       "取交集：drug_targets[drug_targets$gene %in% candidate, ]。",
       "打分用 ifelse 嵌套或者建一个对照表再 merge —— 后者更清晰、更好维护。",
@@ -255,25 +255,25 @@ window.SX_LEVELS = (window.SX_LEVELS || []).concat([
 
   /* ============================ BOSS ============================ */
   {
-    id: "boss-1", track: "boss", title: "终章 BOSS · RILD 老药新用迷你全流程",
-    story: "导师把钥匙拍在桌上：『用这批数据，从放疗损伤一路走到候选药物，写成一个可提交的结果块。』\n这是本站所有关卡的集合体 —— 也是你这个课题的真实路线图。",
+    id: "boss-1", track: "boss", title: "终章 BOSS · 老药新用迷你全流程",
+    story: "导师把钥匙拍在桌上：『用这批数据，从损伤一路走到候选药物，写成一个可提交的结果块。』\n这是本站所有关卡的集合体 —— 也是你这个课题的真实路线图。",
     goal: "打通 DEG -> 富集 -> 机制定位 -> 药物匹配 -> 结果输出 的完整链路。",
     tasks: [
-      "step1_deg：Zone3 照射 28 天 vs 对照的差异基因（含 logFC / adj.P）",
+      "step1_deg：Zone3 处理 28 天 vs 对照的差异基因（含 logFC / adj.P）",
       "step2_enrich：基于 step1 的显著上调基因做 ORA，返回显著通路",
       "step3_drug：把富集/候选基因映射到已获批药物，输出可投的候选清单",
       "report：一个字符串，3-5 句话总结你发现的生物学故事"
     ],
-    datasets: ["rild_expr", "rild_meta", "drug_targets"],
+    datasets: ["expr_mat", "expr_meta", "drug_targets"],
     starter: "# 这一关没有 starter hand-holding，只有任务。\n# 前 25 关的技能全部可以调用。\n#\n# step 1：Zone3 + 28天 vs Zone3 + 0天\n# step 2：显著上调基因 -> ORA（gmt 不在本关数据里，请从药物靶点与候选基因的对应关系入手，\n#          或直接用 += 这批基因去看violate 了哪些已知机制）\n# step 3：candidate gene x drug_targets 匹配，筛 Approved\n# step 4：用自然语言写出结论\n",
     hints: [
-      "step1 复用 bulk-2 的做法，注意这里物种符号是大鼠风格（首字母大写），而药物表是人的全大写 —— 需要 toupper() 转换。",
+      "step1 复用 bulk-2 的做法，注意这里基因符号是首字母大写风格，而药物表是人的全大写 —— 需要 toupper() 转换。",
       "这一步的坑正是你课题里真实存在的坑：跨物种基因符号不一致。",
       "候选基因的筛选：adj.P < 0.05 且 |logFC| > 1。",
       "report 要有生物学叙事，不要只罗列基因名。"
     ],
-    solution: "treat <- rild_meta$sample[rild_meta$zone == 3 & rild_meta$time == 28]\nctrl  <- rild_meta$sample[rild_meta$zone == 3 & rild_meta$time == 0]\nstep1_deg <- data.frame(\n  logFC   = rowMeans(rild_expr[, treat]) - rowMeans(rild_expr[, ctrl]),\n  P.Value = apply(rild_expr, 1, function(x) t.test(x[treat], x[ctrl])$p.value),\n  stringsAsFactors = FALSE)\nstep1_deg$adj.P <- p.adjust(step1_deg$P.Value, method = \"BH\")\n\ncandidate <- toupper(rownames(step1_deg)[step1_deg$adj.P < 0.05 & abs(step1_deg$logFC) > 1])\nstep2_enrich <- drug_targets[drug_targets$gene %in% candidate, ]\nstep2_enrich <- step2_enrich[order(step2_enrich$status), ]\n\nstep3_drug <- step2_enrich[step2_enrich$status == \"Approved\", c(\"gene\", \"drug\", \"mechanism\")]\nstep3_drug <- step3_drug[!duplicated(step3_drug$drug), ]\n\nreport <- paste0(\n  \"Zone 3 (pericentral) hepatocytes at day 28 after irradiation show sustained cell-cycle restraint \" ,\n  \"alongside late fibrogenic activation. Among the differentially expressed genes, several map to \" ,\n  \"clinically approved agents targeting PPARA/ACSL4-mediated lipid handling, TGFB1-driven fibrosis, \" ,\n  \"and Hippo-YAP signalling, nominating repositionable candidates for RILD intervention. \" ,\n  \"These in silico hypotheses require experimental validation in the rat RILD model.\")\n",
-    check: "if (!exists(\"step1_deg\")) return(\"缺少对象 step1_deg\")\nif (!all(c(\"logFC\", \"P.Value\", \"adj.P\") %in% names(step1_deg))) return(\"step1_deg 应含 logFC / P.Value / adj.P\")\nif (!exists(\"step2_enrich\")) return(\"缺少对象 step2_enrich\")\nif (!exists(\"step3_drug\")) return(\"缺少对象 step3_drug\")\nif (!exists(\"report\")) return(\"缺少对象 report：请用自然语言写出生物学结论\")\nif (!is.character(report) || nchar(report) < 150) return(sprintf(\"report 应有 150 字符以上的完整叙述，当前 %d\", nchar(report)))\nif (nrow(step1_deg) != 51) return(sprintf(\"step1_deg 应覆盖全部 51 个基因，当前 %d\", nrow(step1_deg)))\nif (nrow(step3_drug) == 0) return(\"没有匹配到任何已获批药物 —— 记得把大鼠风格基因名 toupper() 后再匹配\")\nTRUE",
+    solution: "treat <- expr_meta$sample[expr_meta$zone == 3 & expr_meta$time == 28]\nctrl  <- expr_meta$sample[expr_meta$zone == 3 & expr_meta$time == 0]\nstep1_deg <- data.frame(\n  logFC   = rowMeans(expr_mat[, treat]) - rowMeans(expr_mat[, ctrl]),\n  P.Value = apply(expr_mat, 1, function(x) t.test(x[treat], x[ctrl])$p.value),\n  stringsAsFactors = FALSE)\nstep1_deg$adj.P <- p.adjust(step1_deg$P.Value, method = \"BH\")\n\ncandidate <- toupper(rownames(step1_deg)[step1_deg$adj.P < 0.05 & abs(step1_deg$logFC) > 1])\nstep2_enrich <- drug_targets[drug_targets$gene %in% candidate, ]\nstep2_enrich <- step2_enrich[order(step2_enrich$status), ]\n\nstep3_drug <- step2_enrich[step2_enrich$status == \"Approved\", c(\"gene\", \"drug\", \"mechanism\")]\nstep3_drug <- step3_drug[!duplicated(step3_drug$drug), ]\n\nreport <- paste0(\n  \"Zone 3 (pericentral) hepatocytes at day 28 after irradiation show sustained cell-cycle restraint \" ,\n  \"alongside late fibrogenic activation. Among the differentially expressed genes, several map to \" ,\n  \"clinically approved agents targeting PPARA/ACSL4-mediated lipid handling, TGFB1-driven fibrosis, \" ,\n  \"and Hippo-YAP signalling, nominating repositionable candidates for 损伤模型 intervention. \" ,\n  \"These in silico hypotheses require experimental validation in the rat 损伤模型 model.\")\n",
+    check: "if (!exists(\"step1_deg\")) return(\"缺少对象 step1_deg\")\nif (!all(c(\"logFC\", \"P.Value\", \"adj.P\") %in% names(step1_deg))) return(\"step1_deg 应含 logFC / P.Value / adj.P\")\nif (!exists(\"step2_enrich\")) return(\"缺少对象 step2_enrich\")\nif (!exists(\"step3_drug\")) return(\"缺少对象 step3_drug\")\nif (!exists(\"report\")) return(\"缺少对象 report：请用自然语言写出生物学结论\")\nif (!is.character(report) || nchar(report) < 150) return(sprintf(\"report 应有 150 字符以上的完整叙述，当前 %d\", nchar(report)))\nif (nrow(step1_deg) != 51) return(sprintf(\"step1_deg 应覆盖全部 51 个基因，当前 %d\", nrow(step1_deg)))\nif (nrow(step3_drug) == 0) return(\"没有匹配到任何已获批药物 —— 记得把动物模型风格基因名 toupper() 后再匹配\")\nTRUE",
     xp: 300, star: 5, boss: true
   }
 ]);

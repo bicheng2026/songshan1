@@ -471,7 +471,7 @@ details.real[open] > summary { margin-bottom: 6px; }
 
 .sxPanel {
     position: fixed; right: 24px; bottom: 24px; z-index: 901;
-    width: 440px; max-width: calc(100vw - 36px); height: 660px; max-height: calc(100vh - 50px);
+    width: 440px; max-width: calc(100vw - 36px); height: auto; max-height: calc(100vh - 50px); overflow-y: auto;
     background: var(--panel); border: 1px solid var(--line-strong); border-radius: 22px;
     display: none; flex-direction: column; overflow: hidden;
 }

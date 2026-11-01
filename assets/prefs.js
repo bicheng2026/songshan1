@@ -9,7 +9,7 @@
     lh: { min: 150, max: 240, def: 205 },
     sp: { min: 80, max: 200, def: 140 },
     /* 宽度到顶就是铺满，中间值是内容区最大宽度（px） */
-    w: { min: 960, max: 2400, def: 1440 }
+    w: { min: 900, max: 2400, def: 1280 }
   };
   var PRESETS = [
     { name: "紧凑", fs: 100, lh: 175, sp: 100, w: 1200 },
@@ -17,7 +17,7 @@
     { name: "宽松", fs: 100, lh: 205, sp: 140, w: 1640 },
     { name: "极宽", fs: 108, lh: 220, sp: 175, w: 2400 }
   ];
-  var K = { fs: "sx_fs", lh: "sx_lh", sp: "sx_sp", w: "sx_w" };
+  var K = { fs: "sx_fs", lh: "sx_lh", sp: "sx_sp", w: "sx_w2" };
   var KEYS = ["fs", "lh", "sp", "w"];
 
   var root = document.documentElement;
@@ -78,12 +78,12 @@
     pop.id = "readPop";
     pop.innerHTML =
       '<div class="rp-head"><b>阅读设置</b><a href="javascript:void 0" id="rpReset">恢复默认</a></div>' +
+      row("w", "页面宽") +
       row("fs", "字号") +
       row("lh", "行距") +
       row("sp", "留白") +
-      row("w", "宽度") +
       '<div class="rp-presets" id="rpPre"></div>' +
-      '<div class="rp-tip">拖到顺手为止，当场生效。宽度拉到最右是铺满屏。Ctrl + = / − 调字号，Ctrl + 0 复位。</div>';
+      '<div class="rp-tip">拖到顺手为止，当场生效。页面宽拉到底＝铺满。Ctrl + = / − 调字号，Ctrl + 0 复位。</div>';
 
     document.body.appendChild(pop);
 

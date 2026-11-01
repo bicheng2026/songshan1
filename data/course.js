@@ -7,6 +7,233 @@ window.SX_COURSE = {
   
   chapters: [
     {
+      id: "sc",
+      title: "专题 · 单细胞 Seurat 实操：从 count 矩阵到细胞通讯",
+      plain: "课题组做的是 RILD 肝细胞单细胞，这一讲专门带你用 R（Seurat）把一张 10x 矩阵跑成带注释的细胞分群，再顺手跑一遍细胞通讯（CellChat）。不依赖本课题数据，用 Seurat 自带的 pbmc3k 当练习对象，跑通了你再换成自己的数据。",
+      goal: [
+        "能独立用 Read10X / CreateSeuratObject 把 10x 输出读成 Seurat 对象",
+        "能解释 QC 三个指标（nFeature / nCount / percent.mt）各自在卡什么并定阈值",
+        "能跑通 归一化 → 高变基因 → PCA → UMAP → 聚类 的标准链路",
+        "会用 marker 基因 + SingleR 给 cluster 注释，而不是瞎猜",
+        "能跑通 CellChat 细胞通讯并看懂一张通讯网络图"
+      ],
+      watch: [
+        { n: "Biomamba《手把手教你做单细胞转录组测序数据分析》", u: "https://www.bilibili.com/video/BV1S44y1b76Z" },
+        { n: "生信幻想家《单细胞数据分析 标准分析流程》", u: "https://www.bilibili.com/video/BV1Ct421j7X3" },
+        { n: "未名阿《保姆级单细胞代码分析（1）质控·降维·聚类》", u: "https://www.bilibili.com/video/BV1yR4y1q7X4" },
+        { n: "生信技能树-jimmy《单细胞亚群注释》", u: "https://www.bilibili.com/video/BV1mE421w7Te" }
+      ],
+      refs: [
+        { n: "Seurat 官网", u: "https://satijalab.org/seurat/", d: "所有 Seurat 教程入口，版本更新都在这", t: "doc" },
+        { n: "Seurat PBMC3K 标准流程", u: "https://satijalab.org/seurat/articles/pbmc3k_tutorial", d: "单细胞「Hello World」，必须亲手敲一遍", t: "doc" },
+        { n: "Seurat 常用命令速查", u: "https://satijalab.org/seurat/articles/essential_commands", d: "对象结构、取子集、改 meta 都在这里", t: "doc" },
+        { n: "OSCA：单细胞分析 Bioconductor 书", u: "https://bioconductor.org/books/release/OSCA/", d: "最完整的免费单细胞教材", t: "doc" },
+        { n: "sc-best-practices", u: "https://www.sc-best-practices.org/", d: "专门讲「这一步为什么这么做、什么时候会错」", t: "doc" },
+        { n: "SingleR（自动注释）", u: "https://bioconductor.org/packages/release/bioc/html/SingleR.html", d: "用参考数据集给 cluster 自动打细胞类型", t: "doc" },
+        { n: "sctransform 归一化", u: "https://bioconductor.org/packages/release/bioc/html/sctransform.html", d: "建模技术噪声的归一化，替代 log 归一", t: "doc" },
+        { n: "Harmony 快速上手", u: "https://portals.broadinstitute.org/harmony/articles/quickstart.html", d: "多样本整合去批次最常用", t: "doc" },
+        { n: "CellChat 官方仓库", u: "https://github.com/jinworks/CellChat", d: "细胞通讯分析，vignette 在 README", t: "doc" },
+        { n: "CellChat 教程（Nature Protocols）", u: "https://www.nature.com/articles/s41596-021-00534-2", d: "从对象构建到网络可视化的完整流程", t: "doc" },
+        { n: "DoubletFinder（双细胞检测）", u: "https://github.com/chris-mcginnis-ucsf/DoubletFinder", d: "10x 双细胞剔除，建对象后第一步就做", t: "doc" },
+        { n: "Monocle3（拟时序）", u: "https://cole-trapnell-lab.github.io/monocle3/", d: "轨迹推断，看细胞状态连续变化", t: "doc" },
+        { n: "生信技能树 单细胞专栏", u: "https://www.bilibili.com/video/BV1mE421w7Te", d: "jimmy 团队的系列实操视频", t: "video" }
+      ],
+      subs: [
+        {
+          t: "sc.1 读入 10x 数据并建成 Seurat 对象",
+          why: "10x 输出是三个文件（barcodes / features / matrix.mtx.gz）。Read10X 把它们读成稀疏矩阵，CreateSeuratObject 再包成 Seurat 对象——之后所有分析都在这个对象里。",
+          pts: [
+            "Seurat 对象是「带抽屉的盒子」：counts 在 @assays$RNA@counts，归一化结果在 @data，降维在 @reductions。先看结构再动手。",
+            "如果是从 GEO 下到的表达矩阵（行为基因、列为细胞），也能直接 CreateSeuratObject(mat)，不一定非要是 10x。",
+            "min.cells / min.features 是第一次粗筛：一个基因只在 3 个细胞里出现，留着没意义；一个细胞只测到 200 个基因，大概率是空 droplet。"
+          ],
+          code: `# 读 10x 标准输出目录（含 barcodes.tsv / features.tsv / matrix.mtx.gz）
+library(Seurat)
+pbmc <- Read10X(data.dir = "pbmc3k/filtered_gene_bc_matrices/hg19/")
+so <- CreateSeuratObject(counts = pbmc,
+                         project = "pbmc3k",
+                         min.cells = 3,
+                         min.features = 200)
+
+# 看一下对象长什么样
+so
+so@assays$RNA@counts[1:5, 1:5]
+dim(so)                      # 基因数 x 细胞数
+
+# 从现成矩阵直接建（GEO 下载的 expr_mat 也可）
+# so2 <- CreateSeuratObject(counts = expr_mat, project = "myGEO")`
+        },
+        {
+          t: "sc.2 质控 QC：三个指标各自卡什么",
+          why: "单细胞最容易被垃圾细胞带偏。QC 就盯三个数：每个细胞测到多少基因（nFeature_RNA）、测到多少 UMI（nCount_RNA）、线粒体基因占比（percent.mt）。",
+          pts: [
+            "nFeature_RNA 太低 = 空 droplet 或死细胞；太高 = 双细胞（两个细胞挤一个 barcode）。",
+            "percent.mt 高 = 死细胞（线粒体 RNA 漏出来）。肝细胞本身代谢高，阈值可以比免疫细胞的 5-10% 略宽，但要有理由。",
+            "阈值没有标准答案，看小提琴图分布、在拐点处切，并写进方法部分。",
+            "课题背景：RILD 肝细胞，percent.mt 按文献常用 10-20% 起步，nFeature 按分布切，别照抄别人的数。"
+          ],
+          code: `so[["percent.mt"]] <- PercentageFeatureSet(so, pattern = "^MT-")
+
+# 小提琴图看分布，再定切点
+VlnPlot(so, features = c("nFeature_RNA", "nCount_RNA", "percent.mt"), ncol = 3)
+
+# 过滤：线粒体 < 20%，基因数 200-6000（按你的图调）
+so <- subset(so, subset = nFeature_RNA > 200 & nFeature_RNA < 6000 & percent.mt < 20)
+
+# 顺手做双细胞检测（10x 必做）
+# library(DoubletFinder)
+# so <- doubletFinder(so, PCs = 1:15, pN = 0.25, pK = 0.09)`
+        },
+        {
+          t: "sc.3 归一化与挑高变基因",
+          why: "不同细胞测序深度差很多，先归一化把深度抹平；再挑出在细胞间波动最大的那批基因（高变基因），后面的 PCA 只在这些基因上做。",
+          pts: [
+            "LogNormalize（默认）：log(1 + 总数归一化后的表达)。简单但假设所有细胞同样多噪声。",
+            "sctransform：建模每个基因的均值-方差关系，对技术噪声更稳，推荐用。",
+            "高变基因不是「差异基因」，只是「在细胞间变化大、值得拿去做降维」的基因，默认 2000 个。"
+          ],
+          code: `# 方式一：标准 log 归一化
+so <- NormalizeData(so, normalization.method = "LogNormalize", scale.factor = 10000)
+so <- FindVariableFeatures(so, selection.method = "vst", nfeatures = 2000)
+
+# 方式二（推荐）：sctransform，一步完成归一化 + 高变
+# so <- SCTransform(so, vars.to.regress = "percent.mt")
+
+# 看挑出来的高变基因
+top <- head(VariableFeatures(so), 20)
+plot1 <- VariableFeaturePlot(so)
+LabelPoints(plot1, points = top, repel = TRUE)`
+        },
+        {
+          t: "sc.4 降维：PCA -> UMAP",
+          why: "2 万基因没法画。先 ScaleData（中心化、回归掉深度/线粒体影响），再 PCA 压到几十个主成分，最后 UMAP 压到 2 维给你看分群。",
+          pts: [
+            "ScaleData 这一步会把深度和线粒体比例「回归掉」，否则降维会被这些技术因素主导。",
+            "PCA 用多少 PC？看 ElbowPlot 拐点，一般取 10-30。取少了丢信息，取多了把噪声当信号。",
+            "UMAP 是「看」用的，不是「算」用的。聚类和差异仍然在 PCA 空间做。"
+          ],
+          code: `so <- ScaleData(so, vars.to.regress = c("nCount_RNA", "percent.mt"))
+so <- RunPCA(so, features = VariableFeatures(object = so))
+ElbowPlot(so)              # 拐点处决定用前几个 PC
+
+so <- RunUMAP(so, dims = 1:15)
+DimPlot(so, reduction = "umap", label = TRUE)
+
+# 顺带存一下 PCA 结果
+so <- RunTSNE(so, dims = 1:15)   # tSNE 备选，UMAP 通常更稳`
+        },
+        {
+          t: "sc.5 聚类：resolution 决定分几群",
+          why: "聚类不是直接对细胞做，而是先建一个「细胞-细胞相似图」（基于前 N 个 PC），再用图聚类切成 community。resolution 越大，切得越细。",
+          pts: [
+            "FindNeighbors 用前 dims 个 PC 建图；FindClusters 切图。",
+            "resolution 没有标准值：0.4 粗、0.8 中、1.2 细。先 0.8，看分群是否有生物学意义再调。",
+            "cluster 数不是越多越好。一个 cluster 里混着两种细胞类型，比多切几个空 cluster 更糟。"
+          ],
+          code: `so <- FindNeighbors(so, dims = 1:15)
+so <- FindClusters(so, resolution = 0.8)
+
+# 看每个 cluster 多少细胞
+table(so$seurat_clusters)
+
+# 调 resolution 重跑，对比分群
+# so <- FindClusters(so, resolution = 0.4)
+# DimPlot(so, reduction = "umap", label = TRUE)`
+        },
+        {
+          t: "sc.6 注释：marker 基因 + SingleR，别瞎猜",
+          why: "聚类只给你 0/1/2/3 编号，不知道是什么细胞。用每个 cluster 高表达的基因（marker）判断身份；嫌手累就用 SingleR 自动注释，再人工核对。",
+          pts: [
+            "FindAllMarkers 对每个 cluster 做差异（默认 Wilcoxon），挑 logFC 大、padj 小的基因当 marker。",
+            "肝细胞 Markers（贴合 RILD 课题）：Alb / Hnf4a 肝细胞，Krt19 胆管上皮，Pecam1/CD31 内皮，Cd68/Adgre1 巨噬，Col1a1 成纤维，Epcam 上皮。",
+            "SingleR 用参考数据集（如 Human Primary Cell Atlas）自动打类型，快但可能粗，关键 cluster 一定手查 marker 复核。",
+            "注释用新列存：so$celltype <- ...，别覆盖 seurat_clusters。"
+          ],
+          code: `markers <- FindAllMarkers(so, only.pos = TRUE, min.pct = 0.25, logfc.threshold = 0.25)
+# 看每个 cluster 前 2 个 marker
+top_mk <- markers %>% group_by(cluster) %>% top_n(2, avg_log2FC)
+
+# 可视化确认
+DotPlot(so, features = c("ALB", "HNF4A", "KRT19", "PECAM1", "CD68", "COL1A1")) + RotatedAxis()
+FeaturePlot(so, features = c("ALB", "CD68"))
+
+# SingleR 自动注释
+library(SingleR)
+ref <- celldex::HumanPrimaryCellAtlasData()
+pred <- SingleR(test = so@assays$RNA@data, ref = ref, labels = ref$label.main)
+so$celltype_pred <- pred$pruned.labels
+table(so$celltype_pred)`
+        },
+        {
+          t: "sc.7 多样本批次整合（Harmony）",
+          why: "如果数据来自多个样本/批次，不整合的话 UMAP 会先按「哪个样本」分团，而不是按「什么细胞」分团。Harmony 把批次效应压掉、保留生物学差异。",
+          pts: [
+            "先做标准降维到 PCA，再 RunHarmony 在 PCA 上纠正批次，后面聚类/UMAP 用 harmony 降维。",
+            "不是所有数据都要整合：单样本或批次影响很小时，强行整合会抹掉真实差异。先看不整合的图再决定。",
+            "Seurat v4 也有 IntegrateData 流程，但 Harmony 更快、对大矩阵更友好。"
+          ],
+          code: `library(harmony)
+so <- RunPCA(so, features = VariableFeatures(object = so))
+so <- RunHarmony(so, group.by.vars = "orig.ident", dims.use = 1:15)
+so <- RunUMAP(so, reduction = "harmony", dims = 1:15)
+so <- FindNeighbors(so, reduction = "harmony", dims = 1:15)
+so <- FindClusters(so, resolution = 0.8)
+DimPlot(so, reduction = "umap", label = TRUE) + NoLegend()`
+        },
+        {
+          t: "sc.8 细胞通讯 CellChat：谁在跟谁说话",
+          why: "分完群只是第一步。CellChat 用配体-受体数据库算：哪两个 cell type 之间在大量「发信号」，信号网络里谁是 hub。这直接对应课题「损伤-再生机制」里细胞间的对话。",
+          pts: [
+            "输入是表达矩阵 + 每个细胞的 cell type 注释（so$celltype）。",
+            "computeCommunProb 算通讯概率，filterCommunication 去掉弱信号，aggregateNet 汇总成网络。",
+            "netVisual 出网络图，netAnalysis_signalingRole 找发送/接收 hub。",
+            "配体-受体库默认 human，鼠数据要用 CellChatDB.mouse。课题是鼠 RILD 数据，记得换库。"
+          ],
+          code: `library(CellChat)
+cellchat <- createCellChat(object = so@assays$RNA@data,
+                           meta = so@meta.data,
+                           group.by = "celltype")
+cellchat <- setIdent(cellchat, ident.use = "celltype")
+cellchat <- subsetData(cellchat)
+
+# 用鼠数据库（课题是鼠 RILD）；人是 CellChatDB.human
+cellchat@DB <- CellChatDB.mouse
+cellchat <- subsetDB(cellchat, high.thr = 0.1)
+
+cellchat <- computeCommunProb(cellchat, type = "triMean")
+cellchat <- filterCommunication(cellchat, min.cells = 10)
+cellchat <- aggregateNet(cellchat)
+
+# 看整体网络和 hub
+netVisual(cellchat, layout = "circle")
+netAnalysis_signalingRole(cellchat, pattern = "outgoing")
+netAnalysis_signalingRole_network(cellchat, signaling = "TGFb", width = 8)`
+        },
+        {
+          t: "sc.9 可视化导出：把分群结果交给下游",
+          why: "分完群要出图、要存档，还要把 cluster 级别的矩阵导出给下游分析（GSVA、WGCNA、差异），形成「单细胞 → 通路 → 网络」的闭环。",
+          pts: [
+            "DimPlot / VlnPlot / FeaturePlot / DoHeatmap 是四类常用出图，pdf 保存最稳。",
+            "导出的 cluster 平均表达矩阵，可以直接喂给课题现有的 GSVA / WGCNA 脚本，不必重造轮子。",
+            "所有阈值、参数、Seurat 版本都记进方法部分——单细胞可重复性的命门就在这。"
+          ],
+          code: `pdf("sc_figs.pdf", width = 10)
+DimPlot(so, reduction = "umap", label = TRUE)
+VlnPlot(so, features = c("ALB", "CD68"), ncol = 2)
+FeaturePlot(so, features = c("HNF4A", "KRT19"))
+DoHeatmap(so, features = top_mk$gene[1:30]) + NoLegend()
+dev.off()
+
+# 导出 cluster 平均表达矩阵，喂给下游 GSVA / WGCNA
+avg <- AverageExpression(so, assays = "RNA", slot = "data")$RNA
+write.csv(avg, "cluster_avg_expr.csv")
+
+# 导出带注释的 metadata
+write.csv(so@meta.data, "cell_annotations.csv")`
+        }
+      ]
+    },
+    {
       id: "k1",
       title: "第 1 讲　生信是什么：counts 矩阵、Bulk 与单细胞",
       plain: "你下载到的那个大表格，格子里其实是「数到几条」，不是「表达高不高」。这讲只说清这一件事——搞明白了，后面的归一化、差异分析才不会越看越糊涂。",

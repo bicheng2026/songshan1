@@ -3,21 +3,21 @@ window.SX_LEVELS = [
   /* ============================ R 基础 ============================ */
   {
     id: "rbase-1", track: "rbase", title: "第一关 · 索引：从 54 个样本里揪出你要的那一批",
-    story: "导师扔给你一张样本信息表，说：『把照射组和分区2第3天的样本先挑出来』。这是所有生信分析的起手式。",
+    story: "导师扔给你一张样本信息表，说：『把处理组和分区2第3天的样本先挑出来』。这是所有生信分析的起手式。",
     goal: "学会用逻辑表达式 + 方括号索引，从数据框里精确取子集。",
     tasks: [
-      "ir_samples：所有照射组（group == \"IR\"）的样本编号，长度应为 45",
+      "ir_samples：所有处理组（group == \"Trt\"）的样本编号，长度应为 45",
       "z2d3：Zone 2 + 第 3 天（zone == 2 且 time == 3）的样本编号，长度应为 3",
       "n_sham：对照组样本数（应为 9）"
     ],
-    datasets: ["rild_meta"],
-    starter: "# 数据已经帮你读好了：rild_meta\nhead(rild_meta)\nstr(rild_meta)\n\n# 1) 照射组样本编号\nir_samples <- ...\n\n# 2) Zone2 第3天\nz2d3 <- ...\n\n# 3) 对照组数量\nn_sham <- ...\n",
+    datasets: ["expr_meta"],
+    starter: "# 数据已经帮你读好了：expr_meta\nhead(expr_meta)\nstr(expr_meta)\n\n# 1) 处理组样本编号\nir_samples <- ...\n\n# 2) Zone2 第3天\nz2d3 <- ...\n\n# 3) 对照组数量\nn_sham <- ...\n",
     hints: [
       "取值要用双等号 ==，单个等号 = 是赋值，在这会变成新建一列。",
       "两个条件同时满足用 & ；或者用 &&（但 && 只用于长度 1）。",
-      "rild_meta$sample[条件] 就是『挑行取列』的标准写法。"
+      "expr_meta$sample[条件] 就是『挑行取列』的标准写法。"
     ],
-    solution: "ir_samples <- rild_meta$sample[rild_meta$group == \"IR\"]\nz2d3      <- rild_meta$sample[rild_meta$zone == 2 & rild_meta$time == 3]\nn_sham    <- sum(rild_meta$group == \"Sham\")\n",
+    solution: "ir_samples <- expr_meta$sample[expr_meta$group == \"Trt\"]\nz2d3      <- expr_meta$sample[expr_meta$zone == 2 & expr_meta$time == 3]\nn_sham    <- sum(expr_meta$group == \"Ctrl\")\n",
     check: "if (!exists(\"ir_samples\")) return(\"缺少对象 ir_samples：请选择 IR 组的样本编号\")\nif (!exists(\"z2d3\")) return(\"缺少对象 z2d3\")\nif (!exists(\"n_sham\")) return(\"缺少对象 n_sham\")\nif (length(ir_samples) != 45) return(sprintf(\"ir_samples 应有 45 个，当前 %d 个\", length(ir_samples)))\nif (length(z2d3) != 3) return(sprintf(\"z2d3 应有 3 个：\", length(z2d3)))\nif (!all(startsWith(z2d3, \"Z2_d3\"))) return(\"z2d3 里的样本名应该都以 Z2_d3 开头（Z2_d3_r1..r3）\")\nif (n_sham != 9) return(sprintf(\"n_sham 应为 9，当前 %s\", n_sham))\nTRUE",
     xp: 30, star: 1
   },
@@ -30,14 +30,14 @@ window.SX_LEVELS = [
       "zone2_mean：Zone 2 各基因的平均表达，长度 51 的命名向量",
       "Mki67 在 Zone2 的均值应落在 6–9 之间（如果你算出来离谱，回去检查索引是否取对）"
     ],
-    datasets: ["rild_expr", "rild_meta"],
-    starter: "# rild_expr：51 个基因 x 54 个样本（log2 尺度）\n# rild_meta：每个样本的 zone / time / group\nz2_cols    <- ...\nzone2_mean <- ...\n",
+    datasets: ["expr_mat", "expr_meta"],
+    starter: "# expr_mat：51 个基因 x 54 个样本（log2 尺度）\n# expr_meta：每个样本的 zone / time / group\nz2_cols    <- ...\nzone2_mean <- ...\n",
     hints: [
-      "rild_expr 是矩阵，取列用 rild_expr[, z2_cols]。",
+      "expr_mat 是矩阵，取列用 expr_mat[, z2_cols]。",
       "逐行求平均：rowMeans()，它对矩阵按行算均值，速度快还好读。",
-      "也可以用 apply(rild_expr[, z2_cols], 1, mean)，但那是用循环，慢。"
+      "也可以用 apply(expr_mat[, z2_cols], 1, mean)，但那是用循环，慢。"
     ],
-    solution: "z2_cols    <- rild_meta$sample[rild_meta$zone == 2]\nzone2_mean <- rowMeans(rild_expr[, z2_cols])\n",
+    solution: "z2_cols    <- expr_meta$sample[expr_meta$zone == 2]\nzone2_mean <- rowMeans(expr_mat[, z2_cols])\n",
     check: "if (!exists(\"z2_cols\")) return(\"缺少对象 z2_cols\")\nif (!exists(\"zone2_mean\")) return(\"缺少对象 zone2_mean\")\nif (length(z2_cols) != 18) return(sprintf(\"z2_cols 应有 18 个（3 个时间点 x 3 重复 x 2? 实际 Zone2 共 18 列），当前 %d\", length(z2_cols)))\nif (length(zone2_mean) != 51) return(sprintf(\"zone2_mean 应有 51 个基因，当前 %d\", length(zone2_mean)))\nif (abs(zone2_mean[\"Mki67\"] - 7.5) > 1.2) return(sprintf(\"Mki67 的 Zone2 均值约 7.5，你算出来是 %.3f，检查是不是把样本选错了\", zone2_mean[\"Mki67\"]))\nTRUE",
     xp: 40, star: 1
   },
@@ -50,14 +50,14 @@ window.SX_LEVELS = [
       "行名应为 Z1/Z2/Z3，列名 d0..d28",
       "你会发现 Zone3 的 Cdkn1a 最高最持久 —— 这就是论文的结论之一"
     ],
-    datasets: ["rild_expr", "rild_meta"],
+    datasets: ["expr_mat", "expr_meta"],
     starter: "# 目标：3 行 x 6 列的矩阵\n# 提示：tapply(向量, list(分组1, 分组2), FUN)\ncd_mat <- ...\n",
     hints: [
       "tapply(x, list(g1, g2), mean) 会自动把结果排成 g1 为行、g2 为列。",
       "注意顺序：tapply 的值向量顺序必须和分组向量的顺序一致，<｜hy_place▁holder▁no▁813｜>直接按样本顺序取。",
       "Zone3 第3天的值应该在 9 以上，明显高于 Zone2。"
     ],
-    solution: "cd_vec <- as.numeric(rild_expr[\"Cdkn1a\", rild_meta$sample])\ncd_mat <- tapply(cd_vec, list(rild_meta$zone, rild_meta$time), mean)\n",
+    solution: "cd_vec <- as.numeric(expr_mat[\"Cdkn1a\", expr_meta$sample])\ncd_mat <- tapply(cd_vec, list(expr_meta$zone, expr_meta$time), mean)\n",
     check: "if (!exists(\"cd_mat\")) return(\"缺少对象 cd_mat\")\nif (!is.matrix(cd_mat)) return(\"cd_mat 应该是矩阵，用 tapply 出来的正好是矩阵\")\nif (!all(dim(cd_mat) == c(3, 6))) return(sprintf(\"cd_mat 应是 3 行 6 列，当前是 %d 行 %d 列\", nrow(cd_mat), ncol(cd_mat)))\nz3 <- cd_mat[\"3\", \"3\"]; z2 <- cd_mat[\"2\", \"3\"]\nif (is.na(z3) || is.na(z2)) return(\"索引取不到值：行名应是 1/2/3，列名应是 0/1/3/7/14/28\")\nif (!(z3 > z2)) return(sprintf(\"第3天 Zone3 (%.2f) 应高于 Zone2 (%.2f)，否则说明 Cdkn1a 取错了\", z3, z2))\nif (z3 < 8.5) return(sprintf(\"Zone3 第3天的 Cdkn1a 约在 9.5 附近，你算出 %.2f，检查分组是否错乱\", z3))\nTRUE",
     xp: 50, star: 2
   },
@@ -68,17 +68,17 @@ window.SX_LEVELS = [
     tasks: [
       "log2fc <- function(mat, cols_a, cols_b)：返回每个基因 log2(平均A / 平均B)",
       "用它算 Zone2 第3天 vs 第0天的 logFC：fc_z2d3",
-      "Mki67 的 logFC 应为正数且 > 0.5（照射后 Zone2 增殖上调）"
+      "Mki67 的 logFC 应为正数且 > 0.5（处理后 Zone2 增殖上调）"
     ],
-    datasets: ["rild_expr", "rild_meta"],
+    datasets: ["expr_mat", "expr_meta"],
     starter: "log2fc <- function(mat, cols_a, cols_b) {\n  # 待实现\n}\n\nfc_z2d3 <- ...\nfc_z2d3[\"Mki67\"]\n",
     hints: [
       "对数倍变化的定义是 log2(mean(A) / mean(B))，不是 mean(A) - mean(B)——因为数据已经是 log2 尺度了，两种写法数值一样，但概念要分清。",
       "函数里 rowMeans(mat[, cols_a]) - rowMeans(mat[, cols_b]) 是最简洁的写法（因为输入已是 log2）。",
       "如果 Mki67 是负的，说明你把 A 和 B 放反了。"
     ],
-    solution: "log2fc <- function(mat, cols_a, cols_b) {\n  rowMeans(mat[, cols_a, drop = FALSE]) - rowMeans(mat[, cols_b, drop = FALSE])\n}\na <- rild_meta$sample[rild_meta$zone == 2 & rild_meta$time == 3]\nb <- rild_meta$sample[rild_meta$zone == 2 & rild_meta$time == 0]\nfc_z2d3 <- log2fc(rild_expr, a, b)\n",
-    check: "if (!exists(\"log2fc\") || !is.function(log2fc)) return(\"请定义函数 log2fc\")\nif (!exists(\"fc_z2d3\")) return(\"缺少对象 fc_z2d3\")\nif (length(fc_z2d3) != 51) return(sprintf(\"fc_z2d3 应有 51 个基因，当前 %d\", length(fc_z2d3)))\nif (fc_z2d3[\"Mki67\"] <= 0.5) return(sprintf(\"Mki67 的 logFC 应 > 0.5（Zone2 照射后增殖上调），当前 %.3f\", fc_z2d3[\"Mki67\"]))\ntest <- tryCatch(log2fc(rild_expr, rild_meta$sample[1:3], rild_meta$sample[4:6]), error = function(e) e)\nif (inherits(test, \"error\")) return(sprintf(\"你的函数在只传 3 列时会报错：%s\", conditionMessage(test)))\nTRUE",
+    solution: "log2fc <- function(mat, cols_a, cols_b) {\n  rowMeans(mat[, cols_a, drop = FALSE]) - rowMeans(mat[, cols_b, drop = FALSE])\n}\na <- expr_meta$sample[expr_meta$zone == 2 & expr_meta$time == 3]\nb <- expr_meta$sample[expr_meta$zone == 2 & expr_meta$time == 0]\nfc_z2d3 <- log2fc(expr_mat, a, b)\n",
+    check: "if (!exists(\"log2fc\") || !is.function(log2fc)) return(\"请定义函数 log2fc\")\nif (!exists(\"fc_z2d3\")) return(\"缺少对象 fc_z2d3\")\nif (length(fc_z2d3) != 51) return(sprintf(\"fc_z2d3 应有 51 个基因，当前 %d\", length(fc_z2d3)))\nif (fc_z2d3[\"Mki67\"] <= 0.5) return(sprintf(\"Mki67 的 logFC 应 > 0.5（Zone2 处理后增殖上调），当前 %.3f\", fc_z2d3[\"Mki67\"]))\ntest <- tryCatch(log2fc(expr_mat, expr_meta$sample[1:3], expr_meta$sample[4:6]), error = function(e) e)\nif (inherits(test, \"error\")) return(sprintf(\"你的函数在只传 3 列时会报错：%s\", conditionMessage(test)))\nTRUE",
     xp: 60, star: 2
   },
 
@@ -88,19 +88,19 @@ window.SX_LEVELS = [
     story: "作图软件不吃宽 matrix，只吃长表：一行一个观测、一列一个变量。",
     goal: "手工实现 wide -> long 变换，理解 tidy 数据的形状。",
     tasks: [
-      "rild_long：data.frame，列名为 gene / sample / expr，共 51 x 54 = 2754 行",
+      "expr_long：data.frame，列名为 gene / sample / expr，共 51 x 54 = 2754 行",
       "合并上每条样本对应的 zone / time / group",
       "检查：Zone2 的 Mki67 平均表达约 7.4"
     ],
-    datasets: ["rild_expr", "rild_meta"],
-    starter: "# 不用 tidyr::pivot_longer，纯 base R 实现\nrild_long <- ...\n",
+    datasets: ["expr_mat", "expr_meta"],
+    starter: "# 不用 tidyr::pivot_longer，纯 base R 实现\nexpr_long <- ...\n",
     hints: [
       "思路：先 expand 出所有 (gene, sample) 组合：expand.grid()。",
       "表达值用 as.vector(t(mat)) 或 as.vector(mat) —— 注意 R 是按列存的，别把行列顺序搞反。",
-      "合并信息用 merge(rild_long, rild_meta, by = \"sample\")。"
+      "合并信息用 merge(expr_long, expr_meta, by = \"sample\")。"
     ],
-    solution: "rild_long <- expand.grid(gene = rownames(rild_expr), sample = colnames(rild_expr),\n                          stringsAsFactors = FALSE)\nrild_long$expr <- as.vector(as.matrix(rild_expr))\nrild_long <- merge(rild_long, rild_meta, by = \"sample\")\n",
-    check: "if (!exists(\"rild_long\")) return(\"缺少对象 rild_long\")\nif (!all(c(\"gene\", \"sample\", \"expr\") %in% names(rild_long))) return(\"rild_long 至少要包含三列：gene / sample / expr\")\nif (nrow(rild_long) != 2754) return(sprintf(\"应有 2754 行（51 基因 x 54 样本），当前 %d 行\", nrow(rild_long)))\nif (!all(c(\"zone\", \"time\", \"group\") %in% names(rild_long))) return(\"请再把 zone / time / group 合并进来（merge(rild_long, rild_meta, by=\\\"sample\\\")）\")\nsub <- subset(rild_long, gene == \"Mki67\" & zone == 2)\nif (abs(mean(sub$expr) - 7.4) > 1.0) return(sprintf(\"Zone2 的 Mki67 均值约 7.4，你算出 %.3f —— 极可能是转置方向搞反了\", mean(sub$expr)))\nTRUE",
+    solution: "expr_long <- expand.grid(gene = rownames(expr_mat), sample = colnames(expr_mat),\n                          stringsAsFactors = FALSE)\nexpr_long$expr <- as.vector(as.matrix(expr_mat))\nexpr_long <- merge(expr_long, expr_meta, by = \"sample\")\n",
+    check: "if (!exists(\"expr_long\")) return(\"缺少对象 expr_long\")\nif (!all(c(\"gene\", \"sample\", \"expr\") %in% names(expr_long))) return(\"expr_long 至少要包含三列：gene / sample / expr\")\nif (nrow(expr_long) != 2754) return(sprintf(\"应有 2754 行（51 基因 x 54 样本），当前 %d 行\", nrow(expr_long)))\nif (!all(c(\"zone\", \"time\", \"group\") %in% names(expr_long))) return(\"请再把 zone / time / group 合并进来（merge(expr_long, expr_meta, by=\\\"sample\\\")）\")\nsub <- subset(expr_long, gene == \"Mki67\" & zone == 2)\nif (abs(mean(sub$expr) - 7.4) > 1.0) return(sprintf(\"Zone2 的 Mki67 均值约 7.4，你算出 %.3f —— 极可能是转置方向搞反了\", mean(sub$expr)))\nTRUE",
     xp: 60, star: 2
   },
   {
@@ -112,15 +112,15 @@ window.SX_LEVELS = [
       "比较 Zone2 第3天（处理）vs 第0天（对照）",
       "Mki67 应显著上调，Cdkn1a 也应上调"
     ],
-    datasets: ["rild_expr", "rild_meta"],
-    starter: "# 1) 分组列名\ntreat <- rild_meta$sample[rild_meta$zone == 2 & rild_meta$time == 3]\nctrl  <- rild_meta$sample[rild_meta$zone == 2 & rild_meta$time == 0]\n\n# 2) 逐基因 t 检验（apply 或 for 循环）\n# 3) logFC = 处理均值 - 对照均值\n# 4) p.adjust(method = \"BH\")\ndeg <- ...\n",
+    datasets: ["expr_mat", "expr_meta"],
+    starter: "# 1) 分组列名\ntreat <- expr_meta$sample[expr_meta$zone == 2 & expr_meta$time == 3]\nctrl  <- expr_meta$sample[expr_meta$zone == 2 & expr_meta$time == 0]\n\n# 2) 逐基因 t 检验（apply 或 for 循环）\n# 3) logFC = 处理均值 - 对照均值\n# 4) p.adjust(method = \"BH\")\ndeg <- ...\n",
     hints: [
       "逐基因检验：apply(mat, 1, function(x) t.test(x[treat], x[ctrl])$p.value)。",
       "注意 t.test 里传的是数值向量，不是列名——用 match() 把列名换成列序号。",
       "BH 校正一行搞定：p.adjust(p, method = \"BH\")。别用 Bonferroni，太保守。",
       "为什么不能直接对 counts 做 t 检验？因为 counts 是离散的、均值方差相关；本数据已是 log2，近似正态，所以这里可以先做。"
     ],
-    solution: "treat <- rild_meta$sample[rild_meta$zone == 2 & rild_meta$time == 3]\nctrl  <- rild_meta$sample[rild_meta$zone == 2 & rild_meta$time == 0]\nmt <- rild_expr[, treat]; mc <- rild_expr[, ctrl]\ndeg <- data.frame(\n  logFC     = rowMeans(mt) - rowMeans(mc),\n  P.Value   = apply(rild_expr, 1, function(x) t.test(x[treat], x[ctrl])$p.value),\n  stringsAsFactors = FALSE\n)\ndeg$adj.P.Val <- p.adjust(deg$P.Value, method = \"BH\")\n",
+    solution: "treat <- expr_meta$sample[expr_meta$zone == 2 & expr_meta$time == 3]\nctrl  <- expr_meta$sample[expr_meta$zone == 2 & expr_meta$time == 0]\nmt <- expr_mat[, treat]; mc <- expr_mat[, ctrl]\ndeg <- data.frame(\n  logFC     = rowMeans(mt) - rowMeans(mc),\n  P.Value   = apply(expr_mat, 1, function(x) t.test(x[treat], x[ctrl])$p.value),\n  stringsAsFactors = FALSE\n)\ndeg$adj.P.Val <- p.adjust(deg$P.Value, method = \"BH\")\n",
     check: "if (!exists(\"deg\")) return(\"缺少对象 deg\")\nneed <- c(\"logFC\", \"P.Value\", \"adj.P.Val\")\nmiss <- setdiff(need, names(deg))\nif (length(miss)) return(sprintf(\"deg 缺少列：%s\", paste(miss, collapse = \", \")))\nif (nrow(deg) != 51) return(sprintf(\"deg 应有 51 行（全部基因），当前 %d\", nrow(deg)))\nif (any(is.na(deg$adj.P.Val))) return(\"adj.P.Val 里有 NA，检查 p.adjust 的输入是否有 NA\")\nm <- deg[\"Mki67\", ]\nif (m$logFC <= 0.5) return(sprintf(\"Mki67 应上调（logFC > 0.5），当前 %.3f\", m$logFC))\nif (!(\"Cdkn1a\" %in% rownames(deg) && deg[\"Cdkn1a\", \"logFC\"] > 0)) return(\"Cdkn1a 应上调，检查分组是否放反\")\nsig <- rownames(deg)[deg$adj.P.Val < 0.05 & abs(deg$logFC) > 1]\nif (length(sig) < 5) return(sprintf(\"显著基因（adj<0.05 且 |logFC|>1）应有不少（>=5），当前只有 %d\", length(sig)))\nTRUE",
     xp: 90, star: 3
   },

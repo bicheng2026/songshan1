@@ -123,7 +123,7 @@
       '<div class="lit-egs"><span>试：</span>' +
       '<button class="lit-eg" data-eg="10.1016/j.jhep.2023.01.001">DOI</button>' +
       '<button class="lit-eg" data-eg="PMC4302049">PMC</button>' +
-      '<button class="lit-eg" data-eg="RILD single cell">关键词</button>' +
+      '<button class="lit-eg" data-eg="single cell">关键词</button>' +
       "</div>" +
 
       '<div id="litId"></div>' +

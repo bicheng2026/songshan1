@@ -4,17 +4,17 @@ window.SX_EXAMPLES = {
     why: "先用一个更简单的同类任务，把「挑行取列」这件事看明白",
     code:
       "# 一、先看清表长什么样\n" +
-      "dim(rild_meta)        # 54 行 x 5 列\n" +
-      "colnames(rild_meta)   # sample zone time rep group\n" +
-      "head(rild_meta, 3)\n" +
+      "dim(expr_meta)        # 54 行 x 5 列\n" +
+      "colnames(expr_meta)   # sample zone time rep group\n" +
+      "head(expr_meta, 3)\n" +
       "\n" +
       "# 二、一个更简单的同类任务：挑出所有 Sham（对照组）样本\n" +
-      "rild_meta$group == \"Sham\"          # 54 个 TRUE/FALSE\n" +
-      "rild_meta$sample[rild_meta$group == \"Sham\"]\n" +
+      "expr_meta$group == \"Ctrl\"          # 54 个 TRUE/FALSE\n" +
+      "expr_meta$sample[expr_meta$group == \"Ctrl\"]\n" +
       "#  → \"Z1_d0_r1\" \"Z1_d0_r2\" \"Z1_d0_r3\" ... 共 9 个\n" +
       "\n" +
       "# 三、两个条件同时满足，用 & 连起来\n" +
-      "rild_meta$sample[rild_meta$zone == 1 & rild_meta$time == 0]",
+      "expr_meta$sample[expr_meta$zone == 1 & expr_meta$time == 0]",
     tip: "看懂上面三行，本关就是把「Sham」换成「IR」、把 zone 1 换成 zone 2。"
   },
 
@@ -22,11 +22,11 @@ window.SX_EXAMPLES = {
     why: "分组求均值的套路：先取列名 → 再取子矩阵 → 再按行求均值",
     code:
       "# 一、先取出某一组的样本列名\n" +
-      "z1 <- rild_meta$sample[rild_meta$zone == 1]\n" +
+      "z1 <- expr_meta$sample[expr_meta$zone == 1]\n" +
       "head(z1, 3)      # \"Z1_d0_r1\" \"Z1_d0_r2\" \"Z1_d0_r3\"\n" +
       "\n" +
       "# 二、用这些列名去矩阵里切子矩阵\n" +
-      "m1 <- rild_expr[, z1]      # 逗号前空着=所有基因，逗号后是列\n" +
+      "m1 <- expr_mat[, z1]      # 逗号前空着=所有基因，逗号后是列\n" +
       "dim(m1)                    # 51 个基因 x 18 个样本\n" +
       "\n" +
       "# 三、按行求均值（每个基因一个数）\n" +
@@ -39,15 +39,15 @@ window.SX_EXAMPLES = {
     why: "先看一维的 tapply，再看二维的",
     code:
       "# 一、取一个基因在所有样本上的表达\n" +
-      "x <- as.numeric(rild_expr[\"Alb\", ])\n" +
+      "x <- as.numeric(expr_mat[\"Alb\", ])\n" +
       "\n" +
       "# 二、一维分组：按 zone 求均值\n" +
-      "tapply(x, rild_meta$zone, mean)\n" +
+      "tapply(x, expr_meta$zone, mean)\n" +
       "#        1        2        3\n" +
       "# 12.11717 12.19267 12.09339   ← 三个分区的 Alb 平均表达，差别很小\n" +
       "\n" +
       "# 三、二维分组：第二个参数换成 list()\n" +
-      "tapply(x, list(rild_meta$zone, rild_meta$time), mean)\n" +
+      "tapply(x, list(expr_meta$zone, expr_meta$time), mean)\n" +
       "# 出来就是一个 3 行 x 6 列的矩阵：行=zone，列=time\n" +
       "# dim() 是 c(3, 6)，rownames 是 \"1\" \"2\" \"3\"，colnames 是 \"0\" \"1\" \"3\" \"7\" \"14\" \"28\"",
     tip: "本关把 Alb 换成 Cdkn1a，就是 cd_mat。行名是 zone 值（1/2/3）、列名是 time 值（0/1/3/7/14/28）；Cdkn1a 的三区整体均值是 8.07 / 8.11 / 9.16，其中 zone 3 在 d7 冲到 10.08——数字对不对，跑完自己核一遍。"
@@ -65,7 +65,7 @@ window.SX_EXAMPLES = {
       "diff_mean(c(5, 7), c(1, 2))   # 4.5\n" +
       "\n" +
       "# 三、把 mean 换成 rowMeans，就能一次算很多基因\n" +
-      "rowMeans(rild_expr[, c(\"Z2_d3_r1\")], drop = FALSE)",
+      "rowMeans(expr_mat[, c(\"Z2_d3_r1\")], drop = FALSE)",
     tip: "本关的 mat 是矩阵、cols_a/cols_b 是列名向量；返回的是每个基因一个差值，所以要用 rowMeans 而不是 mean。"
   },
 
@@ -101,8 +101,8 @@ window.SX_EXAMPLES = {
     why: "先用一个 3 基因 × 6 样本的玩具矩阵，把「一个基因的 t 检验」看明白，再让它对每一行自动跑一遍",
     code:
       "# 一、先看真实数据：51 个基因 × 54 个样本，行是基因、列是样本\n" +
-      "dim(rild_expr)\n" +
-      "rild_expr[1:2, 1:3]\n" +
+      "dim(expr_mat)\n" +
+      "expr_mat[1:2, 1:3]\n" +
       "\n" +
       "# 二、3 基因 × 6 样本的玩具矩阵：前 3 列当对照，后 3 列当处理\n" +
       "toy <- matrix(c(10, 10.2, 10.1, 12, 12.4, 12.2,\n" +
@@ -121,7 +121,7 @@ window.SX_EXAMPLES = {
       "\n" +
       "# logFC 同理：rowMeans 一次算完所有行（处理组 − 对照组）\n" +
       "rowMeans(toy[, 4:6]) - rowMeans(toy[, 1:3])",
-    tip: "本关就是把 toy 换成 rild_expr、把 4:6 / 1:3 换成 treat / ctrl 这两组列名。真数据跑完：31 个基因 adj.P < 0.05（25 上调、6 下调），Mki67 的 logFC 约 1.17。"
+    tip: "本关就是把 toy 换成 expr_mat、把 4:6 / 1:3 换成 treat / ctrl 这两组列名。真数据跑完：31 个基因 adj.P < 0.05（25 上调、6 下调），Mki67 的 logFC 约 1.17。"
   },
 
   "bulk-3": {
@@ -638,11 +638,11 @@ window.SX_EXAMPLES = {
     why: "终章没有新知识，就是把前面几关的输出接起来：DEG → 富集 → 药物匹配，20 行串完",
     code:
       "# 第一步：DEG（Zone3 照后 28 天 vs 对照），就是 bulk-2 那套\n" +
-      "treat <- rild_meta$sample[rild_meta$zone == 3 & rild_meta$time == 28]\n" +
-      "ctrl  <- rild_meta$sample[rild_meta$group == \"Sham\"]\n" +
-      "p  <- apply(rild_expr, 1, function(x) t.test(x[treat], x[ctrl])$p.value)\n" +
-      "fc <- rowMeans(rild_expr[, treat]) - rowMeans(rild_expr[, ctrl])\n" +
-      "deg <- data.frame(gene = rownames(rild_expr), logFC = fc,\n" +
+      "treat <- expr_meta$sample[expr_meta$zone == 3 & expr_meta$time == 28]\n" +
+      "ctrl  <- expr_meta$sample[expr_meta$group == \"Ctrl\"]\n" +
+      "p  <- apply(expr_mat, 1, function(x) t.test(x[treat], x[ctrl])$p.value)\n" +
+      "fc <- rowMeans(expr_mat[, treat]) - rowMeans(expr_mat[, ctrl])\n" +
+      "deg <- data.frame(gene = rownames(expr_mat), logFC = fc,\n" +
       "                  adj.P = p.adjust(p, \"BH\"), stringsAsFactors = FALSE)\n" +
       "up  <- deg$gene[deg$adj.P < 0.05 & deg$logFC > 1]\n" +
       "length(up)          # 这一步的输出，就是下一步的输入\n" +

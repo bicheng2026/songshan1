@@ -42,7 +42,7 @@
       '<div class="step"><span class="num">1</span><div><b>看例子</b>：目标下面挂着一个同类小例子，更简单，套路一样。' +
       "先跑一遍看真输出。不会编程的从这里开始，别直接看题。</div></div>" +
       '<div class="step"><span class="num">2</span><div><b>看题</b>：本关在真实分析里解决什么、要造哪几个对象。' +
-      "数据已经替你读进 R 了，变量名就是数据名（比如 <code class='inline'>rild_expr</code>）。</div></div>" +
+      "数据已经替你读进 R 了，变量名就是数据名（比如 <code class='inline'>expr_mat</code>）。</div></div>" +
       '<div class="step"><span class="num">3</span><div><b>填空</b>：编辑器里已经预置好半成品代码，每个 <code class="inline">...</code> 都是一处填空。' +
       "把 <code class='inline'>...</code> 换成你的答案，别的行不用动。</div></div>" +
       '<div class="step"><span class="num">4</span><div><b>跑</b>：按 <kbd>Ctrl</kbd>+<kbd>Enter</kbd> 或点「运行并判题」。' +

@@ -148,7 +148,7 @@
   }
 
   /* ==================== AI 导师 ==================== */
-  let tutorId = "mentor-rild";
+  let tutorId = "mentor-proj";
 
   function tutor(root) {
     const T = window.SX_TUTORS || [];

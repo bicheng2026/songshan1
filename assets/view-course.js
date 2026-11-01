@@ -53,7 +53,7 @@
         '<div class="lec-h"><span class="lec-no">' + pad(ci) + "</span>" +
         '<div class="lec-t"><h3>' + E(ch.title.replace(/^第 \d+ 讲　?/, "")) + "</h3>" +
         (ch.plain ? '<div class="lec-plain">' + E(ch.plain) + "</div>" : "") +
-        (ch.goal ? '<div class="lec-goal">学完这讲：' + E(ch.goal) + "</div>" : "") +
+        (ch.goal ? '<div class="lec-goal">学完这讲：' + (Array.isArray(ch.goal) ? '<ul style="margin:6px 0 0 18px;padding:0;list-style:disc">' + ch.goal.map(g => '<li style="margin:2px 0">' + E(g) + "</li>").join("") + "</ul>" : E(ch.goal)) + "</div>" : "") +
         "</div></div>" +
         (ch.watch && ch.watch.length
           ? '<div class="lec-watch">配套看：' + ch.watch.map(w =>
