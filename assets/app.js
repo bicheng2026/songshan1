@@ -135,7 +135,7 @@
 
       (next
         ? '<div class="card nextcard"><span class="tiny muted">下一关</span>' +
-          "<b style=\"font-size:17px;display:block;margin:4px 0\">" + E(next.title) + "</b>" +
+          "<b style=\"font-size:calc(19px * var(--fs));display:block;margin:6px 0\">" + E(next.title) + "</b>" +
           '<div class="small muted">' + E(next.goal || "") + "</div>" +
           '<button class="btn primary sm" id="goNext" style="margin-top:10px">进入道场</button></div>'
         : '<div class="card nextcard"><b>' + levels.length + ' 关全部通关了</b><div class="small muted">去写作台把课题写出来。</div></div>') +
@@ -154,7 +154,7 @@
       SX.ACHIEVEMENTS.map(a => {
         const got = ach.indexOf(a) >= 0;
         return '<div class="lv ' + (got ? "done" : "locked") + '" style="padding:9px">' +
-          "<b style=\"font-size:13px\">" + E(a.name) + "</b>" +
+          "<b style=\"font-size:calc(15px * var(--fs))\">" + E(a.name) + "</b>" +
           '<div class="tiny muted">' + E(a.desc) + "</div></div>";
       }).join("") + "</div>" +
       '<div class="small muted">' +

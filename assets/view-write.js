@@ -55,7 +55,7 @@
 
     function drawSecs() {
       document.getElementById("secList").innerHTML = (W.sections || []).map(s =>
-        '<div class="lvrow" data-s="' + E(s.id) + '" style="padding:6px 8px;border-radius:6px;cursor:pointer;font-size:13px;' +
+        '<div class="lvrow" data-s="' + E(s.id) + '" style="padding:6px 8px;border-radius:6px;cursor:pointer;font-size:calc(14.5px * var(--fs));' +
         (curSec === s.id ? "background:var(--brand-soft);" : "") +
         'display:flex;justify-content:space-between;align-items:center">' +
         "<span>" + E(s.name) + "</span>" +
@@ -198,7 +198,7 @@
       document.getElementById("tutorList").innerHTML = T.map(t =>
         '<div class="lvrow" data-t="' + E(t.id) + '" style="padding:8px;border-radius:6px;cursor:pointer;' +
         (tutorId === t.id ? "background:var(--brand-soft);" : "") + '">' +
-        "<div style=\"font-size:13px\"><b>" + E(t.name) + "</b></div>" +
+        "<div style=\"font-size:calc(14.5px * var(--fs))\"><b>" + E(t.name) + "</b></div>" +
         '<div class="tiny muted">' + E(t.desc) + "</div></div>").join("");
       document.querySelectorAll("[data-t]").forEach(b => b.onclick = () => {
         tutorId = b.getAttribute("data-t"); drawTutors(); drawChat();
@@ -224,7 +224,7 @@
       box.innerHTML = msgs.map(m =>
         '<div style="margin:10px 0">' +
         '<div class="tiny muted" style="margin-bottom:2px">' + (m.role === "user" ? "你" : E(t.name)) + "</div>" +
-        '<div class="' + (m.role === "user" ? "" : "") + '" style="white-space:pre-wrap;font-size:13.5px;' +
+        '<div class="' + (m.role === "user" ? "" : "") + '" style="white-space:pre-wrap;font-size:calc(15px * var(--fs));' +
         (m.role === "user" ? "background:#eef4f2;border-radius:8px;padding:8px 10px" : "") + '">' +
         (m.role === "user" ? E(m.content) : SX.md(m.content)) + "</div></div>").join("");
       box.scrollTop = box.scrollHeight;

@@ -7,6 +7,25 @@
 <meta name="theme-color" content="#000000">
 <title>嵩山一号 · 科研训练工作站</title>
 <link rel="stylesheet" href="assets/theme.css">
+<script>
+/* 首屏先套用已保存的字号/间距，避免闪一下再变 */
+(function () {
+  try {
+    var FS = [0.90, 1, 1.09, 1.18, 1.28];
+    var SP = [[0.92, 1.66], [1.06, 1.80], [1.18, 1.95], [1.32, 2.10]];
+    var f = parseInt(localStorage.getItem("sx_fs"), 10);
+    var s = parseInt(localStorage.getItem("sx_sp"), 10);
+    if (isNaN(f) || f < 0 || f > 4) f = 1;
+    if (isNaN(s) || s < 0 || s > 3) s = 2;
+    var d = document.documentElement;
+    d.style.setProperty("--fs", FS[f]);
+    d.style.setProperty("--sp", SP[s][0]);
+    d.style.setProperty("--lh", SP[s][1]);
+    d.setAttribute("data-fs", f);
+    d.setAttribute("data-sp", s);
+  } catch (e) { }
+})();
+</script>
 </head>
 <body>
 
@@ -14,6 +33,7 @@
   <a class="brand" href="#/map" title="回到修炼地图"><b>嵩山一号</b></a>
   <nav class="nav" id="nav"></nav>
   <div class="hud">
+    <button class="themebtn readbtn" id="readBtn" title="字号与间距" aria-label="字号与间距">Aa</button>
     <button class="themebtn" id="themeBtn" title="切换深浅色">◐</button>
     <button class="menubtn" id="menuBtn" aria-label="打开菜单">菜单</button>
   </div>
@@ -56,5 +76,6 @@
 <script src="assets/view-write.js"></script>
 <script src="assets/tutor-dock.js"></script>
 <script src="assets/app.js"></script>
+<script src="assets/prefs.js"></script>
 </body>
 </html>

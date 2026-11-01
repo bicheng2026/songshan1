@@ -87,7 +87,7 @@
     function cardOf(x) {
       return '<div class="card" style="display:flex;flex-direction:column;gap:6px">' +
         '<div style="display:flex;gap:6px;align-items:flex-start;justify-content:space-between">' +
-        "<b style=\"font-size:14px\">" + E(x.title) + "</b>" +
+        "<b style=\"font-size:calc(16px * var(--fs))\">" + E(x.title) + "</b>" +
         '<span class="tag n">' + E(x.level || "") + "</span></div>" +
         '<div class="small muted">' + E(x.scene || "") + "</div>" +
         '<div>' + (x.packages || []).map(p => '<span class="tag">' + E(p) + "</span>").join(" ") + "</div>" +
@@ -293,13 +293,13 @@
       document.getElementById("kList").innerHTML = list.map(x =>
         '<div class="card" data-id="' + E(x.id) + '">' +
         '<div style="display:flex;justify-content:space-between;gap:8px;align-items:flex-start">' +
-        "<b style=\"font-size:14px\">" + E(x.title) + "</b>" +
+        "<b style=\"font-size:calc(16px * var(--fs))\">" + E(x.title) + "</b>" +
         '<span class="tag n">' + E(x.level || "") + "</span>" +
         (refsOf(x.id).length ? '<span class="tag g" title="已挂真实文献">文献</span>' : "") + "</div>" +
         '<div class="small" style="margin:4px 0;color:var(--brand)">' + E(x.summary || "") + "</div>" +
         '<div class="small muted">' + (x.tags || []).map(t => '<span class="tag">' + E(t) + "</span>").join(" ") + "</div>" +
         (openId === x.id ?
-          '<div class="markdown-body" style="margin-top:8px;font-size:13.5px">' + SX.md(x.body || "") + "</div>" +
+          '<div class="markdown-body" style="margin-top:10px;font-size:calc(15px * var(--fs))">' + SX.md(x.body || "") + "</div>" +
           (x.keyPoints ? '<div style="margin-top:8px"><b class="small">要点</b>' +
             x.keyPoints.map(k => '<div class="small">· ' + E(k) + "</div>").join("") + "</div>" : "") +
           (x.testYourself ? '<div class="note" style="margin-top:8px"><b class="small">自测：</b>' + E(x.testYourself) + "</div>" : "") +
@@ -341,7 +341,7 @@
       document.getElementById("mList").innerHTML = list.map(x =>
         '<div class="card" style="display:flex;flex-direction:column;gap:6px">' +
         '<div style="display:flex;justify-content:space-between;gap:6px;align-items:flex-start">' +
-        "<b style=\"font-size:14px\">" + E(x.title) + "</b>" +
+        "<b style=\"font-size:calc(16px * var(--fs))\">" + E(x.title) + "</b>" +
         '<span class="tag ' + (x.maturity === "跑通" ? "g" : (x.maturity === "未验证" ? "r" : "y")) + '">' + E(x.maturity) + "</span></div>" +
         '<div class="tiny muted" style="font-family:var(--mono);word-break:break-all">' + E(x.path) + "</div>" +
         '<div class="tiny muted">' + (x.kb ? x.kb + " KB / " : "") + (x.lines ? x.lines + " 行" : "") +
