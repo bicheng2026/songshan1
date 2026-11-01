@@ -123,12 +123,12 @@ html[data-theme="light"] .topbar { background: rgba(255, 255, 255, .78); }
 body.mnav .menubtn { color: var(--ink); }
 
 /* ---------- 主体 ---------- */
-.wrap { flex: 1 1 auto; overflow: auto; padding: 0 22px 180px; }
-.page { max-width: none; margin: 0 auto; }
+.wrap { flex: 1 1 auto; overflow: auto; padding: 0 32px 180px; }
+.page { max-width: var(--page-w, 1440px); margin: 0 auto; }
 
 .page-head { margin: 68px 0 40px; }
 .page-head h2 { margin: 0 0 16px; font-size: calc(48px * var(--fs)); line-height: 1.15; letter-spacing: -.02em; font-weight: 700; }
-.page-head p { margin: 0; color: var(--ink-2); font-size: calc(18px * var(--fs)); line-height: 1.75; max-width: 740px; }
+.page-head p { margin: 0; color: var(--ink-2); font-size: calc(18px * var(--fs)); line-height: 1.75; max-width: 820px; }
 
 /* ---------- 首屏 ---------- */
 .hero { padding: 88px 0 56px; border-bottom: 1px solid var(--line); margin-bottom: 56px; }
@@ -137,7 +137,7 @@ body.mnav .menubtn { color: var(--ink); }
     text-transform: uppercase; margin-bottom: 20px; font-weight: 600;
 }
 .hero h2 { margin: 0 0 24px; font-size: calc(62px * var(--fs)); line-height: 1.14; letter-spacing: -.025em; font-weight: 700; }
-.hero-sub { margin: 0 0 36px; font-size: calc(20px * var(--fs)); line-height: 1.72; color: var(--ink-2); max-width: 700px; }
+.hero-sub { margin: 0 0 36px; font-size: calc(20px * var(--fs)); line-height: 1.72; color: var(--ink-2); max-width: 780px; }
 .hero-sub b { color: var(--ink); font-weight: 600; }
 .hero-acts { display: flex; gap: 14px; flex-wrap: wrap; margin-bottom: 32px; }
 .hero-tip {
@@ -226,7 +226,7 @@ table.tbl tr:hover td { background: var(--panel-2); }
 .bar > i { display: block; height: 100%; background: var(--ink); }
 html[data-theme="light"] .bar > i { background: #0071e3; }
 
-.layout-2 { display: grid; grid-template-columns: 268px 1fr; gap: 48px; align-items: start; }
+.layout-2 { display: grid; grid-template-columns: 268px 1fr; gap: 76px; align-items: start; }
 @media (max-width: 1040px) { .layout-2 { grid-template-columns: 1fr; gap: 24px; } }
 .side { position: sticky; top: 74px; max-height: calc(100vh - 100px); overflow: auto; padding: 8px 0; }
 @media (max-width: 1040px) { .side { position: static; max-height: none; border: 1px solid var(--line); border-radius: 14px; padding: 14px; } }
@@ -349,7 +349,7 @@ details.acc[open] > summary { margin-bottom: 20px; border-bottom: 1px solid var(
 .lec-h { display: flex; gap: 24px; align-items: flex-start; margin-bottom: 16px; }
 .lec-no { font-size: calc(14px * var(--fs)); line-height: 1; color: var(--ink-3); flex: 0 0 38px; padding-top: 10px; font-variant-numeric: tabular-nums; }
 .lec-t h3 { margin: 0 0 10px; font-size: calc(32px * var(--fs)); line-height: 1.22; letter-spacing: -.02em; font-weight: 700; }
-.lec-plain { font-size: calc(17.5px * var(--fs)); line-height: 1.78; color: var(--ink-2); margin-bottom: 10px; max-width: 700px; }
+.lec-plain { font-size: calc(17.5px * var(--fs)); line-height: 1.78; color: var(--ink-2); margin-bottom: 10px; max-width: 820px; }
 .lec-goal { font-size: calc(14px * var(--fs)); line-height: 1.7; color: var(--ink-3); }
 .lec-watch { font-size: calc(14px * var(--fs)); line-height: 1.7; margin: 14px 0 8px; color: var(--ink-3); }
 .lec-watch a { color: var(--brand); margin-right: 18px; }
@@ -366,7 +366,7 @@ details.sec > summary::after {
 }
 details.sec[open] > summary::after { transform: rotate(90deg); color: var(--ink); }
 details.sec > summary:hover { color: var(--brand); }
-.sec-b { padding: 0 2px 34px; max-width: 760px; }
+.sec-b { padding: 0 2px 34px; max-width: 820px; }
 .why { font-size: calc(17px * var(--fs)); line-height: 1.8; color: var(--ink-2); padding: 4px 0 4px 18px; border-left: 2px solid var(--line-strong); margin: 6px 0 22px; }
 .pts-h { font-size: calc(12.5px * var(--fs)); letter-spacing: .12em; color: var(--ink-3); margin: 26px 0 4px; font-weight: 600; }
 details.real { margin-top: 18px; border-top: 1px solid var(--line); padding-top: 14px; }
@@ -516,7 +516,7 @@ details.real[open] > summary { margin-bottom: 6px; }
 
 html, body { line-height: var(--lh); }
 
-.wrap { padding: 0 22px calc(180px * var(--sp)); }
+.wrap { padding: 0 32px calc(180px * var(--sp)); }
 
 .page-head { margin: calc(72px * var(--sp)) 0 calc(46px * var(--sp)); }
 .page-head h2 { margin-bottom: calc(20px * var(--sp)); }
@@ -603,7 +603,7 @@ details.real { margin-top: calc(24px * var(--sp)); padding-top: calc(18px * var(
    上一版只放大了区块留白，但课程正文是 ol.crit > li，条目之间只有 12px，
    中文行距 1.8 也不够，几行字就糊成一块。这里给条目、代码块、标签各留固定气口。 */
 
-.sec-b { padding: 0 2px calc(56px * var(--sp)); max-width: 660px; }
+.sec-b { padding: 0 2px calc(56px * var(--sp)); max-width: 820px; }
 .sec-b .why { margin: calc(6px * var(--sp)) 0 calc(34px * var(--sp)); }
 .pts { margin: calc(6px * var(--sp)) 0 calc(36px * var(--sp)); }
 .pts-h { margin: 0 0 calc(18px * var(--sp)); }
@@ -862,3 +862,35 @@ a.lit-port-n:hover { color: var(--brand); border-bottom-color: var(--brand); }
     .lit-search .btn { padding: 0 20px; }
     .lit-port-u { display: none; }
 }
+
+/* 小屏收到 16px，正文别贴边 */
+@media (max-width: 760px) {
+    .wrap { padding-left: 16px; padding-right: 16px; }
+}
+
+/* ---------- 代码道场：重排引导卡与关卡栏 ----------
+   原来四步竖排占满首屏，关卡栏 268 太窄导致标题折两行，选中项只有变色没有位置感。 */
+.guide-body { display: grid; grid-template-columns: 1fr 1fr; gap: calc(18px * var(--sp)) 40px; align-items: start; }
+.guide-body > .note, .guide-body > .tiny { grid-column: 1 / -1; margin: 0; }
+.guide .step { font-size: calc(15px * var(--fs)); line-height: 1.72; }
+.guide .num { background: transparent; border: 1px solid var(--brand-line); color: var(--brand); }
+@media (max-width: 1120px) {
+    .guide-body { grid-template-columns: 1fr; gap: calc(14px * var(--sp)); }
+}
+
+.layout-2 { grid-template-columns: 300px 1fr; }
+.side.card { padding: calc(18px * var(--sp)) 14px; }
+.tk { padding: 0 10px; }
+.lvrow { border-radius: 9px; margin-bottom: 2px; }
+.lvrow.on { background: var(--brand-soft); color: var(--brand); box-shadow: inset 2px 0 0 var(--brand); }
+.lvrow.done > span:first-child { color: var(--ok); }
+.lvrow.locked { opacity: .45; }
+
+/* 关卡标题与正文分开，小标题收紧 */
+.lv-title { padding-bottom: calc(16px * var(--sp)); border-bottom: 1px solid var(--line); margin-bottom: calc(2px * var(--sp)); }
+h4.sec { margin: calc(28px * var(--sp)) 0 calc(12px * var(--sp)); }
+
+/* 关卡列表降噪：单行紧凑，一屏能看见更多关 */
+.lvrow { padding: calc(9px * var(--sp)) 10px; font-size: calc(13.5px * var(--fs)); gap: 8px; }
+.lvrow > span:nth-child(2) { -webkit-line-clamp: 1; }
+.tk { font-size: calc(11.5px * var(--fs)); display: flex; justify-content: space-between; margin: calc(18px * var(--sp)) 0 calc(5px * var(--sp)); }

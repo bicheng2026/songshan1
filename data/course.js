@@ -237,7 +237,6 @@ round(t(scale(t(m))), 2)`
         ]
       },
       refs: [
-        { n: "clusterProfiler 配套书", u: "https://yulab-smu.top/biomedical-knowledge-mining-book/", d: "富集分析最权威的中文作者原书，含背景集怎么选", t: "doc" },
         { n: "GSVA 官方 vignette", u: "https://bioconductor.org/packages/release/bioc/vignettes/GSVA/inst/doc/GSVA.html", d: "通路打分和 ssGSEA 的原始实现", t: "doc" }
       ],
       subs: [
@@ -324,7 +323,13 @@ fg <- fgsea(pathways = msigdb_list, stats = gl, minSize = 15, maxSize = 500)`
         ]
       },
       refs: [
-        { n: "TIMER2.0", u: "http://timer.cistrome.org/", d: "不写代码就能看免疫浸润，用来对结论", t: "doc" }
+        { n: "CIBERSORTx 官网（反卷积算免疫细胞比例）", u: "https://cibersortx.stanford.edu/", d: "22 种免疫细胞的参考矩阵就在这里，注册后能跑网页版", t: "tool" },
+        { n: "xCell 官网（ssGSEA 打分，64 种细胞）", u: "https://xcell.ucsf.edu/", d: "输出是富集分数不是百分比，别拿去做归一化", t: "tool" },
+        { n: "TIMER2.0（按癌种优化的免疫浸润）", u: "http://timer.cistrome.org/", d: "不写代码也能对结论，和 CIBERSORT 不是一回事", t: "tool" },
+        { n: "ESTIMATE（算免疫/基质评分）", u: "https://bioinformatics.mdanderson.org/estimate/", d: "肿瘤纯度估计算法的经典实现", t: "tool" },
+        { n: "MCP-counter 官方仓库", u: "https://github.com/ebecht/MCPcounter", d: "8 种免疫 + 2 种基质细胞，简单直观", t: "doc" },
+        { n: "GSVA 官方 vignette（ssGSEA 入口）", u: "https://bioconductor.org/packages/release/bioc/vignettes/GSVA/inst/doc/GSVA.html", d: "k4 正文里 ssGSEA 那段的直接手册", t: "doc" },
+        { n: "看小果：CIBERSORT 与 xCell 两种 R 包演示（B 站专栏）", u: "https://www.bilibili.com/read/cv21535404/", d: "跟着敲一遍 CIBERSORT.R + LM22 的流程", t: "doc" }
       ],
       subs: [
         {
@@ -400,7 +405,13 @@ rank(s$ESTIMATE); rank(s$CIB_T)   # 排序也不完全一致`
         ]
       },
       refs: [
-        { n: "survival 包", u: "https://cran.r-project.org/web/packages/survival/index.html", d: "KM、coxph、log-rank 全在这", t: "doc" }
+        { n: "survminer（画出版级 KM 曲线）", u: "https://cran.r-project.org/web/packages/survminer/", d: "ggsurvplot 的 pval/risk.table 参数都在这", t: "doc" },
+        { n: "timeROC（时间依赖 ROC/AUC）", u: "https://cran.r-project.org/web/packages/timeROC/", d: "普通 ROC 不考虑时间，预后要用这个", t: "doc" },
+        { n: "rms（列线图 nomogram 与校准）", u: "https://cran.r-project.org/web/packages/rms/", d: "nomogram、calibrate 都在里面", t: "doc" },
+        { n: "KM plotter（在线生存分析，不用写代码）", u: "https://kmplot.com/", d: "拿基因名直接出 KM 图，先对结论再写 R", t: "tool" },
+        { n: "【麦子】Cox 回归的 R 操作：单因素到多因素", u: "https://www.bilibili.com/video/av18918951/", d: "小姐姐带写代码，每一步都讲，初学者友好", t: "video" },
+        { n: "R 语言复现 SCI：COX 预测模型全流程（B 站专栏）", u: "https://www.bilibili.com/read/cv28955507/", d: "筛选变量→列线图→校准→ROC→DCA 一气呵成", t: "doc" },
+        { n: "How to run survival analysis in R（英文，但讲得最透）", u: "https://dissertationstatisticshelp.org/blog/survival-analysis-in-r", d: "censoring 怎么编码、PH 假设怎么检验，写错审稿人一眼看穿", t: "doc" }
       ],
       subs: [
         {
@@ -510,7 +521,12 @@ for (th in sort(unique(score))) {
         ]
       },
       refs: [
-        { n: "cBioPortal", u: "https://www.cbioportal.org/", d: "突变、拷贝数、生存一起查", t: "doc" }
+        { n: "ConsensusClusterPlus（一致性聚类官方包）", u: "https://bioconductor.org/packages/release/bioc/html/ConsensusClusterPlus.html", d: "k 值稳定性图、一致性矩阵都它出", t: "doc" },
+        { n: "maftools（突变全景 + TMB 计算）", u: "https://bioconductor.org/packages/release/bioc/html/maftools.html", d: "TMB 分子分母、棒棒糖图、signature 全在这", t: "doc" },
+        { n: "tableone（基线资料 Table 1）", u: "https://cran.r-project.org/web/packages/tableone/", d: "别只放 p 值，分类/连续变量分层展示", t: "doc" },
+        { n: "cBioPortal（查突变、拷贝数、分型）", u: "https://www.cbioportal.org/", d: "先看别人怎么做再动手，k6 三件事都能在这验证", t: "tool" },
+        { n: "生信技能树：肿瘤突变数据分析（含 maftools，B 站）", u: "https://www.bilibili.com/video/BV1Sy4y1S7pz/", d: "下游统计可视化十几个小时，突变分析入门", t: "video" },
+        { n: "使用 maftools 分析 TMB 和 MATH（排坑）", u: "https://www.bioinfo-scrounger.com/archives/645/", d: "TMB 每 Mb 突变数怎么算、bTMB 是什么，讲清楚了", t: "doc" }
       ],
       subs: [
         {
@@ -598,7 +614,13 @@ sA <- sd(d$age[d$arm == "A"]);   sB <- sd(d$age[d$arm == "B"])
         ]
       },
       refs: [
-        { n: "WGCNA（CRAN）", u: "https://cran.r-project.org/web/packages/WGCNA/index.html", d: "共表达网络，教程 PDF 在包主页", t: "doc" }
+        { n: "STRING（蛋白互作网络）", u: "https://string-db.org/", d: "把候选基因丢进去，导出可给 Cytoscape 的边表", t: "tool" },
+        { n: "Cytoscape（画网络图）", u: "https://cytoscape.org/", d: "WGCNA 导出的边表在这可视化，按模块/连通度上色", t: "tool" },
+        { n: "clusterProfiler（富集 + 网络注释）", u: "https://bioconductor.org/packages/release/bioc/html/clusterProfiler.html", d: "hub 基因到底富集在哪个通路，用它确认", t: "doc" },
+        { n: "GeneMANIA（找功能相关基因）", u: "https://genemania.org/", d: "hub 基因的邻居是谁，互补 STRING", t: "tool" },
+        { n: "igraph（R 里算节点度/中心性）", u: "https://igraph.org/r/", d: "不想开 Cytoscape 时，用它在 R 里算 degree/betweenness", t: "doc" },
+        { n: "WGCNA 找 Hub 基因全流程拆解（含「值不值得做」）", u: "http://mp.weixin.qq.com/s?__biz=MzkzNTMwMDE0MQ==&mid=2247566349&idx=2&sn=ee8d44809448a520e93b7ba6ec26e03b&chksm=c3dfa2621e802aa73bc0735accb75e3461b72bd1975b3c0e3df41177c62a7b3d823800871608", d: "MM/GS 双高只是起点，怎么判断一个 hub 基因值得做，讲得最实在", t: "doc" },
+        { n: "Gene Co-Expression Network Analysis with WGCNA（英文教程）", u: "https://indianelucidbiology.com/tutorials/gene-coexpression-network-wgcna-tutorial.html", d: "软阈值→模块→hub→导出 Cytoscape，参数怎么调都列了", t: "doc" }
       ],
       subs: [
         {
@@ -677,9 +699,7 @@ nrow(subset(edges, score >= 0.4))`
         ]
       },
       refs: [
-        { n: "GDC（TCGA 官方门户）", u: "https://portal.gdc.cancer.gov/", d: "TCGA 唯一的官方来源，别用二手整理版", t: "doc" },
-        { n: "GEO", u: "https://www.ncbi.nlm.nih.gov/geo/", d: "查 GSE 号、下表达矩阵和临床信息", t: "doc" },
-        { n: "UCSC Xena", u: "https://xenabrowser.net/", d: "同一队列的 TCGA 标准化数据，省掉一半预处理", t: "doc" }
+        { n: "GDC（TCGA 官方门户）", u: "https://portal.gdc.cancer.gov/", d: "TCGA 唯一的官方来源，别用二手整理版", t: "doc" }
       ],
       subs: [
         {
