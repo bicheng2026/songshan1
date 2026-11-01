@@ -126,6 +126,16 @@
       '<button class="btn sm" id="btnRunEx">在 R 里跑一遍这个例子</button>' +
       "</details>" : "";
 
+    const libRefs = (window.SX_CODEBANK3 || []).filter(x => x.track === lv.track);
+    const refHtml = libRefs.length ?
+      '<div class="card" style="margin-top:16px"><div class="lv-title"><h3>配套实战代码</h3>' +
+      '<span class="tag n">来自主公笔记 / R 课配套</span></div>' +
+      '<div class="small muted" style="margin:6px 0 10px">这些是从主公本机学习笔记与 R 课配套脚本里提取的真实跑通代码，按本关所属方向归类，作为延伸参考。点开看，复制了自己在 RStudio 里跑。</div>' +
+      libRefs.map(x => '<details class="acc"><summary>' + SX.esc(x.title) + '</summary>' +
+        "<pre class='code'>" + SX.esc(x.code) + "</pre>" +
+        '<button class="btn sm" data-refcopy="' + SX.esc(x.id) + '">复制代码</button></details>').join("") +
+      "</div>" : "";
+
     document.getElementById("lvMain").innerHTML =
       '<div class="card">' +
       '<div class="lv-title"><h3>' + SX.esc(lv.title) + "</h3>" +
@@ -160,7 +170,7 @@
       '<span class="tiny muted">Ctrl+Enter 运行</span></div>' +
       '<div class="out" id="outBox">（运行后，R 的真实输出会显示在这里）</div>' +
       '<div id="hintBox"></div><div id="solBox"></div>' +
-      "</div>";
+      "</div>" + refHtml;
 
     const ed = document.getElementById("codeEd");
     ed.value = code;
@@ -201,6 +211,13 @@
         SX.toast("已填入。建议看完删掉，凭记忆重写一次");
       };
     };
+
+    document.querySelectorAll("[data-refcopy]").forEach(b => {
+      b.onclick = () => {
+        const it = (window.SX_CODEBANK3 || []).find(y => y.id === b.getAttribute("data-refcopy"));
+        if (it) { SX.copy(it.code); SX.toast("已复制：" + it.title); }
+      };
+    });
 
     if (window.SXR.status === "idle") {
       document.getElementById("rStatus").textContent = "首次运行要下载 R 运行时（约 11 MB），等 20-80 秒";

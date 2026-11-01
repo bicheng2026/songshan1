@@ -3,7 +3,7 @@
    每节两段代码：一段 base R 能在站内直接跑（讲原理），一段标了包名的真实写法（讲实战）。
    不依赖本课题数据。 */
 window.SX_COURSE = {
-  intro: "第 0 讲真的从零开始（1 + 1 怎么写、变量是什么）；之后 10 讲按「一篇生信文章从数据到成图」的顺序排：第 1 讲讲清 counts 矩阵是什么，第 2 讲跑通差异分析，3-4 讲把基因变成通路和细胞，5-6 讲把结果变成临床结论，7-10 讲网络、GEO 实战、模型和复现。每节都分两段代码：一段只用 base R，能在本页直接点「运行」看到结果（讲原理）；另一段标了真实包名的写法，讲真正做分析时怎么写。看懂原理再去跑真包，顺序反了只会抄代码。",
+  intro: "第 0 讲真的从零开始（1 + 1 怎么写、变量是什么）；之后 10 讲按「一篇生信文章从数据到成图」的顺序排：第 1 讲讲清 counts 矩阵是什么，第 2 讲跑通差异分析，3-4 讲把基因变成通路和细胞，5-6 讲把结果变成临床结论，7-10 讲网络、GEO 实战、模型和复现。每节都分两段代码：一段只用 base R，能在本页直接点「运行」看到结果（讲原理）；另一段标了真实包名的写法，讲真正做分析时怎么写。看懂原理再去跑真包，顺序反了只会抄代码。配套 10 讲 50 集录播（小陈，免登录）在下方「资源」区，按课列出文件名，进去按名看；每课 PPT 课件与生信实战代码也在同一分享里。",
   resources: [
     {
       g: "视频课（B 站，都已核对过能打开）",
@@ -57,6 +57,22 @@ window.SX_COURSE = {
         { n: "UCSC Xena", m: "xenabrowser.net", u: "https://xenabrowser.net/", d: "同一队列的 TCGA 标准化数据，省掉一半预处理" },
         { n: "TIMER2.0", m: "timer.cistrome.org", u: "http://timer.cistrome.org/", d: "不写代码就能看免疫浸润，用来对结论" },
         { n: "cBioPortal", m: "cbioportal.org", u: "https://www.cbioportal.org/", d: "突变、拷贝数、生存一起查" }
+      ]
+    },
+    {
+      g: "配套录播课（小陈 · 10 讲 50 集，免登录）",
+      items: [
+        { n: "全部 50 集入口（进 123 网盘，按文件名找）", m: "10 课 50 集", u: "https://4007218689.share.123pan.cn/123pan/2rzowh-GFk6d", d: "课程配套录播，从装环境到能自己跑代码。每课分文件夹，下面按课列出文件名；进去后按名定位。每课 PPT 课件（ClassN课件.pptx）和生信实战代码/数据（SHENGXIN 文件夹）也在同一分享里。" },
+        { n: "第 1 课 录播（小陈）", m: "2 集 · 690 MB", u: "https://4007218689.share.123pan.cn/123pan/2rzowh-GFk6d", d: "文件：class1-1.mp4、class1-2.mp4" },
+        { n: "第 2 课 录播（小陈）", m: "4 集 · 1.9 GB", u: "https://4007218689.share.123pan.cn/123pan/2rzowh-GFk6d", d: "文件：Class2-1.mp4、Class2-2.mp4、Class2-3.mp4、Class2-4.mp4" },
+        { n: "第 3 课 录播（小陈）", m: "6 集 · 1.7 GB", u: "https://4007218689.share.123pan.cn/123pan/2rzowh-GFk6d", d: "文件：Class3-1.mp4、Class3-2.mp4、Class3-3.mp4、Class3-4.mp4、Class3-5.mp4、Class3-6.mp4" },
+        { n: "第 4 课 录播（小陈）", m: "6 集 · 1.9 GB", u: "https://4007218689.share.123pan.cn/123pan/2rzowh-GFk6d", d: "文件：Class4-1.mp4、Class4-2.mp4、Class4-3.mp4、Class4-4.mp4、Class4-5.mp4、Class4-6.mp4" },
+        { n: "第 5 课 录播（小陈）", m: "6 集 · 2.1 GB", u: "https://4007218689.share.123pan.cn/123pan/2rzowh-GFk6d", d: "文件：Class5-1.mp4、Class5-2.mp4、Class5-3.mp4、Class5-4.mp4、Class5-5.mp4、Class5-6.mp4" },
+        { n: "第 6 课 录播（小陈）", m: "6 集 · 2.0 GB", u: "https://4007218689.share.123pan.cn/123pan/2rzowh-GFk6d", d: "文件：Class6-1.mp4、Class6-2.mp4、Class6-3.mp4、Class6-4.mp4、Class6-5.mp4、Class6-6.mp4" },
+        { n: "第 7 课 录播（小陈）", m: "6 集 · 1.7 GB", u: "https://4007218689.share.123pan.cn/123pan/2rzowh-GFk6d", d: "文件：Class7-1.mp4、Class7-2.mp4、Class7-3.mp4、Class7-4.mp4、Class7-5.mp4、Class7-6.mp4" },
+        { n: "第 8 课 录播（小陈）", m: "5 集 · 2.6 GB", u: "https://4007218689.share.123pan.cn/123pan/2rzowh-GFk6d", d: "文件：Class8-1.mp4、Class8-2.mp4、Class8-3.mp4、Class8-4.mp4、Class8-5.mp4" },
+        { n: "第 9 课 录播（小陈）", m: "6 集 · 1.2 GB", u: "https://4007218689.share.123pan.cn/123pan/2rzowh-GFk6d", d: "文件：Class9-1.mp4、Class9-2.mp4、Class9-3.mp4、Class9-4.mp4、Class9-5.mp4、Class9-6.mp4" },
+        { n: "第 10 课 录播（小陈）", m: "3 集 · 1.9 GB", u: "https://4007218689.share.123pan.cn/123pan/2rzowh-GFk6d", d: "文件：Class10-1.mp4、Class10-2.mp4、Class10-3.mp4" },
       ]
     }
   ],

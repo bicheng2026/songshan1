@@ -20,7 +20,9 @@
     { id: "data", name: "数据中心", group: "more", fn: () => window.SXViewLib.data(document.getElementById("view")) },
     { id: "vault", name: "数据仓库", group: "more", fn: () => window.SXViewLib.vault(document.getElementById("view")) },
     { id: "write", name: "论文写作台", group: "more", fn: () => window.SXViewWrite.write(document.getElementById("view")) },
-    { id: "tutor", name: "AI 导师", group: "more", fn: () => window.SXViewWrite.tutor(document.getElementById("view")) }
+    { id: "tutor", name: "AI 导师", group: "more", fn: () => window.SXViewWrite.tutor(document.getElementById("view")) },
+    { id: "account", name: "账号", group: "more", fn: () => window.SXViewAccount.render(document.getElementById("view")) },
+    { id: "space", name: "个人空间", group: "more", fn: () => window.SXViewSpace.render(document.getElementById("view")) }
   ];
 
   function go(id) {
@@ -73,7 +75,7 @@
       (window.SX_KNOWLEDGE || []).length + (window.SX_KNOWLEDGE2 || []).length + (window.SX_KNOWLEDGE3 || []).length);
     const citeN = Object.keys(window.SX_KNOW_CITE || {}).length;
     const paperN = Math.max(DECLARED.paper, (window.SX_PAPERS || []).length + (window.SX_PAPERS2 || []).length);
-    const cbN = Math.max(DECLARED.cb, (window.SX_CODEBANK || []).length + (window.SX_CODEBANK2 || []).length);
+    const cbN = Math.max(DECLARED.cb, (window.SX_CODEBANK || []).length + (window.SX_CODEBANK2 || []).length + (window.SX_CODEBANK3 || []).length);
     const lecN = (window.SX_COURSE0 ? 1 : 0) + ((window.SX_COURSE || {}).chapters || []).length;
     const secN = ((window.SX_COURSE0 || {}).subs || []).length +
       ((window.SX_COURSE || {}).chapters || []).reduce((a, c) => a + (c.subs || []).length, 0);

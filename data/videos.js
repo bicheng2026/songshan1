@@ -67,26 +67,4 @@ window.SX_VIDEOS = {
     { n: "OSCA：单细胞分析书", u: "https://bioconductor.org/books/release/OSCA/", d: "免费、系统、比绝大多数中文课严谨" },
     { n: "sc-best-practices", u: "https://www.sc-best-practices.org/", d: "专讲「这一步为什么这么做、什么时候会错」" }
   ]
-  ,
-  /* 自己录的 R 课：托管在 123 网盘，免登录可看可下。
-     share 是分享链接；code 是提取码（没有就留空字符串）。
-     classes 里的文件名取自本地真实文件，访客在 123 分享里按文件名对得上。 */
-  local: {
-    title: "自己录的 R 课（小陈 · 10 课 50 集）",
-    share: "https://4007218689.share.123pan.cn/123pan/2rzowh-GFk6d",
-    code: "",
-    note: "我（小陈）从零录的 R&RStudio 入门，从装环境到能自己跑代码，比 B 站那套更贴咱们课题。点上面按钮去 123 网盘，免登录。视频按 Class1–10 分文件夹；每课的 PPT 课件（ClassN课件.pptx）和一套生信实战代码与练习数据（SHENGXIN 文件夹，含 R 脚本、芯片/GSE、TCGA、CIBERSORT、生存分析等）都在同一个分享里，进去按需取用。",
-    classes: [
-      { cls: 1, files: [ {n:"class1-1.mp4", mb:124.8}, {n:"class1-2.mp4", mb:565.5} ] },
-      { cls: 2, files: [ {n:"Class2-1.mp4", mb:52.2}, {n:"Class2-2.mp4", mb:302.2}, {n:"Class2-3.mp4", mb:657.6}, {n:"Class2-4.mp4", mb:890.3} ] },
-      { cls: 3, files: [ {n:"Class3-1.mp4", mb:19.8}, {n:"Class3-2.mp4", mb:298.5}, {n:"Class3-3.mp4", mb:99.0}, {n:"Class3-4.mp4", mb:130.1}, {n:"Class3-5.mp4", mb:186.5}, {n:"Class3-6.mp4", mb:1039.5} ] },
-      { cls: 4, files: [ {n:"Class4-1.mp4", mb:45.4}, {n:"Class4-2.mp4", mb:313.1}, {n:"Class4-3.mp4", mb:426.7}, {n:"Class4-4.mp4", mb:151.3}, {n:"Class4-5.mp4", mb:459.2}, {n:"Class4-6.mp4", mb:510.9} ] },
-      { cls: 5, files: [ {n:"Class5-1.mp4", mb:20.0}, {n:"Class5-2.mp4", mb:489.0}, {n:"Class5-3.mp4", mb:433.0}, {n:"Class5-4.mp4", mb:352.4}, {n:"Class5-5.mp4", mb:565.5}, {n:"Class5-6.mp4", mb:284.1} ] },
-      { cls: 6, files: [ {n:"Class6-1.mp4", mb:12.8}, {n:"Class6-2.mp4", mb:246.0}, {n:"Class6-3.mp4", mb:199.1}, {n:"Class6-4.mp4", mb:343.5}, {n:"Class6-5.mp4", mb:1036.9}, {n:"Class6-6.mp4", mb:216.0} ] },
-      { cls: 7, files: [ {n:"Class7-1.mp4", mb:7.2}, {n:"Class7-2.mp4", mb:321.8}, {n:"Class7-3.mp4", mb:157.6}, {n:"Class7-4.mp4", mb:298.1}, {n:"Class7-5.mp4", mb:605.0}, {n:"Class7-6.mp4", mb:401.1} ] },
-      { cls: 8, files: [ {n:"Class8-1.mp4", mb:8.2}, {n:"Class8-2.mp4", mb:907.2}, {n:"Class8-3.mp4", mb:628.6}, {n:"Class8-4.mp4", mb:767.7}, {n:"Class8-5.mp4", mb:368.1} ] },
-      { cls: 9, files: [ {n:"Class9-1.mp4", mb:9.3}, {n:"Class9-2.mp4", mb:225.9}, {n:"Class9-3.mp4", mb:201.8}, {n:"Class9-4.mp4", mb:290.4}, {n:"Class9-5.mp4", mb:107.0}, {n:"Class9-6.mp4", mb:388.4} ] },
-      { cls: 10, files: [ {n:"Class10-1.mp4", mb:11.2}, {n:"Class10-2.mp4", mb:1830.5}, {n:"Class10-3.mp4", mb:68.3} ] }
-    ]
-  }
 };

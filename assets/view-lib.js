@@ -36,9 +36,10 @@
   function codebankDraw(root) {
     const A = window.SX_CODEBANK || [];
     const B = window.SX_CODEBANK2 || [];
+    const C = window.SX_CODEBANK3 || [];
     const seen = {};
     const all = [];
-    A.concat(B).forEach(x => {
+    A.concat(B).concat(C).forEach(x => {
       if (seen[x.id]) return;
       seen[x.id] = 1; all.push(x);
     });
@@ -150,7 +151,7 @@
       const shown = list.slice(0, limit);
       root.innerHTML =
         head("论文库",
-          "共 " + ps.length + " 篇，按方法标签反查「这一类题是怎么搭的」。来源：Europe PMC 分主题检索 + 论文订阅每日精读日报。" +
+          "共 " + ps.length + " 篇，按方法标签反查「这一类题是怎么搭的」。来源：Europe PMC 分主题检索 + 泰山一号每日精读日报。" +
           "立场不变 —— 学方法，不学做法。") +
         '<div class="card" style="margin-bottom:16px">' +
         '<div class="small"><b>' + ps.length + "</b> 篇 · 合计被引 <b>" + totalCited.toLocaleString() +
