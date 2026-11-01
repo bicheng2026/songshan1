@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>方案 A · 暗房记录本</title>
+<style>
+:root{
+  --bg:#0B0C0A; --panel:#12140F; --line:#242820;
+  --ink:#E9E7DC; --ink2:#9EA090; --ink3:#6B6D60;
+  --red:#FF4B3E; --green:#35C77E; --blue:#5B6EF5;
+  --serif:"Source Han Serif SC","Songti SC","SimSun",serif;
+  --sans:"PingFang SC","Microsoft YaHei",system-ui,sans-serif;
+  --mono:"SF Mono",Consolas,monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:18px;line-height:1.8;-webkit-font-smoothing:antialiased}
+.wrap{max-width:1120px;margin:0 auto;padding:0 40px}
+header{display:flex;align-items:center;justify-content:space-between;padding:22px 0;border-bottom:1px solid var(--line)}
+.brand{font-family:var(--serif);font-size:22px;letter-spacing:.02em}
+nav{display:flex;gap:26px;font-size:15px;color:var(--ink2)}
+nav a{color:inherit;text-decoration:none}
+nav a:hover{color:var(--ink)}
+.hero{padding:86px 0 60px;border-bottom:1px solid var(--line)}
+.kicker{font-family:var(--mono);font-size:13px;color:var(--ink3);letter-spacing:.06em;margin-bottom:26px}
+h1{font-family:var(--serif);font-size:60px;line-height:1.16;letter-spacing:-.01em;font-weight:600;max-width:14em}
+h1 em{font-style:normal;color:var(--green)}
+.lead{margin-top:28px;max-width:34em;color:var(--ink2);font-size:19px}
+.acts{margin-top:38px;display:flex;gap:14px;flex-wrap:wrap}
+.btn{display:inline-block;padding:13px 26px;border:1px solid var(--line);border-radius:3px;color:var(--ink);text-decoration:none;font-size:16px}
+.btn.solid{background:var(--ink);color:var(--bg);border-color:var(--ink);font-weight:600}
+.sec{padding:56px 0;border-bottom:1px solid var(--line)}
+.sec-h{font-family:var(--mono);font-size:13px;letter-spacing:.1em;color:var(--ink3);margin-bottom:30px}
+.steps{display:grid;grid-template-columns:repeat(4,1fr);gap:0}
+.step{padding:0 26px 0 18px;border-left:2px solid var(--line);transition:border-color .2s}
+.step:hover{border-left-color:var(--green)}
+.step:nth-child(2){border-left-color:#2A2E24}
+.step b{display:block;font-size:19px;margin-bottom:8px;font-weight:600}
+.step p{font-size:15.5px;color:var(--ink2);line-height:1.75}
+.step .tag{font-family:var(--mono);font-size:12.5px;color:var(--ink3);display:block;margin-bottom:10px}
+.nums{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line)}
+.num{background:var(--panel);padding:28px 26px}
+.num b{font-family:var(--serif);font-size:40px;display:block;line-height:1}
+.num span{font-size:14.5px;color:var(--ink2);display:block;margin-top:10px}
+.num.warn b{color:var(--red)}
+.num.ok b{color:var(--green)}
+.foot{padding:44px 0;font-family:var(--mono);font-size:13px;color:var(--ink3)}
+@media(max-width:860px){
+  .wrap{padding:0 22px} h1{font-size:38px}
+  .steps{grid-template-columns:1fr;gap:26px} .step{border-left-width:2px}
+  .nums{grid-template-columns:1fr}
+}
+</style></head><body>
+<div class="wrap">
+  <header>
+    <div class="brand">嵩山一号</div>
+    <nav><a>课程</a><a>道场</a><a>找文献</a><a>出代码</a></nav>
+  </header>
+
+  <section class="hero">
+    <div class="kicker">科研训练工作站 · 2026</div>
+    <h1>从零练到<br>能自己写出一篇<em>生信论文</em>。</h1>
+    <p class="lead">这里不是资料站，是训练场。一条闭环走四遍：学一段原理，练一遍代码，查清背后的机制，写成自己的结果。</p>
+    <div class="acts">
+      <a class="btn solid">从第一个视频开始</a>
+      <a class="btn">直接做第一关</a>
+    </div>
+  </section>
+
+  <section class="sec">
+    <div class="sec-h">训练闭环</div>
+    <div class="steps">
+      <div class="step"><span class="tag">学</span><b>先看懂</b><p>8 个视频按顺序排好，不想看视频就读 11 讲课程。</p></div>
+      <div class="step"><span class="tag">练</span><b>亲手跑通</b><p>27 关 81 个任务，代码在页面里跑，写完立刻判分。</p></div>
+      <div class="step"><span class="tag">查</span><b>查证机制</b><p>154 条机制条目，64 条挂着真实文献，能点开核对。</p></div>
+      <div class="step"><span class="tag">写</span><b>落成文字</b><p>把结果拼成论文骨架，写完能直接搬进 Word。</p></div>
+    </div>
+  </section>
+
+  <section class="sec">
+    <div class="sec-h">站内实数</div>
+    <div class="nums">
+      <div class="num"><b>3314</b><span>篇论文，按被引排序</span></div>
+      <div class="num ok"><b>141</b><span>个 R 代码模板</span></div>
+      <div class="num warn"><b>36</b><span>条下载通道</span></div>
+    </div>
+  </section>
+
+  <div class="foot">嵩山一号 · 方案 A：暗房记录本</div>
+</div>
+</body></html>

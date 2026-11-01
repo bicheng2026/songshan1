@@ -1,10 +1,58 @@
-/* 嵩山一号 · 工作站 —— 通用课程
+/* 嵩山一号 · 工作站 —— 通用课程（已合并「看视频」：视频清单按学习顺序排在课程顶部）
    第 0 讲从「1+1 怎么写」开始；每节默认折叠，点开才展开。
-   每节两段代码：base R 能在本页直接跑（讲原理）；标了包名的「真实写法」讲实战。 */
+   每节两段代码：base R 能在本页直接跑（讲原理）；标了包名的「真实写法」讲实战。
+   视频数据在 data/videos.261102011837.js；标题/时长/播放量取自 B 站官方接口。 */
 (function () {
   "use strict";
   const SX = window.SX;
   const E = SX.esc;
+
+  /* ---------- 视频块（原 view-video，现已并入本页顶部） ---------- */
+  function av(bv) { return "https://www.bilibili.com/video/" + bv; }
+  function mins(m) {
+    if (!m) return "";
+    if (m < 60) return m + " 分钟";
+    const h = Math.floor(m / 60), r = m % 60;
+    return h + " 小时" + (r ? " " + r + " 分" : "");
+  }
+  function plays(n) {
+    if (!n) return "";
+    return n >= 10000 ? (n / 10000).toFixed(1) + " 万播放" : n + " 播放";
+  }
+  function videoBlock() {
+    const V = window.SX_VIDEOS;
+    if (!V) return "";
+    let h = '<div class="sec-h">配套视频 · 卡住了先看视频，别硬啃文字（按学习顺序排好）</div>';
+    if (V.path && V.path.length) {
+      h += '<div class="path">' + V.path.map(p =>
+        '<a class="path-i" data-bv="' + E(p.bv) + '">' +
+        '<span class="path-s">' + E(p.step) + "</span>" +
+        "<b>" + E(p.t) + "</b>" +
+        '<span class="path-d">' + E(p.d) + "</span></a>").join("") + "</div>";
+    }
+    h += '<div class="vlist">';
+    (V.items || []).forEach((v, i) => {
+      h += '<div class="vrow" id="v-' + E(v.bv) + '">' +
+        '<div class="vno">' + String(i + 1).padStart(2, "0") + "</div>" +
+        '<div class="vbody">' +
+        '<div class="vtitle"><a href="' + av(v.bv) + '" target="_blank" rel="noopener">' + E(v.n) + " &#8599;</a>" +
+        (v.tier ? '<span class="vtier">' + E(v.tier) + "</span>" : "") + "</div>" +
+        '<div class="vmeta">' + E(v.up) + " · " + mins(v.mins) + " · " + plays(v.plays) + "</div>" +
+        '<div class="vwhy">' + E(v.why) + "</div>" +
+        '<a class="vurl" href="' + av(v.bv) + '" target="_blank" rel="noopener">bilibili.com/video/' + E(v.bv) + "</a>" +
+        "</div>" +
+        '<div class="vact"><a class="btn sm" href="' + av(v.bv) + '" target="_blank" rel="noopener">去 B 站看</a>' +
+        '<span class="vwatch">' + E(v.watch || "") + "</span></div>" +
+        "</div>";
+    });
+    h += "</div>";
+    if (V.reads && V.reads.length) {
+      h += '<div class="sec-h">不爱看视频的话，这几份文字教程更好</div><div class="reads">' +
+        V.reads.map(r => '<a class="read" href="' + E(r.u) + '" target="_blank" rel="noopener">' +
+          "<b>" + E(r.n) + " &#8599;</b><span>" + E(r.d) + "</span></a>").join("") + "</div>";
+    }
+    return h;
+  }
 
   function chapters() {
     const C = window.SX_COURSE || { chapters: [], resources: [] };
@@ -17,7 +65,6 @@
     if (!CH.length) { root.innerHTML = '<div class="card">课程数据没加载。</div>'; return; }
 
     const total = CH.reduce((a, c) => a + c.subs.length, 0);
-    const nVid = (window.SX_VIDEOS && window.SX_VIDEOS.items || []).length;
 
     /* ---------- 侧栏 ---------- */
     let side = '<div class="sidehead"><b>目录</b><span class="tiny muted">' +
@@ -36,13 +83,13 @@
       "<h2>通用课程</h2>" +
       '<p class="hero-sub">' + E(intro.split("。")[0]) + "。</p>" +
       '<div class="hero-acts">' +
-      (nVid ? '<a class="btn primary" href="#/video">先看视频（' + nVid + " 套，按顺序排好）</a>" : "") +
       '<a class="btn" href="#/dojo">去代码道场动手</a>' +
       '<a class="btn ghost" href="#/knowledge">查机制词典</a>' +
       "</div>" +
-      '<div class="hero-tip">每节都收起来了，<b>点标题才展开</b>。灰框里的代码能直接点按钮跑；' +
+      '<div class="hero-tip">视频已按学习顺序排在页面顶部（先看视频，再往下读文字课）。每节都收起来了，<b>点标题才展开</b>。灰框里的代码能直接点按钮跑；' +
       "带包名的那段是真实写法，本站跑不了，但要写进脚本。</div>" +
       "</div>" +
+      videoBlock() +
       '<div class="toolbar" style="margin:14px 0 0">' +
       '<button class="btn sm ghost" id="expandAll">展开全部</button>' +
       '<button class="btn sm ghost" id="collapseAll">收起全部</button></div>';
@@ -158,6 +205,17 @@
           d.textContent = r.msg;
           box.appendChild(d);
         }
+      };
+    });
+
+    /* 视频「四步路径」点击定位到对应视频 */
+    root.querySelectorAll("[data-bv]").forEach(el => {
+      el.onclick = () => {
+        const t = document.getElementById("v-" + el.getAttribute("data-bv"));
+        if (!t) return;
+        t.scrollIntoView({ behavior: "smooth", block: "center" });
+        t.classList.add("flash");
+        setTimeout(() => t.classList.remove("flash"), 1400);
       };
     });
   }

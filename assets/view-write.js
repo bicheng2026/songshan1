@@ -15,17 +15,21 @@
 
     root.innerHTML =
       '<div class="page-head"><h2>论文写作台</h2>' +
-      "<p>按 IMRaD 逐节写，自动存本机，可导出 Markdown。" +
-      "" +
+      "<p>按 IMRaD 逐节写，自动存本机，导出 Word 或 Markdown。</p></div>" +
+      '<div class="wr-tools">' +
+      '<button class="btn primary" id="dWord">导出 Word</button>' +
+      '<button class="btn" id="dCite">引用</button>' +
+      '<button class="btn" id="dTrans">译成英文</button>' +
+      '<span class="wr-sep"></span>' +
+      '<button class="btn ghost sm" id="dExport">Markdown</button>' +
+      '<button class="btn ghost sm" id="dPrint">打印 / PDF</button>' +
+      '<button class="btn ghost sm" id="dCopy">复制全文</button>' +
+      "</div>" +
       '<div class="layout-2">' +
       '<aside class="side">' +
       '<div class="card"><b>标题</b>' +
       '<input type="text" id="dTitle" style="width:100%;margin-top:6px" placeholder="论文标题" value="' + E(d.title || "") + '">' +
-      '<div class="toolbar" style="margin-top:8px">' +
-      '<button class="btn sm primary" id="dExport">导出 Markdown</button>' +
-      '<button class="btn sm" id="dPrint">排版打印 / 存 PDF</button>' +
-      '<button class="btn sm ghost" id="dCopy">复制全文</button>' +
-      "</div></div>" +
+      "</div>" +
       '<div class="card" style="margin-top:12px"><b>章节</b><div id="secList"></div></div>' +
       '<div class="card" style="margin-top:12px"><b>自查清单</b>' +
       Object.keys(W.checklists || {}).map(k =>
@@ -37,6 +41,8 @@
       '<section><div class="card"><div id="secHead"></div>' +
       '<textarea class="ed" id="dBody" style="min-height:420px" placeholder="在这里写正文。支持 Markdown。"></textarea>' +
       '<div class="small muted" style="margin-top:6px" id="dCount"></div>' +
+      '<div id="citeHost"></div>' +
+      '<pre class="code" id="trOut" style="display:none;margin-top:14px;max-height:340px;overflow:auto"></pre>' +
       "</div>" +
       '<div class="card" style="margin-top:12px"><b>图注生成器</b>' +
       '<div class="grid g3" style="margin-top:8px">' +
@@ -103,7 +109,7 @@
       d.title = this.value; SX.save();
     }, 400);
 
-    drawSecs(); syncBody();
+    drawSecs(); syncBody(); renderCites();
 
     function fullText() {
       let t = "# " + (d.title || "（未命名）") + "\n\n";
@@ -145,6 +151,156 @@
       const o = document.getElementById("lgOut");
       if (o.textContent) { SX.copy(o.textContent); SX.toast("图注已复制"); }
     };
+
+    /* ---------------- 引用管理 ---------------- */
+    function cites() { if (!d.cites) d.cites = []; return d.cites; }
+
+    function renderCites() {
+      const host = document.getElementById("citeHost");
+      if (!host) return;
+      const n = cites().length;
+      host.innerHTML =
+        '<details class="acc" id="citeBox"' + (n ? "" : "") + ">" +
+        '<summary><b>引用</b><span class="tag n">' + n + " 条</span></summary>" +
+        '<div class="small muted" style="margin:-6px 0 12px">填一条点「加」，编号自动排。正文里写 [1] 这样的标记，导出 Word 时变上标，文末自动出参考文献。</div>' +
+        '<div class="cite-grid">' +
+        '<input id="cA" placeholder="作者：Smith JA, Wang L">' +
+        '<input id="cT" placeholder="文献标题（必填）">' +
+        '<input id="cJ" placeholder="期刊名">' +
+        '<input id="cY" placeholder="年份">' +
+        '<input id="cV" placeholder="卷(期):起止页">' +
+        '<input id="cD" placeholder="DOI（可选）">' +
+        "</div>" +
+        '<div class="toolbar" style="margin-top:10px"><button class="btn primary sm" id="cAdd">加一条</button></div>' +
+        '<div id="cList" style="margin-top:10px"></div></details>';
+      drawCiteList();
+      document.getElementById("cAdd").onclick = addCite;
+    }
+
+    function drawCiteList() {
+      const box = document.getElementById("cList");
+      if (!box) return;
+      const list = cites();
+      box.innerHTML = list.length ? list.map((c, i) =>
+        '<div class="cite-item"><span class="cite-no">[' + (i + 1) + "]</span>" +
+        '<span class="cite-txt">' + E([c.authors, c.title, c.journal, c.year, c.vol].filter(Boolean).join(". ")) + "</span>" +
+        '<button class="btn sm ghost" data-ins="' + i + '">插入</button>' +
+        '<button class="btn sm ghost" data-del="' + i + '">删</button></div>').join("")
+        : '<div class="small muted">还没有引用。</div>';
+      box.querySelectorAll("[data-ins]").forEach(b => {
+        b.onclick = () => insertCite(+b.getAttribute("data-ins"));
+      });
+      box.querySelectorAll("[data-del]").forEach(b => {
+        b.onclick = () => {
+          cites().splice(+b.getAttribute("data-del"), 1);
+          SX.save(); renderCites();
+        };
+      });
+    }
+
+    function addCite() {
+      const g = id => (document.getElementById(id).value || "").trim();
+      const c = { authors: g("cA"), title: g("cT"), journal: g("cJ"), year: g("cY"), vol: g("cV"), doi: g("cD") };
+      if (!c.title) { SX.toast("至少填标题"); return; }
+      cites().push(c); SX.save();
+      ["cA", "cT", "cJ", "cY", "cV", "cD"].forEach(id => { document.getElementById(id).value = ""; });
+      renderCites();
+      SX.toast("已加第 " + cites().length + " 条");
+    }
+
+    /* 把 [n] 插到光标处，不破坏别的段落 */
+    function insertCite(i) {
+      const ta = document.getElementById("dBody");
+      if (!ta) return;
+      const mark = "[" + (i + 1) + "]";
+      const pos = ta.selectionStart == null ? ta.value.length : ta.selectionStart;
+      ta.value = ta.value.slice(0, pos) + mark + ta.value.slice(pos);
+      ta.focus();
+      ta.selectionStart = ta.selectionEnd = pos + mark.length;
+      saveBody(); updateCount();
+      SX.toast("已插入 " + mark);
+    }
+
+    document.getElementById("dCite").onclick = () => {
+      const box = document.getElementById("citeBox");
+      if (box) { box.open = true; box.scrollIntoView({ behavior: "smooth", block: "nearest" }); }
+    };
+
+    /* ---------------- 导出 Word ---------------- */
+    function esc2(x) {
+      return String(x == null ? "" : x).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+    }
+    function mdToHtml(t) {
+      return t.split(/\n{2,}/).map(par => {
+        let p = esc2(par.trim())
+          .replace(/\*\*(.+?)\*\*/g, "<b>$1</b>")
+          .replace(/(?<!\*)\*([^*]+?)\*(?!\*)/g, "<i>$1</i>");
+        p = p.replace(/\[(\d+(?:\s*[,，-]\s*\d+)*)\]/g, "<sup>[$1]</sup>").replace(/\n/g, "<br>");
+        return p.trim() ? "<p>" + p + "</p>" : "";
+      }).join("");
+    }
+
+    function toWord() {
+      const list = cites();
+      let body = "<h1>" + esc2(d.title || "Manuscript") + "</h1>";
+      (W.sections || []).forEach(sec => {
+        const t = ((d.sections || {})[sec.id] || "").trim();
+        if (!t) return;
+        body += "<h2>" + esc2(sec.name.split(" ")[0]) + "</h2>" + mdToHtml(t);
+      });
+      if (list.length) {
+        body += "<h2>References</h2><ol class=\"ref\">" + list.map(c =>
+          "<li>" + (c.authors ? esc2(c.authors) + ". " : "") + esc2(c.title) + ". <i>" +
+          esc2(c.journal || "") + "</i>" + (c.year ? ", " + esc2(c.year) : "") +
+          (c.vol ? "; " + esc2(c.vol) : "") + "." +
+          (c.doi ? " doi: " + esc2(c.doi) : "") + "</li>").join("") + "</ol>";
+      }
+      const html = '<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word">' +
+        '<head><meta charset="utf-8"><title>' + esc2(d.title || "manuscript") + "</title>" +
+        "<style>@page{size:A4;margin:2.54cm 3.17cm}" +
+        'body{font-family:"Times New Roman","SimSun",serif;font-size:12pt;line-height:1.75;color:#000}' +
+        "h1{font-size:16pt;text-align:center;font-weight:bold;margin:0 0 20pt}" +
+        "h2{font-size:13pt;font-weight:bold;margin:20pt 0 8pt}" +
+        "p{margin:0 0 9pt;text-align:justify}" +
+        "sup{font-size:8.5pt}" +
+        'ol.ref{padding-left:20pt}ol.ref li{margin-bottom:5pt;font-size:10.5pt;line-height:1.6;text-align:justify}' +
+        "</style></head><body>" + body + "</body></html>";
+      SX.download((d.title || "manuscript").replace(/[\\/:*?"<>|]/g, "_") + ".doc", html, "application/msword");
+      SX.toast("Word 已导出，排版按 A4 论文格式");
+    }
+    document.getElementById("dWord").onclick = toWord;
+
+    /* ---------------- 一键译成英文（复用 AI 导师的 key）---------------- */
+    const trOut = document.getElementById("trOut");
+    document.getElementById("dTrans").onclick = async () => {
+      const st = SX.state.settings || {};
+      if (!st.key) { SX.toast("先去「AI 导师」页填 API Key"); return; }
+      const src = fullText().trim();
+      if (!src) { SX.toast("正文还是空的"); return; }
+      trOut.style.display = "block";
+      trOut.textContent = "翻译中，长文可能要一两分钟…";
+      trOut.scrollIntoView({ behavior: "smooth", block: "nearest" });
+      try {
+        const resp = await fetch(String(st.base || "").replace(/\/+$/, "") + "/chat/completions", {
+          method: "POST",
+          headers: { "Content-Type": "application/json", Authorization: "Bearer " + st.key },
+          body: JSON.stringify({
+            model: st.model, temperature: 0.2,
+            messages: [
+              { role: "system", content: "你是医学论文翻译。把中文译成学术英文：保留 Markdown 的 # 标题层级、保留 [数字] 引用标记原样、不增删内容、不加任何解释，只输出译文。" },
+              { role: "user", content: src }
+            ]
+          })
+        });
+        if (!resp.ok) throw new Error("接口返回 " + resp.status);
+        const j = await resp.json();
+        const out = (((j.choices || [])[0] || {}).message || {}).content || "";
+        trOut.textContent = out || "（没返回内容）";
+        SX.toast("翻译完成，点右上「复制」可取走");
+      } catch (e) {
+        trOut.textContent = "翻译失败：" + String(e.message || e);
+      }
+    };
   }
 
   /* ==================== AI 导师 ==================== */
@@ -160,7 +316,8 @@
       "<p>8 个预设角色，都按你的背景写好。密钥只存本机。</p></div>" +
       '<div class="layout-2">' +
       '<aside class="side">' +
-      '<div class="card"><b>模型设置</b>' +
+      '<details class="acc"><summary><b>模型设置</b><span class="tag n">只存本机</span></summary>' +
+      '<div class="side-body">' +
       '<div style="margin-top:8px"><label class="tiny muted">服务商</label>' +
       '<select id="pvSel" style="width:100%">' +
       P.map(p => '<option value="' + E(p.id) + '"' + (st.provider === p.id ? " selected" : "") + ">" + E(p.name) + "</option>").join("") +
@@ -176,7 +333,7 @@
       '<input type="range" id="pvTemp" min="0" max="1" step="0.1" value="' + st.temp + '" style="width:100%"></div>' +
       '<div class="toolbar" style="margin-top:8px"><button class="btn sm primary" id="pvSave">保存设置</button>' +
       '<button class="btn sm ghost" id="pvTest">测试连通</button></div>' +
-      '<div class="tiny muted" id="pvNote" style="margin-top:6px"></div></div>' +
+      '<div class="tiny muted" id="pvNote" style="margin-top:6px"></div></div></details>' +
       '<div class="card" style="margin-top:12px"><b>导师角色</b><div id="tutorList"></div></div>' +
       "</aside>" +
       '<section class="card">' +

@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>方案 D · 暗房校样</title>
+<style>
+:root{
+  --bg:#0B0C0A; --panel:#101210; --panel2:#15170F;
+  --line:#242821; --line2:#31362C;
+  --ink:#E8E6DB; --ink2:#9B9D8F; --ink3:#6A6C5F;
+  --ok:#35C77E; --warn:#FF4B3E; --mark:#E8B33C;
+  --serif:"Source Han Serif SC","Songti SC","SimSun",serif;
+  --sans:"PingFang SC","Microsoft YaHei",system-ui,sans-serif;
+  --mono:"SF Mono",Consolas,monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:18.5px;line-height:1.8;-webkit-font-smoothing:antialiased}
+.wrap{max-width:1100px;margin:0 auto;padding:0 40px}
+header{display:flex;align-items:center;justify-content:space-between;padding:22px 0;border-bottom:1px solid var(--line)}
+.brand{font-family:var(--serif);font-size:22px;letter-spacing:.04em}
+.brand i{font-style:normal;font-family:var(--mono);font-size:11.5px;color:var(--ink3);margin-left:10px;letter-spacing:.12em}
+nav{display:flex;gap:28px;font-size:15px;color:var(--ink2)}
+nav a{color:inherit;text-decoration:none;position:relative;padding-bottom:2px}
+nav a:hover{color:var(--ink)}
+nav a:hover::after{content:"";position:absolute;left:0;right:0;bottom:-2px;height:2px;background:var(--mark)}
+
+.hero{padding:88px 0 62px}
+.kicker{font-family:var(--mono);font-size:12.5px;color:var(--ink3);letter-spacing:.16em;margin-bottom:28px}
+h1{font-family:var(--serif);font-size:62px;line-height:1.14;font-weight:600;letter-spacing:-.005em;max-width:13em}
+h1 em{font-style:normal;box-shadow:inset 0 -6px 0 rgba(232,179,60,.28)}
+.lead{margin-top:30px;max-width:33em;color:var(--ink2);font-size:19px;line-height:1.85}
+.acts{margin-top:40px;display:flex;gap:14px;flex-wrap:wrap}
+.btn{display:inline-block;padding:13px 27px;border:1px solid var(--line2);border-radius:4px;
+  color:var(--ink);text-decoration:none;font-size:16px;transition:border-color .18s}
+.btn:hover{border-color:var(--mark)}
+.btn.solid{background:var(--ink);color:var(--bg);border-color:var(--ink);font-weight:600}
+.btn.solid:hover{background:var(--mark);border-color:var(--mark);color:#1A1200}
+
+.sec{padding:58px 0;border-bottom:1px solid var(--line)}
+.sec-h{display:flex;align-items:baseline;gap:14px;margin-bottom:34px}
+.sec-h b{font-size:19px;font-weight:600}
+.sec-h span{font-family:var(--mono);font-size:12px;color:var(--ink3);letter-spacing:.1em}
+
+.steps{display:grid;grid-template-columns:repeat(4,1fr);gap:0}
+.step{padding:2px 26px 2px 20px;border-left:2px solid var(--line2)}
+.step:hover{border-left-color:var(--mark)}
+.step .t{font-family:var(--mono);font-size:12px;color:var(--mark);letter-spacing:.12em;display:block;margin-bottom:12px}
+.step b{display:block;font-size:20px;margin-bottom:8px;font-weight:600;font-family:var(--serif)}
+.step p{font-size:15.5px;color:var(--ink2);line-height:1.78}
+
+table{width:100%;border-collapse:collapse;font-size:16px}
+th{font-family:var(--mono);font-size:11.5px;letter-spacing:.14em;color:var(--ink3);font-weight:400;
+  text-align:left;padding:0 0 14px;border-bottom:1px solid var(--line2)}
+td{padding:18px 0;border-bottom:1px solid var(--line);vertical-align:baseline}
+td.n{font-family:var(--mono);font-size:26px;letter-spacing:-.02em;width:150px}
+td.n.ok{color:var(--ok)} td.n.mark{color:var(--mark)} td.n.warn{color:var(--warn)}
+td.d{color:var(--ink2);font-size:15.5px}
+
+.foot{padding:46px 0;display:flex;justify-content:space-between;font-family:var(--mono);font-size:12.5px;color:var(--ink3)}
+
+@media(max-width:900px){
+  .wrap{padding:0 22px} h1{font-size:38px} .lead{font-size:17.5px}
+  .steps{grid-template-columns:1fr;gap:28px}
+  td.n{width:110px;font-size:22px}
+  .foot{flex-direction:column;gap:8px}
+}
+</style></head><body>
+<div class="wrap">
+  <header>
+    <div class="brand">嵩山一号<i>WORKSTATION</i></div>
+    <nav><a>课程</a><a>道场</a><a>找文献</a><a>出代码</a></nav>
+  </header>
+
+  <section class="hero">
+    <div class="kicker">科研训练工作站 · 2026</div>
+    <h1>从零练到<br>能自己写出一篇<em>生信论文</em>。</h1>
+    <p class="lead">这里不是资料站，是训练场。一条闭环走四遍：学一段原理，练一遍代码，查清背后的机制，写成自己的结果。不用预习，也不用先去别处补课。</p>
+    <div class="acts">
+      <a class="btn solid">从第一个视频开始</a>
+      <a class="btn">直接做第一关</a>
+    </div>
+  </section>
+
+  <section class="sec">
+    <div class="sec-h"><b>训练闭环</b><span>LEARN · PRACTICE · VERIFY · WRITE</span></div>
+    <div class="steps">
+      <div class="step"><span class="t">学</span><b>先看懂</b><p>8 个视频按顺序排好，不想看视频就读 11 讲课程。</p></div>
+      <div class="step"><span class="t">练</span><b>亲手跑通</b><p>27 关 81 个任务，代码在页面里跑，写完立刻判分。</p></div>
+      <div class="step"><span class="t">查</span><b>查证机制</b><p>154 条机制条目，64 条挂着真实文献，能点开核对。</p></div>
+      <div class="step"><span class="t">写</span><b>落成文字</b><p>把结果拼成论文骨架，写完能直接搬进 Word。</p></div>
+    </div>
+  </section>
+
+  <section class="sec">
+    <div class="sec-h"><b>站内实数</b><span>EVERYTHING YOU CAN RUN</span></div>
+    <table>
+      <tr><th>项目</th><th>数量</th><th>怎么用</th></tr>
+      <tr><td>论文</td><td class="n ok">3314</td><td class="d">按被引排序，方法标签可反查</td></tr>
+      <tr><td>R 代码模板</td><td class="n mark">141</td><td class="d">一键复制进 RStudio</td></tr>
+      <tr><td>下载通道</td><td class="n warn">36</td><td class="d">开放获取、机构传递、同行求助</td></tr>
+      <tr><td>关卡任务</td><td class="n">81</td><td class="d">边写边判，错了说差在哪</td></tr>
+    </table>
+  </section>
+
+  <div class="foot"><span>嵩山一号 · 方案 D：暗房校样</span><span>A 的骨 · B 的字 · C 的色</span></div>
+</div>
+</body></html>

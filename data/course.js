@@ -7,6 +7,221 @@ window.SX_COURSE = {
   
   chapters: [
     {
+      id: "bk",
+      title: "专题 · Bulk RNA-seq 专章：从 counts 到免疫浸润（整合你的一号~四号 + 小陈录播）",
+      plain: "你的一号~四号笔记（R 基础、TCGA/DESeq2、GO-KEGG/GSEA、ESTIMATE/CIBERSORT/ssGSEA/xCell）就是一套完整的 bulk RNA-seq 主线。这章把它们整章串起来：从拿到一张 counts 矩阵，到差异基因、火山图热图、富集、免疫浸润，最后接回单细胞。每一步都给一段 base R 能直接跑的原理代码，和一段标了真实包名的实战写法。配套视频全部用小陈自己的录播（123 网盘，免登录）。文件与本专章各节对应：class1-1/1-2 = R 基础（第1节）；Class2-1~4 = TCGA 下载与差异分析（第2节）；Class3-1~6 = 富集 / GSEA（第3、4节）；Class4-1~6 = 免疫浸润（第5节）。点开下面分享链接后，按文件名对应到对应小节即可，不用纠结点哪一个。",
+      goal: [
+        "能从 TCGA/GEO 拿到原始 counts 矩阵，并完成 Ensembl/探针 ID → 基因名 的转换",
+        "能用 DESeq2 跑通差异分析，说清归一化、离散度估计、Wald 检验各自在干什么",
+        "能自己画出火山图和热图，并解释阈值线代表什么",
+        "能做 ORA 富集和 GSEA，知道两者问的根本不是同一个问题",
+        "能用 ESTIMATE/CIBERSORT/ssGSEA/xCell 反卷积免疫浸润，并分清比例与分数"
+      ],
+      rec: {
+        u: "https://4007218689.share.123pan.cn/123pan/2rzowh-GFk6d",
+        files: [
+        "class1-1.mp4",
+        "class1-2.mp4",
+        "Class2-1.mp4",
+        "Class2-2.mp4",
+        "Class2-3.mp4",
+        "Class2-4.mp4",
+        "Class3-1.mp4",
+        "Class3-2.mp4",
+        "Class3-3.mp4",
+        "Class3-4.mp4",
+        "Class3-5.mp4",
+        "Class3-6.mp4",
+        "Class4-1.mp4",
+        "Class4-2.mp4",
+        "Class4-3.mp4",
+        "Class4-4.mp4",
+        "Class4-5.mp4",
+        "Class4-6.mp4"
+        ]
+      },
+      refs: [
+        { n: "DESeq2 官方 vignette", u: "https://bioconductor.org/packages/release/bioc/vignettes/DESeq2/inst/doc/DESeq2.html", d: "差异分析金标准，design/lfcShrink 参数都在这", t: "doc" },
+        { n: "clusterProfiler（Bioconductor 官方）", u: "https://bioconductor.org/packages/release/bioc/html/clusterProfiler.html", d: "enrichGO/enrichKEGG/gseGO 都在这里", t: "doc" },
+        { n: "CIBERSORTx 官网", u: "https://cibersortx.stanford.edu/", d: "22 种免疫细胞参考矩阵，注册后跑网页版", t: "tool" },
+        { n: "xCell 官网", u: "https://xcell.ucsf.edu/", d: "64 种细胞 ssGSEA 打分，输出是分数不是百分比", t: "tool" }
+      ],
+      subs: [
+        {
+          t: "1 · 拿到 counts 矩阵：下载、整理与 ID 转换",
+          why: "你拿到的表格格子是「这个数在多少条 reads 里」，不是「表达高不高」。TCGA 给 Ensembl ID（带版本号 ENSG0000xxx.1），GEO 芯片给探针 ID，都得先转成基因名才能往下做。",
+          pts: [
+            "TCGA 用 TCGAbiolinks 下 STAR - Counts（原始计数），绝不拿 TPM/FPKM 喂 DESeq2",
+            "Ensembl ID 先 sub 掉版本号再 mapIds 转 SYMBOL",
+            "芯片探针用注释包（如 hgu133plus2.db）或 AnnotationDbi 转",
+            "表达矩阵行=基因、列=样本，分组信息单独成表，别混一起"
+          ],
+          code: `set.seed(1)
+# 读入原始 counts（行=基因/探针，列=样本）
+cnt <- read.delim("counts.txt", row.names = 1, check.names = FALSE)
+dim(cnt)
+
+# Ensembl ID 常带版本号，先统一去掉（ENSG000001.1 -> ENSG000001）
+rownames(cnt) <- sub("\\..*", "", rownames(cnt))
+
+# ID 转换本质：一次按关键列的两表连接
+# 真实用 AnnotationDbi::mapIds；这里用 base R 演示结构
+ref <- data.frame(ENSEMBL = c("ENSG00001","ENSG00002"),
+                  SYMBOL = c("ABC","DEF"))
+expr_sym <- merge(data.frame(ENSEMBL = rownames(cnt)[1:2]),
+                  ref, by = "ENSEMBL", all.x = TRUE)
+expr_sym`,
+          real: {
+            pkg: "TCGAbiolinks + org.Hs.eg.db",
+            code: `library(TCGAbiolinks)
+query <- GDCquery(project = "TCGA-LIHC",
+                  data.category = "Transcriptome Profiling",
+                  data.type = "Gene Expression Quantification",
+                  workflow.type = "STAR - Counts")
+GDCdownload(query); se <- GDCprepare(query)
+cnt <- assay(se)                        # 原始 counts，直接喂 DESeq2
+library(org.Hs.eg.db)
+sym <- mapIds(org.Hs.eg.db,
+              keys = sub("\\..*", "", rownames(cnt)),
+              keytype = "ENSEMBL", column = "SYMBOL")`
+          }
+        },
+        {
+          t: "2 · DESeq2 差异分析：count → DEG list",
+          why: "差异分析本质是对每个基因做「两组计数是否真的不同」的假设检验，同时估计归一化因子抵消文库大小，再用负二项分布建模离散度。",
+          pts: [
+            "DESeqDataSetFromMatrix 吃原始 counts，design = ~ group",
+            "pre-filter 去掉低表达基因，减少多重检验负担",
+            "results + lfcShrink（apeglm）得到收缩后的 log2FC",
+            "padj<0.05 且 |log2FC|>1 是常用显著阈值"
+          ],
+          code: `set.seed(1)
+g <- c(rpois(20, 100), rpois(20, 200))   # 某基因：正常20、肿瘤20
+grp <- rep(c("N","T"), each = 20)
+# 原理1：log2 倍数变化 ≈ 两组均值比
+log2FC <- log2(mean(g[grp=="T"]) / mean(g[grp=="N"]))
+# 原理2：两组是否真不同，用 t 检验看 p 值
+t.test(g ~ grp)$p.value`,
+          real: {
+            pkg: "DESeq2",
+            code: `library(DESeq2)
+dds <- DESeqDataSetFromMatrix(countData = cnt, colData = meta,
+                              design = ~ group)
+keep <- rowSums(counts(dds) >= 10) >= 5
+dds <- dds[keep, ]
+dds$group <- relevel(factor(dds$group), ref = "normal")
+dds <- DESeq(dds)
+res <- lfcShrink(dds, coef = "group_tumor_vs_normal", type = "apeglm")
+deg <- subset(as.data.frame(res), padj < 0.05 & abs(log2FoldChange) > 1)`
+          }
+        },
+        {
+          t: "3 · 火山图与热图：把差异结果画出来",
+          why: "火山图一眼看「又显著又变化大」的基因；热图看一批基因在样本间的表达模式。两者都是差异分析的门面。",
+          pts: [
+            "火山图 x=log2FC, y=-log10(padj)，画阈值线",
+            "用 ggrepel 标关键基因名，别让点糊成一团",
+            "热图先做 z-score 归一，再按样本/基因聚类",
+            "热图行数别太多，挑 top DEG 或某通路基因"
+          ],
+          code: `set.seed(3)
+n <- 300
+lfc <- rnorm(n, 0, 2); padj <- p.adjust(runif(n), method = "BH")
+# 火山图
+plot(lfc, -log10(padj), pch = 16, cex = 0.7,
+     col = ifelse(padj < 0.05 & abs(lfc) > 1, "red", "grey"),
+     xlab = "log2FC", ylab = "-log10(adj P)")
+abline(v = c(-1,1), lty = 2); abline(h = -log10(0.05), lty = 2)
+# 热图
+mat <- matrix(rnorm(50*8), 50, 8)
+heatmap(mat, scale = "row")`,
+          real: {
+            pkg: "ggplot2 + ggrepel + pheatmap",
+            code: `library(ggplot2); library(ggrepel); library(pheatmap)
+volcano <- ggplot(res.df, aes(x = log2FoldChange, y = -log10(padj),
+       color = change)) + geom_point() + geom_vline(xintercept = c(-1,1)) +
+       geom_hline(yintercept = -log10(0.05)) +
+       geom_text_repel(data = subset(res.df, padj < 0.05 & abs(log2FoldChange)>1),
+                       aes(label = SYMBOL))
+pheatmap(mat_z, scale = "row", cluster_rows = TRUE, show_rownames = FALSE)`
+          }
+        },
+        {
+          t: "4 · 富集分析：ORA 与 GSEA 根本不是一回事",
+          why: "ORA（超几何检验）问的是「差异基因里某个通路的基因是不是扎堆了」；GSEA 问的是「按表达变化排好序的全基因列表里，某通路的基因是不是整体靠前」。一个只看显著基因，一个用全基因排名。",
+          pts: [
+            "ORA 用 enrichGO/enrichKEGG，背景集要选对",
+            "GSEA 输入是排序后的全基因列表 + 基因集，不是只喂 DEG",
+            "p 值要对多重检验做校正（qvalue/FDR）",
+            "两种结果别混着说，结论口径不同"
+          ],
+          code: `pathway_genes <- 200; total_genes <- 20000
+deg_genes <- 1500; deg_in_pathway <- 60
+# ORA：差异基因里某通路基因是否扎堆（超几何检验）
+phyper(deg_in_pathway - 1, pathway_genes,
+       total_genes - pathway_genes, deg_genes, lower.tail = FALSE)
+# GSEA 思想：把全基因按 log2FC 排序，看某通路是否整体靠前
+rank <- sort(lfc, decreasing = TRUE, index.return = TRUE)$ix`,
+          real: {
+            pkg: "clusterProfiler + org.Hs.eg.db",
+            code: `library(clusterProfiler); library(org.Hs.eg.db)
+ego <- enrichGO(gene = deg_symbols, OrgDb = org.Hs.eg.db,
+                ont = "BP", pAdjustMethod = "BH", qvalueCutoff = 0.05)
+ego <- pairwise_termsim(ego)
+ekk <- enrichKEGG(gene = deg_entrez, organism = "hsa")
+gsea <- gseGO(geneList = ranked_lfc, OrgDb = org.Hs.eg.db, ont = "BP")`
+          }
+        },
+        {
+          t: "5 · 免疫浸润：ESTIMATE / CIBERSORT / ssGSEA / xCell",
+          why: "一块组织混着多种细胞，测序只给混合平均值。反卷积就是用一份「参考特征」把混合信号拆回各细胞类型的占比/分数。四种方法给的东西不一样：ESTIMATE 给基质/免疫分数，CIBERSORT 给 22 种免疫细胞比例，ssGSEA/xCell 给富集分数（不是百分比）。",
+          pts: [
+            "CIBERSORT 输出比例（加起来≈1），需网页版或自带 LM22 矩阵",
+            "ssGSEA/xCell 输出富集分数，别拿去归一化当比例",
+            "ESTIMATE 分数高≠细胞多，只是表达谱像",
+            "三种结果当三件不同的事，不能互相替代"
+          ],
+          code: `set.seed(5)
+# 反卷积思想：混合信号 = 各细胞类型特征 x 比例
+M <- matrix(runif(6*3), 6, 3)        # 3 种细胞的 6 基因特征
+true_prop <- c(0.5, 0.3, 0.2)
+mix <- M %*% true_prop               # 混合表达
+est <- solve(M, mix)                 # 反推比例
+round(est, 2)`,
+          real: {
+            pkg: "ESTIMATE + CIBERSORT + GSVA",
+            code: `library(ESTIMATE)
+scores <- estimateScore(t(expr.matrix), platform = "illumina")
+# CIBERSORT 用官方 R 脚本 + 参考矩阵 LM22
+source("CIBERSORT.R")
+res <- CIBERSORT("LM22.txt", "expr.txt")
+library(GSVA); library(GSEABase)
+ss <- gsva(as.matrix(expr), geneSets, method = "ssgsea")`
+          }
+        },
+        {
+          t: "6 · 相关性热图与接回单细胞",
+          why: "算基因间/样本间相关性是 bulk 里最常做的探索；做完 bulk，再上单细胞看「哪些细胞在驱动这些信号」，两层的结论才闭环。",
+          pts: [
+            "cor() 算相关性，heatmap 可视化",
+            "相关性≠因果，别拿 r 当机制证据",
+            "bulk 看到的差异，去单细胞里定位到具体细胞群",
+            "本课题 RILD 里，bulk 差异 + 单细胞分区定位 = 治疗图谱"
+          ],
+          code: `cors <- cor(t(mat))                  # 基因间相关性（mat 行=基因）
+heatmap(cors, cex = 0.6)
+heatmap(cor(mat))                    # 样本间相关性`,
+          real: {
+            pkg: "Seurat",
+            code: `library(Seurat)
+Idents(sc) <- sc$celltype
+# 把 bulk 差异基因拿去单细胞验证：哪群细胞在驱动
+VlnPlot(sc, features = head(deg_symbols), group.by = "celltype")`
+          }
+        }
+      ]
+    },
+    {
       id: "sc",
       title: "专题 · 单细胞 Seurat 实操：从 count 矩阵到细胞通讯",
       plain: "课题组做的是 RILD 肝细胞单细胞，这一讲专门带你用 R（Seurat）把一张 10x 矩阵跑成带注释的细胞分群，再顺手跑一遍细胞通讯（CellChat）。不依赖本课题数据，用 Seurat 自带的 pbmc3k 当练习对象，跑通了你再换成自己的数据。",

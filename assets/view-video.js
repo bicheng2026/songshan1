@@ -1,5 +1,5 @@
 /* 嵩山一号 · 工作站 —— 看视频（视频课入口）
-   数据在 data/videos.js；标题/时长/播放量取自 B 站官方接口。 */
+   数据在 data/videos.261102011837.js；标题/时长/播放量取自 B 站官方接口。 */
 (function () {
   "use strict";
   const SX = window.SX;
@@ -21,7 +21,7 @@
     const V = window.SX_VIDEOS;
     if (!V) { root.innerHTML = '<div class="card">视频清单没加载。</div>'; return; }
 
-    let html = '<div class="hero">' +
+    let html = '<div class="hero hero-sm">' +
       '<div class="hero-k">卡住了就看视频 · 别硬啃文字</div>' +
       "<h2>看视频</h2>" +
       '<p class="hero-sub">' + E(String(V.intro || "").split("。")[0]) + "</p></div>";

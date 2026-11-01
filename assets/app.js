@@ -6,7 +6,6 @@
 
   const NAV = [
     { id: "map", name: "修炼地图", group: "main", fn: map },
-    { id: "video", name: "看视频", group: "main", fn: () => window.SXViewVideo.render(document.getElementById("view")) },
     { id: "course", name: "通用课程", group: "main", fn: () => window.SXViewCourse.render(document.getElementById("view")) },
     { id: "dojo", name: "代码道场", group: "main", fn: () => window.SXViewDojo.render(document.getElementById("view")) },
     { id: "litfind", name: "找文献", group: "main", fn: () => window.SXViewLit.render(document.getElementById("view")) },
@@ -95,15 +94,15 @@
       '<p class="hero-sub">这里不是资料站，是训练场。一条闭环走四遍：<b>学</b>一段原理 → <b>练</b>一遍代码 → ' +
       "<b>查</b>清楚背后的机制 → <b>写</b>成自己的结果。不用预习，也不用先去别处补课。</p>" +
       '<div class="hero-acts">' +
-      '<a class="btn primary" href="#/video">从第一个视频开始</a>' +
+      '<a class="btn primary" href="#/course">打开课程（视频在顶部）</a>' +
       '<a class="btn" href="#/dojo">跳过铺垫，直接做第一关</a>' +
       "</div>" +
-      '<div class="hero-tip">第一次来：先看完「R 入门」那个视频，再读第 0、1 讲，然后做 rbase-1。</div>' +
+      '<div class="hero-tip">第一次来：先看完课程页顶部的「R 入门」视频，再读第 0、1 讲，然后做 rbase-1。</div>' +
       "</div>" +
 
       '<div class="sec-h">训练闭环 · 四步走完一轮，再走下一轮</div>' +
       '<div class="loop">' +
-      '<a class="loop-i" href="#/video"><span class="loop-s">第一步 · 学</span><b>先看懂</b>' +
+      '<a class="loop-i" href="#/course"><span class="loop-s">第一步 · 学</span><b>先看懂</b>' +
       '<span class="loop-d">8 个视频按「先 R → 再转录组 → 然后动手 → 最后单细胞」排好，不用自己挑。' +
       "不想看视频就读 " + lecN + " 讲 " + secN + " 节课程，每节先用一句大白话说清它在干什么。</span></a>" +
       '<a class="loop-i" href="#/dojo"><span class="loop-s">第二步 · 练</span><b>亲手跑通</b>' +
