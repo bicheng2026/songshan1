@@ -30,7 +30,7 @@
     if (!D) { root.innerHTML = head("文献汇总", "数据还没生成。"); return; }
     const dirs = D.dirs || [];
     let h = head("文献汇总",
-      "把论文库按方向切成四块，每块给出体量、被引分布和代表作。看一个方向，先看它被引最高那几篇在解决什么问题，再挑 3 篇读全文。") +
+      "论文库按方向切四块，每块给体量、被引和代表作。") +
       '<div class="card"><div class="small"><b>' + D.total + "</b> 篇 · 合计被引 <b>" +
       D.totalCited.toLocaleString() + "</b> 次 · 覆盖 " + D.years[0] + "–" + D.years[1] + " 年</div>" +
       '<table class="tbl" style="margin-top:12px"><thead><tr><th>方向</th><th>篇数</th><th>占比</th>' +
@@ -87,7 +87,7 @@
 
   function refs(root) {
     let h = head("对标与来源",
-      "动手之前先看了 GitHub 上同类项目在怎么做，下面这 7 个是真正影响了本站设计的，逐条写清「它强在哪 / 我借了什么」。") +
+      "7 个影响了本站设计的 GitHub 项目，逐条写清借了什么。") +
       '<div class="card"><table class="tbl"><thead><tr><th style="width:22%">项目</th><th>★</th>' +
       "<th style='width:30%'>它强在哪</th><th>本站借了什么</th></tr></thead><tbody>" +
       REFS.map(r => "<tr><td><code class='inline'>" + E(r.name) + "</code><div class='tiny muted'>" +
@@ -110,7 +110,7 @@
 
     h += '<div class="card" style="margin-top:16px"><b>数据与方法来源</b>' +
       '<table class="tbl"><thead><tr><th>内容</th><th>来源</th></tr></thead><tbody>' +
-      "<tr><td>论文元数据（3247 篇）</td><td>Europe PMC REST（24 个主题检索，按被引/日期排序）+ 论文订阅每日精读日报</td></tr>" +
+      "<tr><td>论文元数据（3247 篇）</td><td>Europe PMC REST（24 个主题检索，按被引/日期排序）+ 泰山一号每日精读日报</td></tr>" +
       "<tr><td>全文链接 / 开放获取标记（300 篇）</td><td>Europe PMC core 接口（fullTextUrlList、isOpenAccess）</td></tr>" +
       "<tr><td>练习数据</td><td>按课题设计仿真的 RILD 大鼠三区 × 六时间点表达矩阵、TCGA-LIHC 子集、空间 spot、MR/coloc 汇总统计</td></tr>" +
       "<tr><td>机制条目（144 条）</td><td>按教科书与共识文献整理，每条标注「这对纯计算课题意味着什么」</td></tr>" +

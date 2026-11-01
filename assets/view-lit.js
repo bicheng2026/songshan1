@@ -86,7 +86,7 @@
     return '<div class="card lit-idcard">' +
       '<div class="lit-idhead"><span class="tag n">识别到 ' + IDNAME[id.type] + "</span><b>" + E(id.v) + "</b>" +
       '<button class="btn sm ghost" id="litCopyId">复制</button></div>' +
-      '<div class="small muted" style="margin:2px 0 12px">下面每一行都是在查同一件事：这篇到底哪儿能下。从绿标那几行开始点，通常前三行就有答案。</div>' +
+      '<div class="small muted" style="margin:2px 0 12px">每行都在查同一件事：哪儿能下。从绿标开始点。</div>' +
       ws.map(w =>
         '<div class="lit-port">' +
         '<div class="lit-port-l"><a class="lit-port-n k-' + w.k + '" href="' + E(w.u) + '" target="_blank" rel="noopener">' + E(w.n) + "</a>" +
@@ -115,43 +115,41 @@
   /* ---------- 主渲染 ---------- */
   function render(root) {
     root.innerHTML =
-      '<div class="page-head"><h2>找文献</h2><p>一个框，三件事：<b>站里有没有</b>这篇、<b>网上哪儿能下</b>、<b>下不到找谁</b>。' +
-      "题目、关键词、DOI、PMID、PMC 号都能粘。链接是当场拼出来的，断网也能用。</p></div>" +
+      '<div class="page-head"><h2>找文献</h2><p>粘 DOI 或关键词，直接告诉你哪儿能下。</p></div>' +
 
       '<div class="lit-search">' +
-      '<input id="litQ" type="search" autocomplete="off" placeholder="粘 DOI / PMID，或打关键词：RILD、hepatocyte heterogeneity、ferroptosis、放射诱导肝损伤">' +
+      '<input id="litQ" type="search" autocomplete="off" placeholder="粘 DOI / PMID，或打关键词">' +
       '<button class="btn primary" id="litGo">查</button></div>' +
-      '<div class="small muted" style="margin:-8px 0 26px">现成例子：' +
-      '<button class="lit-eg" data-eg="10.1016/j.jhep.2023.01.001">10.1016/j.jhep.2023.01.001</button>' +
-      '<button class="lit-eg" data-eg="PMC4302049">PMC4302049</button>' +
-      '<button class="lit-eg" data-eg="RILD single cell">RILD single cell</button>' +
+      '<div class="lit-egs"><span>试：</span>' +
+      '<button class="lit-eg" data-eg="10.1016/j.jhep.2023.01.001">DOI</button>' +
+      '<button class="lit-eg" data-eg="PMC4302049">PMC</button>' +
+      '<button class="lit-eg" data-eg="RILD single cell">关键词</button>' +
       "</div>" +
 
       '<div id="litId"></div>' +
-      '<div id="litEng"></div>' +
       '<div id="litRes"></div>' +
+      '<div id="litEng"></div>' +
 
       portBlock() + wizardBlock() + customBlock();
 
     const inp = document.getElementById("litQ");
-    const go = () => run();
-    const deb = SX.debounce ? SX.debounce(go, 260) : go;
-    inp.oninput = deb;
-    inp.onkeydown = e => { if (e.key === "Enter") go(); };
-    document.getElementById("litGo").onclick = go;
+    const deb = SX.debounce ? SX.debounce(() => run(false), 260) : (() => run(false));
+    inp.oninput = () => deb();
+    inp.onkeydown = e => { if (e.key === "Enter") run(true); };
+    document.getElementById("litGo").onclick = () => run(true);
     root.querySelectorAll("[data-eg]").forEach(b => {
-      b.onclick = () => { inp.value = b.getAttribute("data-eg"); run(); inp.focus(); };
+      b.onclick = () => { inp.value = b.getAttribute("data-eg"); run(true); inp.focus(); };
     });
 
     bindCustom(root);
     RELOAD = () => {
       const i2 = document.getElementById("litQ");
-      if (i2 && i2.value.trim() && !parseId(i2.value)) run();
+      if (i2 && i2.value.trim() && !parseId(i2.value)) run(false);
     };
     loadIndex();
-    run();
+    run(false);
 
-    function run() {
+    function run(jump) {
       const raw = (document.getElementById("litQ").value || "").trim();
       const id = parseId(raw);
       const idBox = document.getElementById("litId");
@@ -159,12 +157,17 @@
         idBox.innerHTML = idBlockHtml(id);
         const cb = document.getElementById("litCopyId");
         if (cb) cb.onclick = () => { SX.copy(id.v); SX.toast("已复制 " + id.v); };
-        document.getElementById("litEng").innerHTML = engineBlockHtml(raw, "带着这个标识符再去别的库核一遍");
+        document.getElementById("litEng").innerHTML = engineBlockHtml(raw, "别的库");
       } else {
         idBox.innerHTML = "";
-        document.getElementById("litEng").innerHTML = raw ? engineBlockHtml(raw, "带着这个词去公开库搜") : engineIntroHtml();
+        document.getElementById("litEng").innerHTML = raw ? engineBlockHtml(raw, "去公开库搜") : engineIntroHtml();
       }
       drawRes(raw, id);
+      // 手动查（回车/点按钮）时，结果若被滚出视口上方就拉回来，不打断输入
+      if (jump === true) {
+        const t = id ? document.getElementById("litId") : document.getElementById("litRes");
+        if (t && t.getBoundingClientRect().top < 0) t.scrollIntoView({ behavior: "smooth", block: "start" });
+      }
     }
 
     function drawRes(raw, id) {
@@ -185,10 +188,8 @@
         "</div>" +
         (list.length
           ? '<div class="lit-list">' + shown.map((p, i) => resCard(p, i)).join("") + "</div>"
-          : '<div class="card lit-empty"><b>站内没收录这一篇</b>' +
-            '<div class="small muted" style="margin-top:6px">站内是 3314 篇生信论文的固定清单，只含已收录的。两条路：' +
-            "把 DOI 或 PMID 粘进上面的框（我给你所有能下的通道），或者点上面那排按钮带着「" + E(raw) + "」去公开库搜。" +
-            "</div></div>");
+          : '<div class="card lit-empty"><b>站内没收录</b>' +
+            '<div class="small muted" style="margin-top:6px">把 DOI 粘上去，或点下面的库搜「' + E(raw) + '」。</div></div>');
 
       const fo = document.getElementById("litFreeOnly");
       if (fo) fo.onchange = () => { onlyFree = fo.checked; limit = 30; drawRes(raw, id); };
@@ -232,7 +233,7 @@
       const box = document.querySelector('[data-box="' + i + '"]');
       if (!doi || !box) return;
       btn.disabled = true;
-      box.innerHTML = '<span class="small muted">在查 OpenAlex 与 Europe PMC…</span>';
+      box.innerHTML = '<span class="small muted">查 OpenAlex 与 Europe PMC…</span>';
       const found = [];
       const errs = [];
       try {
@@ -272,9 +273,9 @@
           (errs.length ? '<span class="muted">（' + E(errs.join("；")) + "）</span>" : "") + "</div>" +
           '<div class="lit-acts">' + uniq.map(x =>
             '<a class="btn sm primary" href="' + E(x.u) + '" target="_blank" rel="noopener">' + E(x.n) + "</a>").join("") + "</div>"
-        : '<div class="small muted">联网查过了，没有免费全文。' + E(errs.join("；")) +
-          '　走两步：<a href="https://www.gxmu.edu.cn/" target="_blank" rel="noopener">进学校图书馆</a>，或者' +
-          '<a href="https://www.ablesci.com/" target="_blank" rel="noopener">去科研通发求助</a>。</div>';
+        : '<div class="small muted">没有免费全文。' + E(errs.join("；")) +
+          '　<a href="https://www.gxmu.edu.cn/" target="_blank" rel="noopener">学校图书馆</a> · ' +
+          '<a href="https://www.ablesci.com/" target="_blank" rel="noopener">科研通求助</a></div>';
       btn.disabled = false;
     }
   }
@@ -304,23 +305,15 @@
   }
 
   function idxReadyHtml() {
-    return '<div class="card lit-empty"><b>上面那个框，三种用法</b>' +
-      '<div class="small muted" style="margin-top:8px">' +
-      "① 粘度 DOI / PMID / PMC 号 → 直接给你这张论文的所有下载通道，一行一行标好哪个能下。<br>" +
-      "② 打关键词 → 先看站内 3 千多篇里有没有，再一键带去 PubMed、Europe PMC、知网等 15 个库。<br>" +
-      "③ 只是想找某篇又不知道号 → 打题目里几个词，站内命中就直接点，没命中就用下面那排引擎。" +
-      "</div></div>";
+    return "";
   }
 
   /* ---------- 检索引擎矩阵 ---------- */
   function engineIntroHtml() {
-    return '<div class="sec-h">十五个库，一个词带过去</div>' +
-      '<div class="small muted" style="margin-bottom:14px">上面输入框空着的时候，这排按钮就是纯入口。填了词，每个按钮都会把词带过去。</div>' +
+    return '<div class="sec-h">十五个库</div>' +
       '<div class="lit-eng">' + (LP.engines || []).map(e =>
         '<a class="lit-engi" href="' + E(String(e.tpl).replace("{q}", "")) + '" target="_blank" rel="noopener">' +
-        "<b>" + E(e.n) + "</b><span>" + E(e.note || "") + "</span></a>").join("") + "</div>" +
-      '<div class="note small">检索式小抄：PubMed 里 <code>RILD AND single cell[Title/Abstract]</code> 比直接打两个词准得多；' +
-      "要限定年份就加 <code>AND 2022:2026[dp]</code>。Europe PMC 支持 <code>DOI:\"10.xxxx/xxxx\"</code> 精确定位。</div>";
+        "<b>" + E(e.n) + "</b><span>" + E(e.note || "") + "</span></a>").join("") + "</div>";
   }
 
   function engineBlockHtml(q, title) {
@@ -332,13 +325,11 @@
 
   /* ---------- 通道速查 ---------- */
   function portBlock() {
-    return '<div class="sec-h">下载通道速查 · 按顺序试，别乱撞</div>' +
-      '<div class="small muted" style="margin-bottom:18px">五组，从上到下就是推荐顺序。第一组能解决就不用往下走。</div>' +
+    return '<div class="sec-h">下载通道</div>' +
       (LP.groups || []).map((g, gi) =>
         '<details class="acc lit-grp"' + (gi === 0 ? " open" : "") + ">" +
         '<summary><b>' + E(g.name) + "</b>" +
-        '<span class="tag n">' + (g.items || []).length + " 个</span></summary>" +
-        '<div class="small muted" style="margin:-6px 0 10px">' + E(g.note || "") + "</div>" +
+        '<span class="tag n">' + (g.items || []).length + "</span></summary>" +
         (g.items || []).map(it =>
           '<div class="lit-port">' +
           '<div class="lit-port-l">' +
@@ -347,7 +338,6 @@
             : '<span class="lit-port-n k-' + E(it.kind || "free") + '">' + E(it.n) + "</span>") +
           (it.u ? '<span class="lit-port-u">' + E(disp(it.u.replace(/^https?:\/\//, ""))) + "</span>" : "") +
           "</div>" +
-          '<div class="lit-port-d">' + E(it.d || "") + "</div>" +
           (it.tip ? '<div class="lit-port-t">' + E(it.tip) + "</div>" : "") +
           "</div>").join("") +
         "</details>").join("");
@@ -355,7 +345,7 @@
 
   /* ---------- 五步走 ---------- */
   function wizardBlock() {
-    return '<div class="sec-h">还是下不到？照这个顺序走，基本不会空手</div>' +
+    return '<div class="sec-h">下不到就照这个顺序</div>' +
       '<div class="lit-wiz">' + (LP.wizard || []).map(w =>
         '<div class="lit-wiz-i"><span class="lit-wiz-s">' + E(w.s) + "</span>" +
         "<b>" + E(w.t) + '</b><span class="small muted">' + E(w.d) + "</span></div>").join("") + "</div>";
@@ -370,8 +360,7 @@
 
   function customBlock() {
     return '<details class="acc lit-grp"><summary><b>自定义通道</b><span class="tag n">只存本机</span></summary>' +
-      '<div class="small muted" style="margin:-6px 0 12px">你信任的来源如果没在上面，自己加一条。链接里可以写 <code>{doi}</code> 和 <code>{q}</code>，' +
-      "用的时候自动替换。这些内容只写进这台电脑的浏览器，不进代码库、不上传。</div>" +
+      '<div class="small muted" style="margin:-6px 0 12px">没列到的来源自己加。链接可写 <code>{doi}</code>、<code>{q}</code>。只存本机。</div>' +
       '<div class="search-bar" style="margin-bottom:10px"><input id="litCName" placeholder="名字，例如 我的镜像">' +
       '<input id="litCUrl" placeholder="https://example.com/{doi}"></div>' +
       '<div class="toolbar"><button class="btn sm primary" id="litCAdd">加一条</button>' +
@@ -389,7 +378,7 @@
         '<span class="lit-port-u">' + E(x.u) + "</span></div>" +
         '<div class="lit-port-d"><a class="btn sm ghost" href="' + E(x.u) + '" target="_blank" rel="noopener">打开</a>' +
         '<button class="btn sm ghost" data-delc="' + i + '">删</button></div></div>').join("")
-      : '<div class="small muted">还没有。加一条之后，上面的站内结果不会自动用它；它的用途是你自己有个常去的站，把入口收在这一页。</div>';
+      : '<div class="small muted">还没有。</div>';
     box.querySelectorAll("[data-delc]").forEach(b => {
       b.onclick = () => {
         const arr = getCustom();

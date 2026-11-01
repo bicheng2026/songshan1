@@ -39,16 +39,16 @@
       '<div class="guide-head"><b>第一次来？四步就懂了</b>' +
       '<button class="btn ghost sm" id="guideToggle">' + (closed ? "展开" : "收起") + "</button></div>" +
       '<div class="guide-body">' +
-      '<div class="step"><span class="num">1</span><div><b>看例子</b>：每关「目标」下面都挂着一个<b>同类的小例子</b>——它比本关简单一圈，但用的是同一个套路。' +
-      "先点『在 R 里跑一遍这个例子』，看真输出长什么样，再往下走。不会编程的人从这里开始，不要直接看本关的题。</div></div>" +
-      '<div class="step"><span class="num">2</span><div><b>看题</b>：下面「本关要干什么」写清了这一关在真实分析里解决什么问题、你要造出哪几个对象。' +
+      '<div class="step"><span class="num">1</span><div><b>看例子</b>：目标下面挂着一个同类小例子，更简单，套路一样。' +
+      "先跑一遍看真输出。不会编程的从这里开始，别直接看题。</div></div>" +
+      '<div class="step"><span class="num">2</span><div><b>看题</b>：本关在真实分析里解决什么、要造哪几个对象。' +
       "数据已经替你读进 R 了，变量名就是数据名（比如 <code class='inline'>rild_expr</code>）。</div></div>" +
       '<div class="step"><span class="num">3</span><div><b>填空</b>：编辑器里已经预置好半成品代码，每个 <code class="inline">...</code> 都是一处填空。' +
       "把 <code class='inline'>...</code> 换成你的答案，别的行不用动。</div></div>" +
       '<div class="step"><span class="num">4</span><div><b>跑</b>：按 <kbd>Ctrl</kbd>+<kbd>Enter</kbd> 或点「运行并判题」。' +
-      "下方会显示 R 的<b>真实输出</b>，然后判题脚本在 R 里逐条检查你造的对象对不对——没过会直接告诉你哪一项差了、差多少。</div></div>" +
+      "下方显示 R 的真实输出，判题逐条检查，没过就说差在哪。</div></div>" +
       '<div class="note" style="margin-top:8px">卡住了按顺序来：<b>提示</b>（四层递进，从公式讲到为什么）→ 自己再试一次 → ' +
-      '<b>参考答案</b>（建议先自己写一遍再看，看完要把答案删掉重写一次，否则等于没学）。</div>' +
+      '<b>参考答案</b>（先自己写，看完删掉重写）。</div>' +
       '<div class="tiny muted" style="margin-top:6px">这一关过了会自动解锁下一关，并拿 XP。进度存在你自己的浏览器里。</div>' +
       "</div></div>";
   }
@@ -64,8 +64,8 @@
 
     root.innerHTML =
       '<div class="page-head"><h2>代码道场</h2>' +
-      "<p>在浏览器里真跑 R（WebAssembly 版 R 4.6.0，只有 base R，不装任何包）。" +
-      "每关配了数据、提示、参考答案和自动判题；打完一关解锁下一关。</p></div>" +
+      "<p>浏览器里真跑 R。" +
+      "每关带数据、提示和自动判题。</p></div>" +
       guideHtml() +
       '<div class="layout-2">' +
       '<aside class="side card" id="lvList"></aside>' +
@@ -130,7 +130,7 @@
     const refHtml = libRefs.length ?
       '<div class="card" style="margin-top:16px"><div class="lv-title"><h3>配套实战代码</h3>' +
       '<span class="tag n">来自主公笔记 / R 课配套</span></div>' +
-      '<div class="small muted" style="margin:6px 0 10px">这些是从主公本机学习笔记与 R 课配套脚本里提取的真实跑通代码，按本关所属方向归类，作为延伸参考。点开看，复制了自己在 RStudio 里跑。</div>' +
+      '<div class="small muted" style="margin:6px 0 10px">本关方向的可跑代码，复制到自己电脑跑。</div>' +
       libRefs.map(x => '<details class="acc"><summary>' + SX.esc(x.title) + '</summary>' +
         "<pre class='code'>" + SX.esc(x.code) + "</pre>" +
         '<button class="btn sm" data-refcopy="' + SX.esc(x.id) + '">复制代码</button></details>').join("") +

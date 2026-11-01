@@ -55,7 +55,7 @@
         ' style="' + (filt === all.find(x => (x.trackName || x.track) === k).track ? "background:var(--brand);color:#fff;border-color:var(--brand)" : "") + '">' +
         E(k) + " (" + tk[k] + ")</button>").join(" ");
 
-      root.innerHTML = head("代码库", "共 " + all.length + " 段可直接复用的 R 模板。每段都写明什么时候用、依赖哪些包、有哪些坑。点『复制』直接粘进 RStudio。") +
+      root.innerHTML = head("代码库", "共 " + all.length + " 段 R 模板，写明何时用、依赖哪些包。") +
         '<div class="search-bar" style="gap:4px"><button class="btn sm" data-t="ALL"' +
         (filt === "ALL" ? ' style="background:var(--brand);color:#fff;border-color:var(--brand)"' : "") +
         '>全部 (' + all.length + ")</button>" + chips + "</div>" +
@@ -151,8 +151,7 @@
       const shown = list.slice(0, limit);
       root.innerHTML =
         head("论文库",
-          "共 " + ps.length + " 篇，按方法标签反查「这一类题是怎么搭的」。来源：Europe PMC 分主题检索 + 泰山一号每日精读日报。" +
-          "立场不变 —— 学方法，不学做法。") +
+          "共 " + ps.length + " 篇，按方法标签反查。学方法，不学做法。") +
         '<div class="card" style="margin-bottom:16px">' +
         '<div class="small"><b>' + ps.length + "</b> 篇 · 合计被引 <b>" + totalCited.toLocaleString() +
         "</b> 次 · " + fieldList.length + " 个领域 · " + tagList.length + " 个方法标签</div>" +
@@ -282,7 +281,7 @@
     function draw() {
       const list = K.filter(x => (curDom === "ALL" || x.domain === curDom) &&
         (!q || (x.title + x.summary + x.body + (x.tags || []).join(" ")).toLowerCase().indexOf(q) >= 0));
-      root.innerHTML = head("知识库", "共 " + K.length + " 条机制与方法论条目，聚焦再生、癌症、放疗，以及生信方法背后的统计与假设。每条都带【和生信分析的连接】。") +
+      root.innerHTML = head("知识库", "共 " + K.length + " 条机制条目，每条带【和生信分析的连接】。") +
         '<div class="search-bar">' +
         Object.keys(dom).map(n => '<button class="btn sm" data-d="' + E(dom[n]) + '"' +
           (curDom === dom[n] ? ' style="background:var(--brand);color:#fff;border-color:var(--brand)"' : "") + ">" +
@@ -326,7 +325,7 @@
     const G = window.SX_GEMS || [];
     let q = "";
     root.innerHTML = head("我的代码本",
-      "本机 R 代码资产盘点：77 个 .R 文件，去重后 " + M.length + " 份独立内容。按成熟度标注了「跑通 / 跟练 / 脚手架 / 未验证」，踩坑注释单独抽出。") +
+      "77 个 .R 文件，去重后 " + M.length + " 份。") +
       '<div class="card" style="margin-bottom:12px"><b>掌握度矩阵</b>' +
       SK.map(s => '<div class="kv" style="margin:6px 0"><dt style="min-width:76px"><span class="tag ' +
         (s.level === "已掌握" ? "g" : (s.level === "工程短板" || s.level === "未接触" ? "r" : "y")) + '">' +
@@ -395,8 +394,7 @@
       }).join("");
 
       root.innerHTML = head("数据中心",
-        "站内内置 " + keys.length + " 个练习数据集（离线可跑，直接下载），以及 " + totalSrc +
-        " 个公共数据源入口（给链接和 R 读取代码，不预下载）。") +
+        keys.length + " 个练习数据集，" + totalSrc + " 个公共数据源。") +
         '<div class="card"><b>内置练习数据集</b>' +
         '<div class="small muted" style="margin:4px 0 10px">这些是造出来的教学数据，结构和真实数据一致，可以离线跑。</div>' +
         keys.map(k => {
@@ -460,7 +458,7 @@
   /* ==================== 数据仓库 ==================== */
   function vault(root) {
     root.innerHTML = head("我的数据仓库",
-      "把 CSV / TSV 拖进来存在浏览器本地（IndexedDB），不上传任何服务器。可以用来存你自己跑出来的结果表、中间产物。") +
+      "CSV 拖进来存本机浏览器，不上传。") +
       '<div class="card">' +
       '<div class="toolbar"><input type="file" id="vFile" accept=".csv,.tsv,.txt">' +
       '<button class="btn primary" id="vUp">上传并保存</button>' +

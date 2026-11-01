@@ -3,79 +3,8 @@
    每节两段代码：一段 base R 能在站内直接跑（讲原理），一段标了包名的真实写法（讲实战）。
    不依赖本课题数据。 */
 window.SX_COURSE = {
-  intro: "第 0 讲真的从零开始（1 + 1 怎么写、变量是什么）；之后 10 讲按「一篇生信文章从数据到成图」的顺序排：第 1 讲讲清 counts 矩阵是什么，第 2 讲跑通差异分析，3-4 讲把基因变成通路和细胞，5-6 讲把结果变成临床结论，7-10 讲网络、GEO 实战、模型和复现。每节都分两段代码：一段只用 base R，能在本页直接点「运行」看到结果（讲原理）；另一段标了真实包名的写法，讲真正做分析时怎么写。看懂原理再去跑真包，顺序反了只会抄代码。配套 10 讲 50 集录播（小陈，免登录）在下方「资源」区，按课列出文件名，进去按名看；每课 PPT 课件与生信实战代码也在同一分享里。",
-  resources: [
-    {
-      g: "视频课（B 站，都已核对过能打开）",
-      items: [
-        { n: "生信技能树《生信人应该这样学 R 语言》", m: "590 分钟 · 55.1 万播放", u: "https://www.bilibili.com/video/BV1cs411j75B", d: "R 基础最系统的一套中文课，讲第 1 讲之前先看这个" },
-        { n: "生信技能树《转录组测序数据分析》", m: "331 分钟 · 54.9 万播放", u: "https://www.bilibili.com/video/BV12s41137HY", d: "对应第 2-4 讲：差异分析、富集、免疫浸润" },
-        { n: "Biomamba《手把手教你做单细胞转录组测序数据分析》", m: "约 17 小时 · 50.8 万播放", u: "https://www.bilibili.com/video/BV1S44y1b76Z", d: "单细胞最全的一套，配合单细胞专题看" },
-        { n: "生信幻想家《单细胞数据分析 标准分析流程》", m: "293 分钟 · 29.1 万播放", u: "https://www.bilibili.com/video/BV1Ct421j7X3", d: "2026 年更新版，流程完整、节奏比上一套快" },
-        { n: "生信幻想家《空间转录组（结合单细胞）》", m: "284 分钟 · 3.1 万播放", u: "https://www.bilibili.com/video/BV1To6FB1Ewm", d: "单细胞之后再上空间，先看这套建立直觉" },
-        { n: "未名阿《保姆级单细胞代码分析（1）质控·降维·聚类》", m: "29 分钟 · 5.8 万播放", u: "https://www.bilibili.com/video/BV1yR4y1q7X4", d: "短，适合先跑通一遍再回头看长课" },
-        { n: "富贵 pic《单细胞测序 01 入门：数据读取与分析》", m: "18 分钟 · 1.3 万播放", u: "https://www.bilibili.com/video/BV1Dh4y1D7m6", d: "最短的入门，看完知道单细胞在干什么" },
-        { n: "生信技能树-jimmy《单细胞亚群注释》", m: "21 分钟", u: "https://www.bilibili.com/video/BV1mE421w7Te", d: "注释这一步最容易做错，专门看这一集" }
-      ]
-    },
-    {
-      g: "单细胞专项（官方教程，长期有效）",
-      items: [
-        { n: "Seurat 官网", m: "satijalab.org", u: "https://satijalab.org/seurat/", d: "所有 Seurat 教程的入口，版本更新都在这" },
-        { n: "Seurat PBMC3K 标准流程", m: "官方 vignette", u: "https://satijalab.org/seurat/articles/pbmc3k_tutorial", d: "单细胞的「Hello World」，必须亲手敲一遍" },
-        { n: "Seurat 常用命令速查", m: "官方 vignette", u: "https://satijalab.org/seurat/articles/essential_commands", d: "对象结构、取子集、改 metadata 都在这里" },
-        { n: "OSCA：单细胞分析 Bioconductor 书", m: "bioconductor.org/books", u: "https://bioconductor.org/books/release/OSCA/", d: "最完整的免费单细胞教材，质量高于绝大多数中文课" },
-        { n: "sc-best-practices", m: "sc-best-practices.org", u: "https://www.sc-best-practices.org/", d: "专门讲「这一步为什么这么做、什么时候会错」" },
-        { n: "Galaxy 单细胞专题", m: "training.galaxyproject.org", u: "https://training.galaxyproject.org/training-material/topics/single-cell/", d: "不写代码也能跑全流程，用来理解每一步在做什么" },
-        { n: "Monocle3 官网", m: "拟时序", u: "https://cole-trapnell-lab.github.io/monocle3/", d: "轨迹推断的标准工具" },
-        { n: "Harmony 快速上手", m: "去批次", u: "https://portals.broadinstitute.org/harmony/articles/quickstart.html", d: "多样本整合最常用的方法之一" },
-        { n: "CellChat 官方仓库", m: "细胞通讯", u: "https://github.com/jinworks/CellChat", d: "细胞通讯分析，vignette 在仓库 README 里" }
-      ]
-    },
-    {
-      g: "Bulk 与差异分析",
-      items: [
-        { n: "DESeq2 官方 vignette", m: "bioconductor", u: "https://bioconductor.org/packages/release/bioc/vignettes/DESeq2/inst/doc/DESeq2.html", d: "差异分析的事实标准，方法段照它写" },
-        { n: "clusterProfiler 配套书", m: "yulab-smu.top", u: "https://yulab-smu.top/biomedical-knowledge-mining-book/", d: "富集分析最权威的中文作者原书，含背景集怎么选" },
-        { n: "GSVA 官方 vignette", m: "bioconductor", u: "https://bioconductor.org/packages/release/bioc/vignettes/GSVA/inst/doc/GSVA.html", d: "通路打分和 ssGSEA 的原始实现" },
-        { n: "WGCNA（CRAN）", m: "cran.r-project.org", u: "https://cran.r-project.org/web/packages/WGCNA/index.html", d: "共表达网络，教程 PDF 在包主页" },
-        { n: "survival 包", m: "cran.r-project.org", u: "https://cran.r-project.org/web/packages/survival/index.html", d: "KM、coxph、log-rank 全在这" }
-      ]
-    },
-    {
-      g: "R 语言基础",
-      items: [
-        { n: "R 官方入门手册", m: "cran.r-project.org", u: "https://cran.r-project.org/doc/manuals/r-release/R-intro.html", d: "遇到语法歧义时查这里，比搜索引擎准" },
-        { n: "R for Data Science（2 版）", m: "r4ds.hadley.nz", u: "https://r4ds.hadley.nz/", d: "dplyr/ggplot 的正统教材，免费在线" }
-      ]
-    },
-    {
-      g: "数据入口",
-      items: [
-        { n: "GDC（TCGA 官方门户）", m: "portal.gdc.cancer.gov", u: "https://portal.gdc.cancer.gov/", d: "TCGA 唯一的官方来源，别用二手整理版" },
-        { n: "GEO", m: "ncbi.nlm.nih.gov/geo", u: "https://www.ncbi.nlm.nih.gov/geo/", d: "查 GSE 号、下表达矩阵和临床信息" },
-        { n: "UCSC Xena", m: "xenabrowser.net", u: "https://xenabrowser.net/", d: "同一队列的 TCGA 标准化数据，省掉一半预处理" },
-        { n: "TIMER2.0", m: "timer.cistrome.org", u: "http://timer.cistrome.org/", d: "不写代码就能看免疫浸润，用来对结论" },
-        { n: "cBioPortal", m: "cbioportal.org", u: "https://www.cbioportal.org/", d: "突变、拷贝数、生存一起查" }
-      ]
-    },
-    {
-      g: "配套录播课（小陈 · 10 讲 50 集，免登录）",
-      items: [
-        { n: "全部 50 集入口（进 123 网盘，按文件名找）", m: "10 课 50 集", u: "https://4007218689.share.123pan.cn/123pan/2rzowh-GFk6d", d: "课程配套录播，从装环境到能自己跑代码。每课分文件夹，下面按课列出文件名；进去后按名定位。每课 PPT 课件（ClassN课件.pptx）和生信实战代码/数据（SHENGXIN 文件夹）也在同一分享里。" },
-        { n: "第 1 课 录播（小陈）", m: "2 集 · 690 MB", u: "https://4007218689.share.123pan.cn/123pan/2rzowh-GFk6d", d: "文件：class1-1.mp4、class1-2.mp4" },
-        { n: "第 2 课 录播（小陈）", m: "4 集 · 1.9 GB", u: "https://4007218689.share.123pan.cn/123pan/2rzowh-GFk6d", d: "文件：Class2-1.mp4、Class2-2.mp4、Class2-3.mp4、Class2-4.mp4" },
-        { n: "第 3 课 录播（小陈）", m: "6 集 · 1.7 GB", u: "https://4007218689.share.123pan.cn/123pan/2rzowh-GFk6d", d: "文件：Class3-1.mp4、Class3-2.mp4、Class3-3.mp4、Class3-4.mp4、Class3-5.mp4、Class3-6.mp4" },
-        { n: "第 4 课 录播（小陈）", m: "6 集 · 1.9 GB", u: "https://4007218689.share.123pan.cn/123pan/2rzowh-GFk6d", d: "文件：Class4-1.mp4、Class4-2.mp4、Class4-3.mp4、Class4-4.mp4、Class4-5.mp4、Class4-6.mp4" },
-        { n: "第 5 课 录播（小陈）", m: "6 集 · 2.1 GB", u: "https://4007218689.share.123pan.cn/123pan/2rzowh-GFk6d", d: "文件：Class5-1.mp4、Class5-2.mp4、Class5-3.mp4、Class5-4.mp4、Class5-5.mp4、Class5-6.mp4" },
-        { n: "第 6 课 录播（小陈）", m: "6 集 · 2.0 GB", u: "https://4007218689.share.123pan.cn/123pan/2rzowh-GFk6d", d: "文件：Class6-1.mp4、Class6-2.mp4、Class6-3.mp4、Class6-4.mp4、Class6-5.mp4、Class6-6.mp4" },
-        { n: "第 7 课 录播（小陈）", m: "6 集 · 1.7 GB", u: "https://4007218689.share.123pan.cn/123pan/2rzowh-GFk6d", d: "文件：Class7-1.mp4、Class7-2.mp4、Class7-3.mp4、Class7-4.mp4、Class7-5.mp4、Class7-6.mp4" },
-        { n: "第 8 课 录播（小陈）", m: "5 集 · 2.6 GB", u: "https://4007218689.share.123pan.cn/123pan/2rzowh-GFk6d", d: "文件：Class8-1.mp4、Class8-2.mp4、Class8-3.mp4、Class8-4.mp4、Class8-5.mp4" },
-        { n: "第 9 课 录播（小陈）", m: "6 集 · 1.2 GB", u: "https://4007218689.share.123pan.cn/123pan/2rzowh-GFk6d", d: "文件：Class9-1.mp4、Class9-2.mp4、Class9-3.mp4、Class9-4.mp4、Class9-5.mp4、Class9-6.mp4" },
-        { n: "第 10 课 录播（小陈）", m: "3 集 · 1.9 GB", u: "https://4007218689.share.123pan.cn/123pan/2rzowh-GFk6d", d: "文件：Class10-1.mp4、Class10-2.mp4、Class10-3.mp4" },
-      ]
-    }
-  ],
+  intro: "第 0 讲真的从零开始（1 + 1 怎么写、变量是什么）；之后 10 讲按「一篇生信文章从数据到成图」的顺序排：第 1 讲讲清 counts 矩阵是什么，第 2 讲跑通差异分析，3-4 讲把基因变成通路和细胞，5-6 讲把结果变成临床结论，7-10 讲网络、GEO 实战、模型和复现。每节都分两段代码：一段只用 base R，能在本页直接点「运行」看到结果（讲原理）；另一段标了真实包名的写法，讲真正做分析时怎么写。看懂原理再去跑真包，顺序反了只会抄代码。每讲下面都挂了对应的「小陈录播」（123 网盘托管、免登录）：文件名直接写在该讲里，点开分享找同名文件即可看；每课 PPT 课件（ClassN课件.pptx）和生信实战代码/数据（SHENGXIN 文件夹）也在同一分享里。B 站视频、官方教程、文档与数据工具，也不再堆在一个资源区，而是按主题拆开挂到对应的讲次「延伸资料」里。",
+  
   chapters: [
     {
       id: "k1",
@@ -84,6 +13,32 @@ window.SX_COURSE = {
       goal: "搞清「你拿到的到底是什么数」，后面的归一化、差异分析才有意义。",
       watch: [
         { n: "生信技能树《生信人应该这样学 R 语言》", u: "https://www.bilibili.com/video/BV1cs411j75B" }
+      ],
+      rec: {
+        u: "https://4007218689.share.123pan.cn/123pan/2rzowh-GFk6d",
+        files: [
+        "class1-1.mp4",
+        "class1-2.mp4"
+        ]
+      },
+      refs: [
+        { n: "Biomamba《手把手教你做单细胞转录组测序数据分析》", u: "https://www.bilibili.com/video/BV1S44y1b76Z", d: "单细胞最全的一套，配合单细胞专题看", t: "video" },
+        { n: "生信幻想家《单细胞数据分析 标准分析流程》", u: "https://www.bilibili.com/video/BV1Ct421j7X3", d: "2026 年更新版，流程完整、节奏比上一套快", t: "video" },
+        { n: "生信幻想家《空间转录组（结合单细胞）》", u: "https://www.bilibili.com/video/BV1To6FB1Ewm", d: "单细胞之后再上空间，先看这套建立直觉", t: "video" },
+        { n: "未名阿《保姆级单细胞代码分析（1）质控·降维·聚类》", u: "https://www.bilibili.com/video/BV1yR4y1q7X4", d: "短，适合先跑通一遍再回头看长课", t: "video" },
+        { n: "富贵 pic《单细胞测序 01 入门：数据读取与分析》", u: "https://www.bilibili.com/video/BV1Dh4y1D7m6", d: "最短的入门，看完知道单细胞在干什么", t: "video" },
+        { n: "生信技能树-jimmy《单细胞亚群注释》", u: "https://www.bilibili.com/video/BV1mE421w7Te", d: "注释这一步最容易做错，专门看这一集", t: "video" },
+        { n: "Seurat 官网", u: "https://satijalab.org/seurat/", d: "所有 Seurat 教程的入口，版本更新都在这", t: "doc" },
+        { n: "Seurat PBMC3K 标准流程", u: "https://satijalab.org/seurat/articles/pbmc3k_tutorial", d: "单细胞的「Hello World」，必须亲手敲一遍", t: "doc" },
+        { n: "Seurat 常用命令速查", u: "https://satijalab.org/seurat/articles/essential_commands", d: "对象结构、取子集、改 metadata 都在这里", t: "doc" },
+        { n: "OSCA：单细胞分析 Bioconductor 书", u: "https://bioconductor.org/books/release/OSCA/", d: "最完整的免费单细胞教材，质量高于绝大多数中文课", t: "doc" },
+        { n: "sc-best-practices", u: "https://www.sc-best-practices.org/", d: "专门讲「这一步为什么这么做、什么时候会错」", t: "doc" },
+        { n: "Galaxy 单细胞专题", u: "https://training.galaxyproject.org/training-material/topics/single-cell/", d: "不写代码也能跑全流程，用来理解每一步在做什么", t: "doc" },
+        { n: "Monocle3 官网", u: "https://cole-trapnell-lab.github.io/monocle3/", d: "轨迹推断的标准工具", t: "doc" },
+        { n: "Harmony 快速上手", u: "https://portals.broadinstitute.org/harmony/articles/quickstart.html", d: "多样本整合最常用的方法之一", t: "doc" },
+        { n: "CellChat 官方仓库", u: "https://github.com/jinworks/CellChat", d: "细胞通讯分析，vignette 在仓库 README 里", t: "doc" },
+        { n: "R 官方入门手册", u: "https://cran.r-project.org/doc/manuals/r-release/R-intro.html", d: "遇到语法歧义时查这里，比搜索引擎准", t: "doc" },
+        { n: "R for Data Science（2 版）", u: "https://r4ds.hadley.nz/", d: "dplyr/ggplot 的正统教材，免费在线", t: "doc" }
       ],
       subs: [
         {
@@ -159,6 +114,20 @@ aggregate(expr ~ group, data = df, sd)       # 分组标准差`
       watch: [
         { n: "生信技能树《转录组测序数据分析》", u: "https://www.bilibili.com/video/BV12s41137HY" },
         { n: "DESeq2 官方 vignette", u: "https://bioconductor.org/packages/release/bioc/vignettes/DESeq2/inst/doc/DESeq2.html" }
+      ],
+      rec: {
+        u: "https://4007218689.share.123pan.cn/123pan/2rzowh-GFk6d",
+        files: [
+        "Class2-1.mp4",
+        "Class2-2.mp4",
+        "Class2-3.mp4",
+        "Class2-4.mp4"
+        ]
+      },
+      refs: [
+        { n: "GDC（TCGA 官方门户）", u: "https://portal.gdc.cancer.gov/", d: "TCGA 唯一的官方来源，别用二手整理版", t: "doc" },
+        { n: "GEO", u: "https://www.ncbi.nlm.nih.gov/geo/", d: "查 GSE 号、下表达矩阵和临床信息", t: "doc" },
+        { n: "UCSC Xena", u: "https://xenabrowser.net/", d: "同一队列的 TCGA 标准化数据，省掉一半预处理", t: "doc" }
       ],
       subs: [
         {
@@ -256,6 +225,21 @@ round(t(scale(t(m))), 2)`
       watch: [
         { n: "clusterProfiler 配套书", u: "https://yulab-smu.top/biomedical-knowledge-mining-book/" }
       ],
+      rec: {
+        u: "https://4007218689.share.123pan.cn/123pan/2rzowh-GFk6d",
+        files: [
+        "Class3-1.mp4",
+        "Class3-2.mp4",
+        "Class3-3.mp4",
+        "Class3-4.mp4",
+        "Class3-5.mp4",
+        "Class3-6.mp4"
+        ]
+      },
+      refs: [
+        { n: "clusterProfiler 配套书", u: "https://yulab-smu.top/biomedical-knowledge-mining-book/", d: "富集分析最权威的中文作者原书，含背景集怎么选", t: "doc" },
+        { n: "GSVA 官方 vignette", u: "https://bioconductor.org/packages/release/bioc/vignettes/GSVA/inst/doc/GSVA.html", d: "通路打分和 ssGSEA 的原始实现", t: "doc" }
+      ],
       subs: [
         {
           t: "3.1 ORA 就是一个超几何检验",
@@ -328,6 +312,20 @@ fg <- fgsea(pathways = msigdb_list, stats = gl, minSize = 15, maxSize = 500)`
         { n: "GSVA 官方 vignette", u: "https://bioconductor.org/packages/release/bioc/vignettes/GSVA/inst/doc/GSVA.html" },
         { n: "TIMER2.0（不写代码也能对结论）", u: "http://timer.cistrome.org/" }
       ],
+      rec: {
+        u: "https://4007218689.share.123pan.cn/123pan/2rzowh-GFk6d",
+        files: [
+        "Class4-1.mp4",
+        "Class4-2.mp4",
+        "Class4-3.mp4",
+        "Class4-4.mp4",
+        "Class4-5.mp4",
+        "Class4-6.mp4"
+        ]
+      },
+      refs: [
+        { n: "TIMER2.0", u: "http://timer.cistrome.org/", d: "不写代码就能看免疫浸润，用来对结论", t: "doc" }
+      ],
       subs: [
         {
           t: "4.1 反卷积：把一个数拆回几种细胞",
@@ -389,6 +387,20 @@ rank(s$ESTIMATE); rank(s$CIB_T)   # 排序也不完全一致`
       goal: "把表达数据变成「高危/低危」，并且知道 HR、AUC 各自能说明什么、不能说明什么。",
       watch: [
         { n: "survival 包（CRAN）", u: "https://cran.r-project.org/web/packages/survival/index.html" }
+      ],
+      rec: {
+        u: "https://4007218689.share.123pan.cn/123pan/2rzowh-GFk6d",
+        files: [
+        "Class5-1.mp4",
+        "Class5-2.mp4",
+        "Class5-3.mp4",
+        "Class5-4.mp4",
+        "Class5-5.mp4",
+        "Class5-6.mp4"
+        ]
+      },
+      refs: [
+        { n: "survival 包", u: "https://cran.r-project.org/web/packages/survival/index.html", d: "KM、coxph、log-rank 全在这", t: "doc" }
       ],
       subs: [
         {
@@ -486,6 +498,20 @@ for (th in sort(unique(score))) {
       watch: [
         { n: "cBioPortal（查突变和拷贝数）", u: "https://www.cbioportal.org/" }
       ],
+      rec: {
+        u: "https://4007218689.share.123pan.cn/123pan/2rzowh-GFk6d",
+        files: [
+        "Class6-1.mp4",
+        "Class6-2.mp4",
+        "Class6-3.mp4",
+        "Class6-4.mp4",
+        "Class6-5.mp4",
+        "Class6-6.mp4"
+        ]
+      },
+      refs: [
+        { n: "cBioPortal", u: "https://www.cbioportal.org/", d: "突变、拷贝数、生存一起查", t: "doc" }
+      ],
       subs: [
         {
           t: "6.1 一致性聚类在评估「稳定性」",
@@ -560,6 +586,20 @@ sA <- sd(d$age[d$arm == "A"]);   sB <- sd(d$age[d$arm == "B"])
       watch: [
         { n: "WGCNA（CRAN 包主页，教程 PDF 在里面）", u: "https://cran.r-project.org/web/packages/WGCNA/index.html" }
       ],
+      rec: {
+        u: "https://4007218689.share.123pan.cn/123pan/2rzowh-GFk6d",
+        files: [
+        "Class7-1.mp4",
+        "Class7-2.mp4",
+        "Class7-3.mp4",
+        "Class7-4.mp4",
+        "Class7-5.mp4",
+        "Class7-6.mp4"
+        ]
+      },
+      refs: [
+        { n: "WGCNA（CRAN）", u: "https://cran.r-project.org/web/packages/WGCNA/index.html", d: "共表达网络，教程 PDF 在包主页", t: "doc" }
+      ],
       subs: [
         {
           t: "7.1 软阈值 β：把「相关强弱」按幂次放大",
@@ -625,6 +665,21 @@ nrow(subset(edges, score >= 0.4))`
       watch: [
         { n: "GEO 首页", u: "https://www.ncbi.nlm.nih.gov/geo/" },
         { n: "UCSC Xena（TCGA 标准化数据）", u: "https://xenabrowser.net/" }
+      ],
+      rec: {
+        u: "https://4007218689.share.123pan.cn/123pan/2rzowh-GFk6d",
+        files: [
+        "Class8-1.mp4",
+        "Class8-2.mp4",
+        "Class8-3.mp4",
+        "Class8-4.mp4",
+        "Class8-5.mp4"
+        ]
+      },
+      refs: [
+        { n: "GDC（TCGA 官方门户）", u: "https://portal.gdc.cancer.gov/", d: "TCGA 唯一的官方来源，别用二手整理版", t: "doc" },
+        { n: "GEO", u: "https://www.ncbi.nlm.nih.gov/geo/", d: "查 GSE 号、下表达矩阵和临床信息", t: "doc" },
+        { n: "UCSC Xena", u: "https://xenabrowser.net/", d: "同一队列的 TCGA 标准化数据，省掉一半预处理", t: "doc" }
       ],
       subs: [
         {
@@ -692,6 +747,20 @@ as.matrix(m)`
       goal: "知道 LASSO 为什么能选基因，以及最容易把结果做废的那几个操作。",
       watch: [
         { n: "OSCA（第 5 章讲特征选择，通用）", u: "https://bioconductor.org/books/release/OSCA/" }
+      ],
+      rec: {
+        u: "https://4007218689.share.123pan.cn/123pan/2rzowh-GFk6d",
+        files: [
+        "Class9-1.mp4",
+        "Class9-2.mp4",
+        "Class9-3.mp4",
+        "Class9-4.mp4",
+        "Class9-5.mp4",
+        "Class9-6.mp4"
+        ]
+      },
+      refs: [
+        { n: "cBioPortal", u: "https://www.cbioportal.org/", d: "突变、拷贝数、生存一起查", t: "doc" }
       ],
       subs: [
         {
@@ -762,6 +831,17 @@ ifelse(risk > median(risk), "high", "low")   # 常用切点：中位数`
       goal: "知道一篇生信文章的骨架长什么样，复现时按什么顺序对数字。",
       watch: [
         { n: "Biomamba《手把手教你做单细胞转录组分析》", u: "https://www.bilibili.com/video/BV1S44y1b76Z" }
+      ],
+      rec: {
+        u: "https://4007218689.share.123pan.cn/123pan/2rzowh-GFk6d",
+        files: [
+        "Class10-1.mp4",
+        "Class10-2.mp4",
+        "Class10-3.mp4"
+        ]
+      },
+      refs: [
+        { n: "cBioPortal", u: "https://www.cbioportal.org/", d: "突变、拷贝数、生存一起查", t: "doc" }
       ],
       subs: [
         {

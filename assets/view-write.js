@@ -15,8 +15,8 @@
 
     root.innerHTML =
       '<div class="page-head"><h2>论文写作台</h2>' +
-      "<p>按 IMRaD 逐节写。左边是每节的要点、句式与红线，右边是你的正文。自动保存到本机。" +
-      "写完可以导出 Markdown，或用打印功能排成 PDF。</p></div>" +
+      "<p>按 IMRaD 逐节写，自动存本机，可导出 Markdown。" +
+      "" +
       '<div class="layout-2">' +
       '<aside class="side">' +
       '<div class="card"><b>标题</b>' +
@@ -157,7 +157,7 @@
 
     root.innerHTML =
       '<div class="page-head"><h2>AI 导师（DeepSeek）</h2>' +
-      "<p>8 个预设角色，每个都写死了你的背景：你的水平、你的课题、你踩过的坑。密钥只存在你的浏览器本地，只发往你填写的地址。</p></div>" +
+      "<p>8 个预设角色，都按你的背景写好。密钥只存本机。</p></div>" +
       '<div class="layout-2">' +
       '<aside class="side">' +
       '<div class="card"><b>模型设置</b>' +

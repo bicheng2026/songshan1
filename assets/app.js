@@ -99,7 +99,7 @@
       '<a class="btn primary" href="#/video">从第一个视频开始</a>' +
       '<a class="btn" href="#/dojo">跳过铺垫，直接做第一关</a>' +
       "</div>" +
-      '<div class="hero-tip">第一次来，建议顺序：看完「先过一遍 R」那一个视频（约两小时），再回来读第 0 讲和第 1 讲，然后进道场做 rbase-1。</div>' +
+      '<div class="hero-tip">第一次来：先看完「R 入门」那个视频，再读第 0、1 讲，然后做 rbase-1。</div>' +
       "</div>" +
 
       '<div class="sec-h">训练闭环 · 四步走完一轮，再走下一轮</div>' +
@@ -115,8 +115,8 @@
       paperN + " 篇生信论文按被引次数排好，找方法、找靶点都在这一页。" +
       "下不到全文就进「找文献」，粘个 DOI，它把能下的通道全列出来。</span></a>" +
       '<a class="loop-i" href="#/write"><span class="loop-s">第四步 · 写</span><b>落成文字</b>' +
-      '<span class="loop-d">把跑出来的结果和查到的机制拼成论文骨架，写作台按投稿口径给结构和句式，' +
-      "写完能直接搬进 Word。写不动的时候旁边就是 AI 导师。</span></a>" +
+      '<span class="loop-d">把结果和机制拼成骨架，' +
+      "写完直接搬进 Word。</span></a>" +
       "</div>" +
 
       '<div class="sec-h">站内实数 · 全部是自己可练、可查、可抄的东西</div>' +

@@ -41,7 +41,7 @@
       '<a class="btn ghost" href="#/knowledge">查机制词典</a>' +
       "</div>" +
       '<div class="hero-tip">每节都收起来了，<b>点标题才展开</b>。灰框里的代码能直接点按钮跑；' +
-      "标了包名的那段是真实分析时的写法，本站跑不了，但它才是要写进脚本的东西。</div>" +
+      "带包名的那段是真实写法，本站跑不了，但要写进脚本。</div>" +
       "</div>" +
       '<div class="toolbar" style="margin:14px 0 0">' +
       '<button class="btn sm ghost" id="expandAll">展开全部</button>' +
@@ -58,6 +58,18 @@
         (ch.watch && ch.watch.length
           ? '<div class="lec-watch">配套看：' + ch.watch.map(w =>
             '<a href="' + E(w.u) + '" target="_blank" rel="noopener">' + E(w.n) + " &#8599;</a>").join("") + "</div>"
+          : "") +
+        (ch.rec && ch.rec.files && ch.rec.files.length
+          ? '<div class="lec-watch">本课录播（小陈·123 网盘托管，免登录）文件名：' +
+            ch.rec.files.map(f => '<code>' + E(f) + '</code>').join("、") +
+            '；<a href="' + E(ch.rec.u) + '" target="_blank" rel="noopener">打开分享找同名文件 ↗</a></div>'
+          : "") +
+        (ch.refs && ch.refs.length
+          ? '<details class="acc" style="margin:10px 0 2px"><summary>延伸资料（' + ch.refs.length +
+            ' 条，官方教程 / 文档 / 数据工具）</summary>' + ch.refs.map(r =>
+              '<div class="resi"><a href="' + E(r.u) + '" target="_blank" rel="noopener">' +
+              E(r.n) + (r.t === "video" ? " ▶" : "") + " &#8599;</a>" +
+              (r.d ? '<div class="resi-d">' + E(r.d) + "</div>" : "") + "</div>").join("") + "</details>"
           : "");
 
       ch.subs.forEach((s, si) => {

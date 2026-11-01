@@ -24,7 +24,7 @@
     let html = '<div class="hero">' +
       '<div class="hero-k">卡住了就看视频 · 别硬啃文字</div>' +
       "<h2>看视频</h2>" +
-      '<p class="hero-sub">' + E(V.intro) + "</p></div>";
+      '<p class="hero-sub">' + E(String(V.intro || "").split("。")[0]) + "</p></div>";
 
     /* 四步路径 */
     if (V.path && V.path.length) {
@@ -61,7 +61,7 @@
     }
 
     html += '<div class="hero-tip" style="margin-top:22px">看不下去很正常——' +
-      "视频只用来「先知道有这回事」。真正的理解发生在你自己敲错、报错、改对的那几分钟里。" +
+      "视频只看个大概，理解发生在你自己敲错改对的时候。" +
       "看完一段就去 <a href='#/course'>课程</a> 跑一遍对应代码，或者去 <a href='#/dojo'>道场</a> 做一关。</div>";
 
     root.innerHTML = html;
