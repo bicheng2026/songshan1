@@ -136,7 +136,7 @@ body.mnav .menubtn { color: var(--ink); }
     font-size: calc(13px * var(--fs)); letter-spacing: .2em; color: var(--brand);
     text-transform: uppercase; margin-bottom: 20px; font-weight: 600;
 }
-.hero h2 { margin: 0 0 24px; font-size: calc(62px * var(--fs)); line-height: 1.05; letter-spacing: -.025em; font-weight: 700; }
+.hero h2 { margin: 0 0 24px; font-size: calc(62px * var(--fs)); line-height: 1.14; letter-spacing: -.025em; font-weight: 700; }
 .hero-sub { margin: 0 0 36px; font-size: calc(20px * var(--fs)); line-height: 1.72; color: var(--ink-2); max-width: 700px; }
 .hero-sub b { color: var(--ink); font-weight: 600; }
 .hero-acts { display: flex; gap: 14px; flex-wrap: wrap; margin-bottom: 32px; }
@@ -512,7 +512,7 @@ details.real[open] > summary { margin-bottom: 6px; }
    这里只覆盖纵向 padding / margin / gap 与正文 line-height，
    横向尺寸一律不动，避免变宽后行宽失控。 */
 
-:root { --fs: 1; --sp: 1.18; --lh: 1.95; }
+:root { --fs: 1; --sp: 1.4; --lh: 2.05; }
 
 html, body { line-height: var(--lh); }
 
@@ -534,7 +534,7 @@ html, body { line-height: var(--lh); }
 
 .loop { gap: 0 44px; }
 .loop-i { gap: calc(11px * var(--sp)); padding: calc(28px * var(--sp)) 0 calc(10px * var(--sp)); }
-.loop-i span.loop-d { line-height: var(--lh); }
+.loop-i span.loop-d { line-height: var(--lh); letter-spacing: .012em; }
 
 .assets { gap: calc(24px * var(--sp)) 20px; margin: calc(50px * var(--sp)) 0 0; }
 .asset { padding-top: calc(22px * var(--sp)); }
@@ -598,6 +598,39 @@ details.real { margin-top: calc(24px * var(--sp)); padding-top: calc(18px * var(
 .sxMsg { line-height: calc(var(--lh) * .92); }
 .markdown-body { line-height: var(--lh); }
 .markdown-body blockquote { margin: calc(22px * var(--sp)) 0; }
+
+/* ---------- 正文节奏：中文长文的呼吸 ----------
+   上一版只放大了区块留白，但课程正文是 ol.crit > li，条目之间只有 12px，
+   中文行距 1.8 也不够，几行字就糊成一块。这里给条目、代码块、标签各留固定气口。 */
+
+.sec-b { padding: 0 2px calc(56px * var(--sp)); max-width: 660px; }
+.sec-b .why { margin: calc(6px * var(--sp)) 0 calc(34px * var(--sp)); }
+.pts { margin: calc(6px * var(--sp)) 0 calc(36px * var(--sp)); }
+.pts-h { margin: 0 0 calc(18px * var(--sp)); }
+ol.crit { margin: 0; padding-left: 26px; }
+ol.crit li { margin: 0 0 calc(24px * var(--sp)); line-height: var(--lh); }
+ol.crit li:last-child { margin-bottom: 0; }
+.sec-b pre.code { margin: calc(28px * var(--sp)) 0; }
+.sec-b details.real { margin-top: calc(26px * var(--sp)); }
+
+/* 目录：原来内边距 8px 且单行截断，标题全被切成「变量：一个数..」 */
+.side { padding: calc(10px * var(--sp)) 0; }
+.sidehead { padding: 0 12px calc(18px * var(--sp)); }
+.lvrow { padding: calc(12px * var(--sp)) 12px; line-height: 1.55; }
+.lvrow > span:nth-child(2) {
+    display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;
+    white-space: normal; overflow: hidden; text-overflow: clip;
+}
+.tk { margin: calc(32px * var(--sp)) 0 calc(12px * var(--sp)); }
+
+/* 折叠行与讲义头 */
+details.sec > summary { padding: calc(26px * var(--sp)) 2px; }
+.lec-goal, .lec-watch { line-height: var(--lh); }
+.lec-watch { margin: calc(20px * var(--sp)) 0 calc(12px * var(--sp)); }
+
+/* 中文别贴字：字距略开一点，长句才不糊 */
+.sec-b, .lec-plain, .lec-goal, .lec-watch, .why, .hero-sub, .hero-tip,
+.markdown-body, .note, .guide .step, .hint-item, table.tbl td { letter-spacing: .012em; }
 
 /* ==================== 手机 ==================== */
 @media (max-width: 760px) {
@@ -671,40 +704,66 @@ details.real { margin-top: calc(24px * var(--sp)); padding-top: calc(18px * var(
     .sxPanel { right: 8px; bottom: 8px; width: calc(100vw - 16px); height: calc(100vh - 16px); }
 }
 
-/* ==================== 阅读设置面板 ==================== */
-/* 行高必须在手机媒体查询之后再说一次，否则被移动端的 line-height: 1.8 盖掉 */
+/* ==================== 阅读设置面板 ====================
+   三根滑杆连续可调，比档位按钮好使：拖到哪儿算哪儿，右边实时给数值。 */
 html, body { line-height: var(--lh); }
+
 .readbtn { font-size: 12.5px; letter-spacing: .02em; font-weight: 600; }
+.readbtn.on { color: var(--ink); }
+
 .readpop {
-    display: none; position: fixed; top: 60px; right: 24px; z-index: 80; width: 302px;
+    display: none; position: fixed; top: 58px; right: 22px; z-index: 80; width: 336px;
     background: var(--panel); border: 1px solid var(--line-strong); border-radius: 18px;
-    padding: 18px 20px 16px;
+    padding: 20px 22px 16px;
 }
 .readpop.open { display: block; }
-.rp-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 14px; }
-.rp-k { font-size: 12.5px; letter-spacing: .12em; color: var(--ink-3); flex: 0 0 auto; }
-.rp-ctl { display: flex; align-items: center; gap: 6px; }
-.rp-step {
-    width: 36px; height: 30px; border: 1px solid var(--line-strong); background: transparent;
-    color: var(--ink); border-radius: 9px; cursor: pointer; font-family: var(--sans);
-    font-size: 13px; line-height: 1; transition: border-color .15s, background .15s;
+
+.rp-head { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 16px; }
+.rp-head b { font-size: 13px; letter-spacing: .14em; color: var(--ink-3); font-weight: 600; }
+.rp-head a { font-size: 12px; color: var(--ink-3); }
+.rp-head a:hover { color: var(--ink); }
+
+.rp-row { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
+.rp-k { flex: 0 0 34px; font-size: 12.5px; color: var(--ink-2); }
+.rp-r {
+    -webkit-appearance: none; appearance: none; flex: 1 1 auto; min-width: 0;
+    height: 22px; background: transparent; cursor: pointer; margin: 0;
 }
-.rp-step:hover { border-color: var(--ink-3); background: var(--panel-alt); }
-.rp-val { min-width: 98px; text-align: center; font-size: 13px; color: var(--ink); font-variant-numeric: tabular-nums; }
-.rp-seg { display: flex; border: 1px solid var(--line-strong); border-radius: 9px; overflow: hidden; }
-.rp-b {
-    border: 0; border-right: 1px solid var(--line); background: transparent; color: var(--ink-2);
-    cursor: pointer; font-family: var(--sans); font-size: 12.5px; padding: 7px 10px;
-    transition: background .15s, color .15s;
+.rp-r::-webkit-slider-runnable-track { height: 2px; background: var(--ink-3); opacity: .55; border-radius: 2px; }
+.rp-r::-webkit-slider-thumb {
+    -webkit-appearance: none; appearance: none; width: 15px; height: 15px; border-radius: 50%;
+    background: var(--ink); border: 0; margin-top: -6.5px; cursor: pointer;
+    transition: transform .12s;
 }
-.rp-b:last-child { border-right: 0; }
-.rp-b:hover { background: var(--panel-alt); color: var(--ink); }
-.rp-b.on { background: var(--ink); color: var(--bg); font-weight: 600; }
-.rp-tip { font-size: 12px; color: var(--ink-3); line-height: 1.7; margin-top: 8px; }
-.rp-tip a { color: var(--ink-3); text-decoration: underline; text-underline-offset: 3px; }
-.rp-tip a:hover { color: var(--ink); }
+.rp-r:hover::-webkit-slider-thumb { transform: scale(1.15); }
+.rp-r::-moz-range-track { height: 2px; background: var(--ink-3); opacity: .55; border-radius: 2px; }
+.rp-r::-moz-range-thumb { width: 15px; height: 15px; border: 0; border-radius: 50%; background: var(--ink); }
+.rp-v {
+    flex: 0 0 46px; text-align: right; font-size: 12.5px; color: var(--ink);
+    font-variant-numeric: tabular-nums;
+}
+
+.rp-presets { display: flex; gap: 6px; margin: 18px 0 0; }
+.rp-p {
+    flex: 1 1 0; border: 1px solid var(--line); background: transparent; color: var(--ink-2);
+    border-radius: 9px; padding: 7px 0; cursor: pointer; font-family: var(--sans);
+    font-size: 12.5px; transition: border-color .15s, color .15s, background .15s;
+}
+.rp-p:hover { border-color: var(--ink-3); color: var(--ink); background: var(--panel-alt); }
+.rp-p.on { background: var(--ink); border-color: var(--ink); color: var(--bg); font-weight: 600; }
+.rp-tip { font-size: 12px; color: var(--ink-3); line-height: 1.75; margin-top: 14px; }
+
 @media print { .readpop { display: none !important; } }
 @media (max-width: 760px) {
-    .readpop { left: 12px; right: 12px; width: auto; top: 56px; }
-    .rp-val { min-width: 84px; }
+    .readpop { left: 10px; right: 10px; width: auto; top: 54px; padding: 18px 18px 14px; }
+    .rp-k { flex: 0 0 30px; }
+}
+
+/* ---------- 首页四步：四栏每栏只有 257px，中文 16 字一行，读着跳 ---------- */
+.loop { grid-template-columns: repeat(2, 1fr); gap: calc(48px * var(--sp)) 60px; }
+.loop-i span.loop-d { font-size: calc(16px * var(--fs)); }
+.hero-tip { max-width: 600px; }
+.asset span { font-size: calc(14px * var(--fs)); letter-spacing: .012em; }
+@media (max-width: 1000px) {
+    .loop { grid-template-columns: 1fr; gap: 0; }
 }

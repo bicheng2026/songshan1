@@ -8,21 +8,23 @@
 <title>嵩山一号 · 科研训练工作站</title>
 <link rel="stylesheet" href="assets/theme.css">
 <script>
-/* 首屏先套用已保存的字号/间距，避免闪一下再变 */
+/* 首屏先套用已保存的字号/行距/留白，避免闪一下再变 */
 (function () {
   try {
-    var FS = [0.90, 1, 1.09, 1.18, 1.28];
-    var SP = [[0.92, 1.66], [1.06, 1.80], [1.18, 1.95], [1.32, 2.10]];
-    var f = parseInt(localStorage.getItem("sx_fs"), 10);
-    var s = parseInt(localStorage.getItem("sx_sp"), 10);
-    if (isNaN(f) || f < 0 || f > 4) f = 1;
-    if (isNaN(s) || s < 0 || s > 3) s = 2;
+    function q(k, d, lo, hi) {
+      var v = parseInt(localStorage.getItem(k), 10);
+      return (isNaN(v) || v < lo || v > hi) ? d : v;
+    }
+    var fs = q("sx_fs", 100, 85, 150);
+    var lh = q("sx_lh", 205, 150, 240);
+    var sp = q("sx_sp", 140, 80, 200);
     var d = document.documentElement;
-    d.style.setProperty("--fs", FS[f]);
-    d.style.setProperty("--sp", SP[s][0]);
-    d.style.setProperty("--lh", SP[s][1]);
-    d.setAttribute("data-fs", f);
-    d.setAttribute("data-sp", s);
+    d.style.setProperty("--fs", fs / 100);
+    d.style.setProperty("--lh", lh / 100);
+    d.style.setProperty("--sp", sp / 100);
+    d.setAttribute("data-fs", fs);
+    d.setAttribute("data-lh", lh);
+    d.setAttribute("data-sp", sp);
   } catch (e) { }
 })();
 </script>

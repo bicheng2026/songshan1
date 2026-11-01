@@ -1,52 +1,67 @@
-/* 嵩山一号 · 工作站 —— 阅读设置（字号 / 间距）
-   两轴：字号 5 档（--fs）、间距 4 档（--sp 留白 + --lh 行高）。
-   写进 localStorage，刷新与下次打开都记得；head 里的内联脚本负责首屏先应用，避免闪一下。 */
+/* 嵩山一号 · 工作站 —— 阅读设置（字号 / 行距 / 留白）
+   三根滑杆连续可调，比档位按钮好使；四个预设一键切到常见手感。
+   存在 localStorage（百分数），刷新与下次打开都记得；head 内联脚本负责首屏先套用。 */
 (function () {
   "use strict";
 
-  var FS = [
-    { name: "小", v: 0.90 },
-    { name: "标准", v: 1.00 },
-    { name: "大", v: 1.09 },
-    { name: "特大", v: 1.18 },
-    { name: "超大", v: 1.28 }
+  var LIM = {
+    fs: { min: 85, max: 150, def: 100 },
+    lh: { min: 150, max: 240, def: 205 },
+    sp: { min: 80, max: 200, def: 140 }
+  };
+  var PRESETS = [
+    { name: "紧凑", fs: 100, lh: 175, sp: 100 },
+    { name: "标准", fs: 100, lh: 195, sp: 120 },
+    { name: "宽松", fs: 100, lh: 205, sp: 140 },
+    { name: "极宽", fs: 108, lh: 220, sp: 175 }
   ];
-  var SP = [
-    { name: "紧", sp: 0.92, lh: 1.66 },
-    { name: "标准", sp: 1.06, lh: 1.80 },
-    { name: "宽松", sp: 1.18, lh: 1.95 },
-    { name: "特宽", sp: 1.32, lh: 2.10 }
-  ];
-  var K_FS = "sx_fs", K_SP = "sx_sp";
+  var K = { fs: "sx_fs", lh: "sx_lh", sp: "sx_sp" };
 
   var root = document.documentElement;
-  var fi = intOf(root.getAttribute("data-fs"), 1, FS.length - 1);
-  var si = intOf(root.getAttribute("data-sp"), 2, SP.length - 1);
+  var st = {
+    fs: read("fs", root.getAttribute("data-fs")),
+    lh: read("lh", root.getAttribute("data-lh")),
+    sp: read("sp", root.getAttribute("data-sp"))
+  };
 
-  function intOf(v, d, max) {
-    var n = parseInt(v, 10);
-    if (isNaN(n) || n < 0 || n > max) return d;
-    return n;
+  function read(k, attr) {
+    var v = parseInt(attr, 10);
+    if (!isNaN(v) && v >= LIM[k].min && v <= LIM[k].max) return v;
+    return LIM[k].def;
   }
-
+  function clamp(k, v) {
+    v = Math.round(Number(v) || 0);
+    return Math.max(LIM[k].min, Math.min(LIM[k].max, v));
+  }
   function apply(save) {
-    var f = FS[fi], s = SP[si];
-    root.style.setProperty("--fs", f.v);
-    root.style.setProperty("--sp", s.sp);
-    root.style.setProperty("--lh", s.lh);
-    root.setAttribute("data-fs", fi);
-    root.setAttribute("data-sp", si);
+    root.style.setProperty("--fs", st.fs / 100);
+    root.style.setProperty("--lh", st.lh / 100);
+    root.style.setProperty("--sp", st.sp / 100);
+    root.setAttribute("data-fs", st.fs);
+    root.setAttribute("data-lh", st.lh);
+    root.setAttribute("data-sp", st.sp);
     if (save !== false) {
-      try {
-        localStorage.setItem(K_FS, fi);
-        localStorage.setItem(K_SP, si);
-      } catch (e) { }
+      Object.keys(st).forEach(function (k) {
+        try { localStorage.setItem(K[k], st[k]); } catch (e) { }
+      });
     }
     paint();
   }
 
-  /* ---------- 面板 ---------- */
+  /* ---------------- 面板 ---------------- */
   var pop = null, btn = null;
+
+  function fmtFs(v) { return v + "%"; }
+  function fmtLh(v) { return (v / 100).toFixed(2); }
+  function fmtSp(v) { return "×" + (v / 100).toFixed(2); }
+
+  function row(k, label) {
+    var fmt = { fs: fmtFs, lh: fmtLh, sp: fmtSp }[k];
+    return '<div class="rp-row"><span class="rp-k">' + label + '</span>' +
+      '<input class="rp-r" type="range" id="rp_' + k + '" min="' + LIM[k].min +
+      '" max="' + LIM[k].max + '" step="1" value="' + st[k] + '" aria-label="' + label + '">' +
+      '<span class="rp-v" id="rpv_' + k + '">' + fmt(st[k]) + '</span></div>';
+  }
 
   function build() {
     btn = document.getElementById("readBtn");
@@ -54,75 +69,99 @@
     pop.className = "readpop";
     pop.id = "readPop";
     pop.innerHTML =
-      '<div class="rp-row"><span class="rp-k">字号</span>' +
-      '<span class="rp-ctl"><button type="button" class="rp-step" data-fs="-1" aria-label="调小字号">A−</button>' +
-      '<span class="rp-val" id="rpVal"></span>' +
-      '<button type="button" class="rp-step" data-fs="1" aria-label="调大字号">A+</button></span></div>' +
-      '<div class="rp-row"><span class="rp-k">间距</span>' +
-      '<span class="rp-seg" id="rpSeg"></span></div>' +
-      '<div class="rp-tip">Ctrl + = 调大 · Ctrl + − 调小 · Ctrl + 0 复位</div>' +
-      '<div class="rp-tip"><a href="javascript:void 0" id="rpReset">恢复默认（标准字号 / 宽松间距）</a></div>';
+      '<div class="rp-head"><b>阅读设置</b><a href="javascript:void 0" id="rpReset">恢复默认</a></div>' +
+      row("fs", "字号") +
+      row("lh", "行距") +
+      row("sp", "留白") +
+      '<div class="rp-presets" id="rpPre"></div>' +
+      '<div class="rp-tip">拖到顺手为止，当场生效。Ctrl + = / − 调字号，Ctrl + 0 复位。</div>';
 
     document.body.appendChild(pop);
 
-    pop.addEventListener("click", function (e) {
-      var st = e.target.closest("[data-fs]");
-      if (st) {
-        fi = Math.max(0, Math.min(FS.length - 1, fi + Number(st.getAttribute("data-fs"))));
+    ["fs", "lh", "sp"].forEach(function (k) {
+      var el = document.getElementById("rp_" + k);
+      if (el) el.addEventListener("input", function () {
+        st[k] = clamp(k, el.value);
         apply();
-        return;
-      }
-      var sp = e.target.closest("[data-sp]");
-      if (sp) {
-        si = Number(sp.getAttribute("data-sp"));
+      });
+    });
+
+    pop.addEventListener("click", function (e) {
+      var p = e.target.closest("[data-pre]");
+      if (p) {
+        var pre = PRESETS[Number(p.getAttribute("data-pre"))];
+        st.fs = pre.fs; st.lh = pre.lh; st.sp = pre.sp;
         apply();
         return;
       }
       if (e.target.id === "rpReset") {
-        fi = 1; si = 2; apply();
+        st.fs = LIM.fs.def; st.lh = LIM.lh.def; st.sp = LIM.sp.def;
+        apply();
       }
     });
 
     if (btn) {
       btn.onclick = function (e) {
         e.stopPropagation();
-        pop.classList.toggle("open");
+        var on = pop.classList.toggle("open");
+        btn.classList.toggle("on", on);
+        btn.setAttribute("aria-expanded", on ? "true" : "false");
       };
-      btn.setAttribute("aria-expanded", "false");
     }
     document.addEventListener("click", function (e) {
       if (!pop.classList.contains("open")) return;
       if (pop.contains(e.target) || (btn && btn.contains(e.target))) return;
-      pop.classList.remove("open");
+      close();
     });
     document.addEventListener("keydown", function (e) {
-      if (e.key === "Escape") pop.classList.remove("open");
+      if (e.key === "Escape") { close(); return; }
       if (!(e.ctrlKey || e.metaKey)) return;
-      if (e.key === "=" || e.key === "+") { e.preventDefault(); fi = Math.min(FS.length - 1, fi + 1); apply(); }
-      else if (e.key === "-" || e.key === "_") { e.preventDefault(); fi = Math.max(0, fi - 1); apply(); }
-      else if (e.key === "0") { e.preventDefault(); fi = 1; si = 2; apply(); }
+      if (e.key === "=" || e.key === "+") { e.preventDefault(); st.fs = clamp("fs", st.fs + 4); apply(); }
+      else if (e.key === "-" || e.key === "_") { e.preventDefault(); st.fs = clamp("fs", st.fs - 4); apply(); }
+      else if (e.key === "0") { e.preventDefault(); st.fs = LIM.fs.def; st.lh = LIM.lh.def; st.sp = LIM.sp.def; apply(); }
     });
+  }
+
+  function close() {
+    if (!pop) return;
+    pop.classList.remove("open");
+    if (btn) { btn.classList.remove("on"); btn.setAttribute("aria-expanded", "false"); }
   }
 
   function paint() {
     if (!pop) return;
-    var v = document.getElementById("rpVal");
-    if (v) v.textContent = FS[fi].name + " · " + FS[fi].v.toFixed(2) + "×";
-    var seg = document.getElementById("rpSeg");
-    if (seg) {
-      seg.innerHTML = SP.map(function (s, i) {
-        return '<button type="button" class="rp-b' + (i === si ? " on" : "") + '" data-sp="' + i + '">' + s.name + "</button>";
+    var fmt = { fs: fmtFs, lh: fmtLh, sp: fmtSp };
+    ["fs", "lh", "sp"].forEach(function (k) {
+      var el = document.getElementById("rp_" + k);
+      if (el && String(el.value) !== String(st[k])) el.value = st[k];
+      var v = document.getElementById("rpv_" + k);
+      if (v) v.textContent = fmt[k](st[k]);
+    });
+    var pre = document.getElementById("rpPre");
+    if (pre) {
+      pre.innerHTML = PRESETS.map(function (p, i) {
+        var on = (p.fs === st.fs && p.lh === st.lh && p.sp === st.sp) ? " on" : "";
+        return '<button type="button" class="rp-p' + on + '" data-pre="' + i + '">' + p.name + "</button>";
       }).join("");
     }
-    if (btn) btn.setAttribute("aria-expanded", pop.classList.contains("open") ? "true" : "false");
   }
 
   function boot() {
     build();
     apply(false);
+    /* 第一次进站自动把面板摊开一次：不摊开，没人知道这三个滑杆在哪。
+       手机上不自动摊——面板会盖住整个首屏。 */
+    var first = false;
+    try { first = !localStorage.getItem("sx_seen"); } catch (e) { }
+    if (first && btn && pop && window.innerWidth > 760) {
+      pop.classList.add("open");
+      btn.classList.add("on");
+      btn.setAttribute("aria-expanded", "true");
+      try { localStorage.setItem("sx_seen", "1"); } catch (e) { }
+    }
   }
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", boot);
   else boot();
 
-  window.SXRead = { get fs() { return fi; }, get sp() { return si; }, apply: apply };
+  window.SXRead = { state: st, apply: apply, presets: PRESETS };
 })();
