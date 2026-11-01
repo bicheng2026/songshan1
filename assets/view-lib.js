@@ -11,6 +11,15 @@
     return '<div class="search-bar"><input type="search" id="' + id + '" placeholder="' + ph + '"></div>';
   }
 
+  /* 横条图：rows = [{k, v, s?}]，给了 s 就在数字后面接 "/s" */
+  function vizBars(rows) {
+    const max = Math.max.apply(null, rows.map(r => r.v).concat([1]));
+    return '<div class="viz">' + rows.map(r =>
+      '<div class="viz-r"><span class="viz-k">' + E(r.k) + "</span>" +
+      '<span class="viz-b"><i style="width:' + Math.max(3, Math.round(r.v / max * 100)) + '%"></i></span>' +
+      '<span class="viz-v">' + r.v + (r.s === undefined ? "" : "/" + r.s) + "</span></div>").join("") + "</div>";
+  }
+
   /* 大块数据懒加载：进入对应页面时才拉，首屏保持轻 */
   const lazyCache = {};
   function ensure(globalName, src) {
@@ -135,6 +144,16 @@
     const fieldList = Object.keys(fields).sort((a, b) => fields[b] - fields[a]);
     const totalCited = ps.reduce((a, b) => a + (b.cited || 0), 0);
 
+    /* 年份按 5 年一档、领域取前 7，都出横条图 */
+    function yearRows() {
+      const b = {};
+      ps.forEach(p => { if (!p.year) return; const k = Math.floor(p.year / 5) * 5; b[k] = (b[k] || 0) + 1; });
+      const ks = Object.keys(b).map(Number).sort((x, y) => y - x).slice(0, 8);
+      return ks.map(k => ({ k: k + "–" + String(k + 4).slice(2), v: b[k] }));
+    }
+    function fieldRows() {
+      return fieldList.slice(0, 7).map(f => ({ k: f.length > 8 ? f.slice(0, 8) : f, v: fields[f] }));
+    }
     function draw() {
       let list = ps.filter(p =>
         (!q || (p.title + " " + (p.titleCn || "") + " " + (p.journal || "") + " " + (p.authors || "") +
@@ -155,7 +174,11 @@
         '<div class="card" style="margin-bottom:16px">' +
         '<div class="small"><b>' + ps.length + "</b> 篇 · 合计被引 <b>" + totalCited.toLocaleString() +
         "</b> 次 · " + fieldList.length + " 个领域 · " + tagList.length + " 个方法标签</div>" +
-        '<div style="margin-top:10px">' +
+        '<div class="viz-split" style="margin-top:4px">' +
+        '<div><div class="viz-h">按年份 · 篇数</div>' + vizBars(yearRows()) + '</div>' +
+        '<div><div class="viz-h">按领域 · 篇数</div>' + vizBars(fieldRows()) + '</div>' +
+        '</div>' +
+        '<div style="margin-top:14px">' +
         tagList.slice(0, 18).map(k =>
           '<span class="tag g">' + E(k) + " ×" + tags[k] + "</span>").join(" ") + "</div></div>" +
         '<div class="search-bar">' +
@@ -220,30 +243,61 @@
   }
 
   /* ==================== 套路拆解 ==================== */
+  /* 每个套路挂的代表作不写死：按标题关键词从论文库实时匹配，按被引取前 4 篇，
+     所以不会出现编出来的 DOI。 */
+  function patRefs(keys, n) {
+    const all = (window.SX_PAPERS || []).concat(window.SX_PAPERS2 || []);
+    const seen = {};
+    const hit = [];
+    all.forEach(p => {
+      const t = String(p.title || "").toLowerCase();
+      if (!keys.some(k => t.indexOf(k) >= 0)) return;
+      const id = (p.doi || t).toLowerCase();
+      if (seen[id]) return;
+      seen[id] = 1;
+      hit.push(p);
+    });
+    hit.sort((a, b) => (b.cited || 0) - (a.cited || 0));
+    return hit.slice(0, n);
+  }
+
   function playbook(root) {
-    const P = window.SX_PLAYBOOK || {};
-    root.innerHTML = head("套路拆解", "") +
-      '<div class="note bad"><b>先说立场：</b>' + E(P.core || "") + "</div>" +
-      '<div class="card" style="margin-top:12px"><b>八步标准流水线</b>' +
-      '<div class="scroll" style="margin-top:8px"><table class="tbl"><thead><tr><th>#</th><th>步骤</th><th>输入</th><th>工具</th><th>输出</th><th>要点</th></tr></thead><tbody>' +
-      (P.sops || []).map(s => "<tr><td>" + s.step + "</td><td><b>" + E(s.name) + "</b></td><td>" + E(s.input) +
-        "</td><td>" + E(s.tool) + "</td><td>" + E(s.output) + "</td><td class=\"small\">" + E(s.note) + "</td></tr>").join("") +
-      "</tbody></table></div></div>" +
-      '<div class="card" style="margin-top:12px"><b>' + E(P.caseStudy.title) + "</b>" +
-      '<div class="small muted" style="margin:4px 0 8px">' + E(P.caseStudy.note) + "</div>" +
-      (P.caseStudy.steps || []).map(s => '<div class="kv" style="margin:4px 0"><dt style="min-width:80px"><b>' + E(s.k) +
-        "</b></dt><dd class=\"small\">" + E(s.v) + "</dd></div>").join("") +
-      '<div class="note warn" style="margin-top:10px"><b>这篇的软肋（值得你引以为戒）：</b>' +
-      (P.caseStudy.weaknesses || []).map(w => "<div>· " + E(w) + "</div>").join("") + "</div></div>" +
-      '<div class="card" style="margin-top:12px"><b>怎么把这套搬到你的 RILD 课题上</b>' +
-      '<div class="scroll" style="margin-top:8px"><table class="tbl"><thead><tr><th>原套路</th><th>换成</th><th>说明</th></tr></thead><tbody>' +
-      (P.transfer || []).map(t => "<tr><td>" + E(t.from) + "</td><td><b>" + E(t.to) + "</b></td><td class=\"small\">" + E(t.note) + "</td></tr>").join("") +
-      "</tbody></table></div></div>" +
-      '<div class="card" style="margin-top:12px"><b style="color:var(--accent)">红线：这些不能碰</b>' +
-      (P.redlines || []).map(r => '<div style="margin:8px 0"><b>· ' + E(r.t) + "</b>" +
-        '<div class="small muted">' + E(r.d) + "</div></div>").join("") + "</div>" +
-      '<div class="card" style="margin-top:12px"><b>五步使用法</b><ol style="margin:6px 0 0 18px;padding:0">' +
-      (P.howToUse || []).map(x => '<li class="small">' + E(x) + "</li>").join("") + "</ol></div>";
+    root.innerHTML = head("套路拆解", "正在匹配代表作…");
+    ensure("SX_PAPERS2", "data/papers2.js").then(() => playbookDraw(root));
+  }
+
+  function playbookDraw(root) {
+    const P = window.SX_PATTERNS || { items: [], redlines: [] };
+    const items = P.items || [];
+
+    root.innerHTML = head("套路拆解", (items.length) + " 条通用骨架，每条挂几篇真代表作。") +
+      (P.intro ? '<div class="note">' + E(P.intro) + "</div>" : "") +
+      items.map((it, i) => {
+        const refs = patRefs(it.keys || [], 4);
+        return '<details class="acc pat"' + (i === 0 ? " open" : "") + ">" +
+          "<summary><b>" + E(it.name) + "</b>" +
+          '<span class="tag n">' + E(it.tag || "") + "</span></summary>" +
+          '<div class="small muted" style="margin:-4px 0 10px">' + E(it.one || "") + "</div>" +
+          '<ol class="pat-steps">' + (it.steps || []).map(x => "<li>" + E(x) + "</li>").join("") + "</ol>" +
+          (it.pitfall ? '<div class="note warn small" style="margin:10px 0 0">坑：' + E(it.pitfall) + "</div>" : "") +
+          (refs.length
+            ? '<div class="pat-refs"><div class="viz-h" style="margin:14px 0 6px">代表作 · ' + refs.length + " 篇</div>" +
+              refs.map(p => {
+                const doi = String(p.doi || "").replace(/^https?:\/\/(dx\.)?doi\.org\//i, "");
+                const u = doi ? "https://doi.org/" + doi : "https://pubmed.ncbi.nlm.nih.gov/?term=" + encodeURIComponent(p.title || "");
+                const meta = [p.journal, p.year, p.cited ? "被引 " + p.cited : ""].filter(Boolean).join(" · ");
+                return '<div class="pat-ref"><a href="' + E(u) + '" target="_blank" rel="noopener">' +
+                  E(String(p.title || "").replace(/\.$/, "")) + "</a>" +
+                  '<span class="muted"> — ' + E(meta) + "</span></div>";
+              }).join("") + "</div>"
+            : "") +
+          "</details>";
+      }).join("") +
+      ((P.redlines || []).length
+        ? '<div class="card" style="margin-top:18px"><b style="color:var(--accent)">四条红线</b>' +
+          P.redlines.map(r => '<div style="margin:10px 0"><b class="small">· ' + E(r.t) + "</b>" +
+            '<div class="small muted">' + E(r.d) + "</div></div>").join("") + "</div>"
+        : "");
   }
 
   /* ==================== 知识库 ==================== */
@@ -278,10 +332,21 @@
     K.forEach(x => dom[x.domainName || x.domain] = x.domain);
     let curDom = "ALL", q = "", openId = null;
 
+    /* 每个域多少条、其中几条挂了真实文献 */
+    function domStat() {
+      return Object.keys(dom).map(n => {
+        const items = K.filter(x => x.domain === dom[n]);
+        return { k: n.length > 7 ? n.slice(0, 7) : n, v: items.length, s: items.filter(x => refsOf(x.id).length).length };
+      }).sort((a, b) => b.v - a.v);
+    }
+
     function draw() {
       const list = K.filter(x => (curDom === "ALL" || x.domain === curDom) &&
         (!q || (x.title + x.summary + x.body + (x.tags || []).join(" ")).toLowerCase().indexOf(q) >= 0));
       root.innerHTML = head("知识库", "共 " + K.length + " 条机制条目，每条带【和生信分析的连接】。") +
+        '<div class="card" style="margin-bottom:18px">' +
+        '<div class="viz-h" style="margin-top:0">九个域 · 条目数 / 其中挂真实文献</div>' +
+        vizBars(domStat()) + "</div>" +
         '<div class="search-bar">' +
         Object.keys(dom).map(n => '<button class="btn sm" data-d="' + E(dom[n]) + '"' +
           (curDom === dom[n] ? ' style="background:var(--brand);color:#fff;border-color:var(--brand)"' : "") + ">" +

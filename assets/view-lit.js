@@ -130,6 +130,8 @@
       '<div id="litRes"></div>' +
       '<div id="litEng"></div>' +
 
+      '<details class="acc" id="litAll"><summary><b>浏览全部论文</b>' +
+      '<span class="tag n">3314 篇</span></summary><div id="litPapers"></div></details>' +
       portBlock() + wizardBlock() + customBlock();
 
     const inp = document.getElementById("litQ");
@@ -142,6 +144,15 @@
     });
 
     bindCustom(root);
+    const allD = document.getElementById("litAll");
+    if (allD) allD.addEventListener("toggle", () => {
+      if (allD.open && !allD.__done) {
+        allD.__done = 1;
+        if (window.SXViewLib && window.SXViewLib.papers) {
+          window.SXViewLib.papers(document.getElementById("litPapers"));
+        }
+      }
+    });
     RELOAD = () => {
       const i2 = document.getElementById("litQ");
       if (i2 && i2.value.trim() && !parseId(i2.value)) run(false);
@@ -162,6 +173,7 @@
         idBox.innerHTML = "";
         document.getElementById("litEng").innerHTML = raw ? engineBlockHtml(raw, "去公开库搜") : engineIntroHtml();
       }
+      if (!id) page = 1;
       drawRes(raw, id);
       // 手动查（回车/点按钮）时，结果若被滚出视口上方就拉回来，不打断输入
       if (jump === true) {
@@ -179,22 +191,37 @@
       let list = IDX.filter(p => p.blob.indexOf(q) >= 0);
       if (onlyFree) list = list.filter(p => { const f = chanOf(p)[0]; return f && f.k === "oa"; });
       list.sort((a, b) => (b.cited || 0) - (a.cited || 0));
-      shown = list.slice(0, limit);
+
+      const total = list.length;
+      const pages = Math.max(1, Math.ceil(total / PAGE));
+      if (page > pages) page = pages;
+      if (page < 1) page = 1;
+      const from = (page - 1) * PAGE;
+      shown = list.slice(from, from + PAGE);
 
       box.innerHTML =
-        '<div class="lit-resbar"><b>站内命中 ' + list.length + " 篇</b>" +
+        '<div class="lit-resbar"><b>站内命中 ' + total + " 篇</b>" +
         '<label class="small"><input type="checkbox" id="litFreeOnly"' + (onlyFree ? " checked" : "") + "> 只看有免费全文的</label>" +
-        (list.length > limit ? '<button class="btn sm" id="litMore">再显示 30 篇</button>' : "") +
+        (pages > 1 ? '<span class="small muted">第 ' + (from + 1) + "–" + Math.min(from + PAGE, total) + " 条</span>" : "") +
         "</div>" +
-        (list.length
-          ? '<div class="lit-list">' + shown.map((p, i) => resCard(p, i)).join("") + "</div>"
+        (total
+          ? '<div class="lit-list">' + shown.map((p, i) => resCard(p, i)).join("") + "</div>" + pager(total, pages)
           : '<div class="card lit-empty"><b>站内没收录</b>' +
             '<div class="small muted" style="margin-top:6px">把 DOI 粘上去，或点下面的库搜「' + E(raw) + '」。</div></div>');
 
       const fo = document.getElementById("litFreeOnly");
-      if (fo) fo.onchange = () => { onlyFree = fo.checked; limit = 30; drawRes(raw, id); };
-      const mb = document.getElementById("litMore");
-      if (mb) mb.onclick = () => { limit += 30; drawRes(raw, id); };
+      if (fo) fo.onchange = () => { onlyFree = fo.checked; page = 1; drawRes(raw, id); };
+      box.querySelectorAll("[data-pg]").forEach(b => {
+        b.onclick = () => {
+          const v = b.getAttribute("data-pg");
+          if (v === "prev") page--;
+          else if (v === "next") page++;
+          else page = +v;
+          drawRes(raw, id);
+          const t = document.getElementById("litRes");
+          if (t) t.scrollIntoView({ behavior: "smooth", block: "start" });
+        };
+      });
       box.querySelectorAll("[data-probe]").forEach(b => {
         b.onclick = () => doProbe(+b.getAttribute("data-probe"), b);
       });
@@ -281,7 +308,30 @@
   }
 
   /* ---------- 站内索引 ---------- */
-  let IDX = null, shown = [], limit = 30, onlyFree = false, RELOAD = null;
+  const PAGE = 20;
+  let IDX = null, shown = [], page = 1, onlyFree = false, RELOAD = null;
+
+  /* 翻页条：页数少就全列，多了用省略号夹住当前页 */
+  function pager(total, pages) {
+    if (pages <= 1) return "";
+    const out = [];
+    const add = n => out.push('<button class="btn sm' + (n === page ? " primary" : "") +
+      '" data-pg="' + n + '">' + n + "</button>");
+    if (pages <= 7) {
+      for (let i = 1; i <= pages; i++) add(i);
+    } else {
+      add(1);
+      if (page > 3) out.push('<span class="lit-pg-dot">…</span>');
+      for (let i = Math.max(2, page - 1); i <= Math.min(pages - 1, page + 1); i++) add(i);
+      if (page < pages - 2) out.push('<span class="lit-pg-dot">…</span>');
+      add(pages);
+    }
+    return '<div class="lit-pager">' +
+      '<button class="btn sm" data-pg="prev"' + (page <= 1 ? " disabled" : "") + ">上一页</button>" +
+      out.join("") +
+      '<button class="btn sm" data-pg="next"' + (page >= pages ? " disabled" : "") + ">下一页</button>" +
+      '<span class="small muted">共 ' + total + " 条 · 第 " + page + "/" + pages + " 页</span></div>";
+  }
 
   function loadIndex() {
     ensure("SX_PAPERS2", "data/papers2.js").then(() => {

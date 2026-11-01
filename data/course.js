@@ -127,7 +127,10 @@ aggregate(expr ~ group, data = df, sd)       # 分组标准差`
       refs: [
         { n: "GDC（TCGA 官方门户）", u: "https://portal.gdc.cancer.gov/", d: "TCGA 唯一的官方来源，别用二手整理版", t: "doc" },
         { n: "GEO", u: "https://www.ncbi.nlm.nih.gov/geo/", d: "查 GSE 号、下表达矩阵和临床信息", t: "doc" },
-        { n: "UCSC Xena", u: "https://xenabrowser.net/", d: "同一队列的 TCGA 标准化数据，省掉一半预处理", t: "doc" }
+        { n: "UCSC Xena", u: "https://xenabrowser.net/", d: "同一队列的 TCGA 标准化数据，省掉一半预处理", t: "doc" },
+        { n: "TCGAbiolinks（Bioconductor 官方）", u: "https://bioconductor.org/packages/release/bioc/html/TCGAbiolinks.html", d: "R 里直接下 TCGA 的标准入口，比网页点快且可复现", t: "doc" },
+        { n: "UCSCXenaTools（rOpenSci）", u: "https://docs.ropensci.org/UCSCXenaTools/", d: "用代码从 Xena 拉数据，避免手动点错版本", t: "doc" },
+        { n: "TCGA 下载-差异-预后 全流程避坑（巴典科研）", u: "http://mp.weixin.qq.com/s?__biz=MzAwMDc4MjYyMQ==&mid=2650921075&idx=1&sn=95c3d39d74ab05129544d6441cb578be&chksm=80420d970ede214e638a842c174b5bb23ba3d5fae5d590e3095feef7f211e49035d9186dd212#rd", d: "含样本筛选红线、FPKM→TPM、生存变量构建、审稿常见质疑", t: "doc" }
       ],
       subs: [
         {
@@ -237,7 +240,13 @@ round(t(scale(t(m))), 2)`
         ]
       },
       refs: [
-        { n: "GSVA 官方 vignette", u: "https://bioconductor.org/packages/release/bioc/vignettes/GSVA/inst/doc/GSVA.html", d: "通路打分和 ssGSEA 的原始实现", t: "doc" }
+        { n: "GSVA 官方 vignette", u: "https://bioconductor.org/packages/release/bioc/vignettes/GSVA/inst/doc/GSVA.html", d: "通路打分和 ssGSEA 的原始实现", t: "doc" },
+        { n: "clusterProfiler（Bioconductor 官方）", u: "https://bioconductor.org/packages/release/bioc/html/clusterProfiler.html", d: "包作者维护，版本最新，enrichGO/enrichKEGG/gseGO 都在这里", t: "doc" },
+        { n: "Gene Ontology 官网", u: "http://geneontology.org/", d: "GO term 的权威解释，查注释来源", t: "doc" },
+        { n: "KEGG 官网", u: "https://www.genome.jp/kegg/", d: "通路图的原始出处", t: "doc" },
+        { n: "MSigDB（GSEA 官方基因集库）", u: "https://www.gsea-msigdb.org/gsea/msigdb/", d: "C2/C5/C6 等基因集，GSEA 的弹药库", t: "doc" },
+        { n: "g:Profiler（在线 ORA，免代码）", u: "https://biit.cs.ut.ee/gprofiler/gost", d: "不写代码也能做富集，和 clusterProfiler 互相印证", t: "tool" },
+        { n: "KEGG/GO/Reactome/DO/MSigDB 全套 GSEA 代码（基迪奥）", u: "http://mp.weixin.qq.com/s?__biz=MzA5NzQzOTgzMw==&mid=2651005004&idx=1&sn=2432c266946ab17d59324ba518b621e0&chksm=8af9046d5a73f73cc0b21b2522e11523b4a721051ed3e87736d898860347a7f0e36453005d1d#rd", d: "五类数据库的 GSEA 与可视化实例", t: "doc" }
       ],
       subs: [
         {
@@ -699,7 +708,13 @@ nrow(subset(edges, score >= 0.4))`
         ]
       },
       refs: [
-        { n: "GDC（TCGA 官方门户）", u: "https://portal.gdc.cancer.gov/", d: "TCGA 唯一的官方来源，别用二手整理版", t: "doc" }
+        { n: "GDC（TCGA 官方门户）", u: "https://portal.gdc.cancer.gov/", d: "TCGA 唯一的官方来源，别用二手整理版", t: "doc" },
+        { n: "GEOquery（Bioconductor 官方）", u: "https://bioconductor.org/packages/release/bioc/html/GEOquery.html", d: "getGEO 一把抓矩阵+临床，本课主包", t: "doc" },
+        { n: "limma（Bioconductor 官方）", u: "https://bioconductor.org/packages/release/bioc/html/limma.html", d: "芯片/RNA-seq 差异与 normalize.quantiles 的来源", t: "doc" },
+        { n: "sva（ComBat 批次校正）", u: "https://bioconductor.org/packages/release/bioc/html/sva.html", d: "合并多数据集前先消批次，本课 8.2 用", t: "doc" },
+        { n: "GEOquery 实例（哈佛公开课）", u: "https://genomicsclass.github.io/book/pages/GEOquery.html", d: "getGEO/getGEOSuppFiles 的实战演示", t: "doc" },
+        { n: "GEO 芯片全流程实战（博客园）", u: "https://www.cnblogs.com/henbio/p/19187697", d: "探针→ENTREZ→SYMBOL 去重，GSE69063 为例", t: "doc" },
+        { n: "GEO2R（NCBI 在线）", u: "https://www.ncbi.nlm.nih.gov/geo/geo2r/", d: "不写代码先预览差异，核对完再进 R", t: "tool" }
       ],
       subs: [
         {
@@ -780,7 +795,13 @@ as.matrix(m)`
         ]
       },
       refs: [
-        { n: "cBioPortal", u: "https://www.cbioportal.org/", d: "突变、拷贝数、生存一起查", t: "doc" }
+        { n: "cBioPortal", u: "https://www.cbioportal.org/", d: "突变、拷贝数、生存一起查", t: "doc" },
+        { n: "glmnet（CRAN 官方）", u: "https://cran.r-project.org/web/packages/glmnet/index.html", d: "LASSO-Cox 本包，cv.glmnet 选 λ", t: "doc" },
+        { n: "timeROC（CRAN）", u: "https://cran.r-project.org/web/packages/timeROC/index.html", d: "时间依赖 AUC，报 1/3/5 年区分度", t: "doc" },
+        { n: "survminer（CRAN）", u: "https://cran.r-project.org/web/packages/survminer/index.html", d: "ggsurvplot 画 KM，本课 9.3 出图", t: "doc" },
+        { n: "ranger（随机生存森林）", u: "https://cran.r-project.org/web/packages/ranger/index.html", d: "LASSO 之外的备选模型，可做集成", t: "doc" },
+        { n: "rms（校准曲线）", u: "https://cran.r-project.org/web/packages/rms/index.html", d: "calibrate 看模型校准，不只看区分度", t: "doc" },
+        { n: "LASSO→多因素COX→风险评分→KM/ROC 全套（微信）", u: "http://mp.weixin.qq.com/s?__biz=MzIyNDI1MzgzOQ==&mid=2650400318&idx=1&sn=7c72b9353829d9c36cc0be43dda8719e&chksm=f01c84dec76b0dc8e2ef640226f949de3fdd647a9316edef4734747c73e602919e51170513da#rd", d: "从表达矩阵到风险评分的完整可运行代码", t: "doc" }
       ],
       subs: [
         {
@@ -861,7 +882,11 @@ ifelse(risk > median(risk), "high", "low")   # 常用切点：中位数`
         ]
       },
       refs: [
-        { n: "cBioPortal", u: "https://www.cbioportal.org/", d: "突变、拷贝数、生存一起查", t: "doc" }
+        { n: "cBioPortal", u: "https://www.cbioportal.org/", d: "突变、拷贝数、生存一起查", t: "doc" },
+        { n: "TIDE（免疫治疗反应预测）", u: "http://tide.dfci.harvard.edu/", d: "高低风险组的免疫反应差异，补 9.3 没讲的下游", t: "tool" },
+        { n: "GEPIA2（在线表达/生存）", u: "http://gepia2.cancer-pku.cn/", d: "不写代码验证单基因表达与生存", t: "tool" },
+        { n: "ICGC Data Portal（独立验证队列）", u: "https://dcc.icgc.org/", d: "跨数据集验证模型用，独立于 TCGA", t: "doc" },
+        { n: "LASSO→外部验证→timeROC 完整范例", u: "http://cytoskeletonres.com/posts/building-a-robust-prognostic-model-integrating-lasso-regression-and-random-forest-with-cytoskeletal-genes", d: "从特征选择到时间依赖 AUC 的端到端范例", t: "doc" }
       ],
       subs: [
         {

@@ -1025,7 +1025,7 @@ counts <- Seurat::Read10X(data.dir = "data/raw/sample_L1/filtered_feature_bc_mat
 if (is.list(counts)) counts <- counts[["Gene Expression"]]
 
 obj1 <- Seurat::CreateSeuratObject(counts = counts,
-                                   project  = "RILD",
+                                   project  = "demo",
                                    min.cells = 3,        # 至少在 3 个细胞里表达
                                    min.features = 200)   # 至少检出 200 个基因
 obj1@meta.data[1:5, ]
@@ -1316,7 +1316,7 @@ seu$celltype <- dplyr::case_when(
 )
 saveRDS(seu, "data/processed/seurat_annotated.rds")`,
     notes: [
-      "SingleR 是「最省事的第一步」，但它参考的是健康组织图谱，肿瘤或辐照损伤样本的预测准确度会下降，人工复核永远不能省。",
+      "SingleR 是「最省事的第一步」，但它参考的是健康组织图谱，肿瘤或损伤样本的预测准确度会下降，人工复核永远不能省。",
       "DotPlot 同时展示「表达该基因的细胞比例（点大小）」和「平均表达量（颜色）」，比单看 FeaturePlot 更能判断一个 cluster 的身份。",
       "AddModuleScore 是按 abundance bins 做对照基因匹配的，结果受数据整体分布影响，只建议在 marker 集足够特异时用它批量打标。"
     ],
@@ -1335,7 +1335,7 @@ saveRDS(seu, "data/processed/seurat_annotated.rds")`,
     level: "进阶",
     tags: ["FindMarkers","伪bulk","AggregateExpression","DESeq2"],
     packages: ["Seurat","DESeq2","dplyr","purrr","tibble","readr","clusterProfiler","org.Hs.eg.db"],
-    scene: "想比较辐照组与对照组在同一细胞类型内的表达差异；Wilcoxon 太粗糙被审稿人质疑时，改用伪 bulk 做 DESeq2。",
+    scene: "想比较处理组与对照组在同一细胞类型内的表达差异；Wilcoxon 太粗糙被审稿人质疑时，改用伪 bulk 做 DESeq2。",
     code: `library(Seurat)
 library(DESeq2)
 library(dplyr)
@@ -1405,7 +1405,7 @@ readr::write_csv(pb_sig, "results/tables/TableS5_pseudobulk_DEG.csv")
     level: "高级",
     tags: ["CellChat","配体-受体","通讯网络","netVisual"],
     packages: ["CellChat","Seurat","patchwork","dplyr"],
-    scene: "想说明辐照后 Kupffer 细胞与肝细胞之间的配体-受体信号增强了，需要定量不同细胞类型间的通讯强度并画出网络图。",
+    scene: "想说明处理后两类细胞之间的配体-受体信号增强了，需要定量不同细胞类型间的通讯强度并画出网络图。",
     code: `library(CellChat)
 library(Seurat)
 library(patchwork)
@@ -1415,7 +1415,7 @@ seu <- readRDS("data/processed/seurat_annotated.rds")
 data.use <- Seurat::GetAssayData(seu, assay = "RNA", slot = "data")
 meta.use <- seu@meta.data[, c("celltype", "condition"), drop = FALSE]
 colnames(meta.use) <- c("celltype", "condition")
-# 2) 按条件拆成两个 CellChat 对象（对照组 vs 辐照组）
+# 2) 按条件拆成两个 CellChat 对象（对照组 vs 处理组）
 make_cc <- function(cells) {
   CellChat::createCellChat(object = data.use[, cells],
                            meta = meta.use[cells, , drop = FALSE],
@@ -1436,7 +1436,7 @@ object_list <- lapply(object_list, function(cc) {
   cc <- CellChat::filterCommunication(cc, min.cells = 10)
   return(cc)
 })
-# 5) 合并对象做对照组 vs 辐照组的差异通讯比较
+# 5) 合并对象做对照组 vs 处理组的差异通讯比较
 cc_merge <- CellChat::mergeCellChat(object_list, add.names = names(object_list))
 gg1 <- CellChat::netVisual_diffInteraction(cc_merge, weight.scale = TRUE)
 gg2 <- CellChat::netVisual_circle(cc_merge$net$count[[1]],
@@ -3157,7 +3157,7 @@ tinytex::tlmgr_install(c("ctex", "xeCJK", "booktabs", "geometry", "fancyhdr"))
 bt <- intToUtf8(rep(96, 3))
 lines <- c(
   "---",
-  "title: '放射性肝损伤的转录组机制研究'",
+  "title: '差异表达的转录组机制研究'",
   "author: '某某某'",
   "date: today",
   "format:",
@@ -3181,7 +3181,7 @@ lines <- c(
   "",
   "## 背景",
   "",
-  "放射治疗引起的肝损伤（RILD）是限制剂量提升的首要因素。",
+  "处理引起的组织损伤是限制剂量提升的首要因素。",
   "",
   paste0(bt, "{r fig-volcano, fig.cap = '差异表达火山图', fig.width = 6}"),
   "knitr::include_graphics('results/figures/Fig1_volcano.pdf')",
