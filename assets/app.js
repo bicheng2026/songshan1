@@ -9,6 +9,7 @@
     { id: "video", name: "看视频", group: "main", fn: () => window.SXViewVideo.render(document.getElementById("view")) },
     { id: "course", name: "通用课程", group: "main", fn: () => window.SXViewCourse.render(document.getElementById("view")) },
     { id: "dojo", name: "代码道场", group: "main", fn: () => window.SXViewDojo.render(document.getElementById("view")) },
+    { id: "litfind", name: "找文献", group: "main", fn: () => window.SXViewLit.render(document.getElementById("view")) },
     { id: "knowledge", name: "知识库", group: "more", fn: () => window.SXViewLib.knowledge(document.getElementById("view")) },
     { id: "papers", name: "论文库", group: "more", fn: () => window.SXViewLib.papers(document.getElementById("view")) },
     { id: "codebank", name: "代码库", group: "more", fn: () => window.SXViewLib.codebank(document.getElementById("view")) },
@@ -109,7 +110,8 @@
       "错的时候不只说错了，还会告诉你错在哪个数字上、该往哪个方向改。</span></a>" +
       '<a class="loop-i" href="#/knowledge"><span class="loop-s">第三步 · 查</span><b>查证机制</b>' +
       '<span class="loop-d">' + knN + " 条机制条目，其中 " + citeN + " 条挂着真实文献，能点开原文核对；" +
-      paperN + " 篇生信论文按被引次数排好，找方法、找靶点都在这一页。</span></a>" +
+      paperN + " 篇生信论文按被引次数排好，找方法、找靶点都在这一页。" +
+      "下不到全文就进「找文献」，粘个 DOI，它把能下的通道全列出来。</span></a>" +
       '<a class="loop-i" href="#/write"><span class="loop-s">第四步 · 写</span><b>落成文字</b>' +
       '<span class="loop-d">把跑出来的结果和查到的机制拼成论文骨架，写作台按投稿口径给结构和句式，' +
       "写完能直接搬进 Word。写不动的时候旁边就是 AI 导师。</span></a>" +

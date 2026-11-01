@@ -5,6 +5,16 @@
   const SX = window.SX;
   const E = SX.esc;
 
+  /* 本地 R 课（123 网盘）区块样式，首次渲染时注入一次 */
+  const LOC_CSS = ".loc-note{margin:10px 0 14px;opacity:.85;line-height:1.7}.loc-list{margin:14px 0 0;display:flex;flex-direction:column;gap:8px}.loc-cls{border:1px solid rgba(128,128,128,.35);border-radius:8px;padding:8px 12px;background:rgba(128,128,128,.04)}.loc-cls>summary{cursor:pointer;display:flex;align-items:center;gap:12px;list-style:none;padding:2px 0}.loc-cls>summary::-webkit-details-marker{display:none}.loc-cls-n{font-weight:600}.loc-meta{font-size:.85em;opacity:.6}.loc-files{margin-top:8px;display:flex;flex-direction:column;gap:4px}.loc-file{display:flex;justify-content:space-between;gap:16px;font-size:.9em;border-top:1px dashed rgba(128,128,128,.3);padding:4px 0}.lf-s{opacity:.6;white-space:nowrap;font-variant-numeric:tabular-nums}";
+  function injectCss() {
+    if (document.getElementById("sx-loc-css")) return;
+    var s = document.createElement("style");
+    s.id = "sx-loc-css";
+    s.textContent = LOC_CSS;
+    document.head.appendChild(s);
+  }
+
   function av(bv) { return "https://www.bilibili.com/video/" + bv; }
   function mins(m) {
     if (!m) return "";
@@ -52,6 +62,29 @@
         "</div>";
     });
     html += "</div>";
+
+    /* 本地 R 课（123 网盘托管） */
+    if (V.local && V.local.classes && V.local.classes.length) {
+      injectCss();
+      const L = V.local;
+      html += '<div class="sec-h">' + E(L.title) + "</div>";
+      html += '<p class="loc-note">' + E(L.note) + "</p>";
+      html += '<a class="btn" href="' + E(L.share) + '" target="_blank" rel="noopener">去 123 网盘看全部（免登录）' + (L.code ? " · 提取码 " + E(L.code) : "") + " &#8599;</a>";
+      html += '<div class="loc-list">';
+      L.classes.forEach(function (c) {
+        const total = c.files.reduce(function (s, f) { return s + f.mb; }, 0);
+        const sizeStr = total >= 1024 ? (total / 1024).toFixed(2) + " GB" : total.toFixed(1) + " MB";
+        html += '<details class="loc-cls"><summary><span class="loc-cls-n">第 ' + c.cls + " 课</span>" +
+          '<span class="loc-meta">' + c.files.length + " 集 · " + sizeStr + "</span></summary>";
+        html += '<div class="loc-files">';
+        c.files.forEach(function (f) {
+          const fs = f.mb >= 1024 ? (f.mb / 1024).toFixed(2) + " GB" : f.mb.toFixed(1) + " MB";
+          html += '<div class="loc-file"><span class="lf-n">' + E(f.n) + '</span><span class="lf-s">' + fs + "</span></div>";
+        });
+        html += "</div></details>";
+      });
+      html += "</div>";
+    }
 
     /* 文字版 */
     if (V.reads && V.reads.length) {
