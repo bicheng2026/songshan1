@@ -1180,6 +1180,285 @@ ck
 cat(sprintf("对上的 %d / %d 项\\n", sum(ck$ok), nrow(ck)))`
         }
       ]
+    },
+    {
+      id: "mr",
+      title: "专题 · 孟德尔随机化（MR）：用遗传变异做「天然随机对照」",
+      plain: "一句话讲清 MR 逻辑——把 SNP 当工具变量，把「暴露→结局」的因果推断变成「基因→暴露→结局」的连锁推理，绕开混杂和反向因果。课题里可用来验证「某通路/基因 → RILD 风险」到底是因果还是相关。这是「观察数据里挖因果」最常用的方法之一，和 k2 差异分析、k5 预后模型是互补关系：那些是看关联，MR 是看因果方向。",
+      goal: [
+        "能用自己的话讲清 MR 三类核心假设（工具变量相关性、独立性、排他性）",
+        "能装 TwoSampleMR 并从 IEU OpenGWAS 直接拉暴露/结局的 GWAS 摘要数据",
+        "能跑通 IVW 主分析，并配 Egger / 加权中位数做交叉验证",
+        "能读懂 MR 散点图、漏斗图、留一图，并据此判断结果可不可信",
+        "能指出 MR 的坑：弱工具变量、人群分层、一暴露多结局带来的假阳性"
+      ],
+      watch: [
+        { n: "孟德尔随机化 入门到实战（BV1pn52zxECu）", u: "https://www.bilibili.com/video/BV1pn52zxECu" },
+        { n: "TwoSampleMR 跑通全流程（BV1SM411L7Xu）", u: "https://www.bilibili.com/video/BV1SM411L7Xu" },
+        { n: "MR 敏感性分析与作图（BV1ED421L7jQ）", u: "https://www.bilibili.com/video/BV1ED421L7jQ" },
+        { n: "孟德尔随机化 选题与发文套路（BV1MmpMeWEzW）", u: "https://www.bilibili.com/video/BV1MmpMeWEzW" },
+        { n: "MR 常见误区与审稿人问题（BV1EM4y1f7F6）", u: "https://www.bilibili.com/video/BV1EM4y1f7F6" }
+      ],
+      refs: [
+        { n: "TwoSampleMR（官方包）", u: "https://mrcieu.github.io/TwoSampleMR/", d: "拉 IEU OpenGWAS 数据 + 跑 IVW/Egger 的核心包，必装", t: "doc" },
+        { n: "IEU OpenGWAS（数据门户）", u: "https://gwas.mrcieu.ac.uk/", d: "几千个现成 GWAS 摘要，直接按 ID 拉，不用自己下原始数据", t: "tool" },
+        { n: "MR-Base / MRInstruments", u: "https://mrcieu.github.io/MRInstruments/", d: "已整理好的暴露/结局仪器变量库", t: "doc" },
+        { n: "STROBE-MR（报告规范）", u: "https://www.strobe-mr.org/", d: "MR 文章怎么写方法、怎么报结果，照着填", t: "doc" },
+        { n: "FUMA（功能注释）", u: "https://fuma.ctglab.nl/", d: "把显著 SNP 注释到基因/通路，出图漂亮", t: "tool" },
+        { n: "Radial MR（稳健方法）", u: "https://mrcieu.github.io/RadialMR/", d: "对离群 SNP 更稳的 IVW 变体", t: "doc" }
+      ],
+      subs: [
+        {
+          t: "mr.1 原理：为什么 SNP 能当「天然随机对照」",
+          why: "随机对照试验（RCT）贵且慢，很多暴露根本不能随机给人上。MR 借用一个事实：你从父母那随机分到哪个 allele，相当于被「随机分组」了，且不受后天混杂影响。",
+          pts: [
+            "三个假设：① 相关性——SNP 与暴露强相关（F 统计量 > 10 才算强工具）；② 独立性——SNP 与混杂无关；③ 排他性——SNP 只经暴露影响结局，不走别的路。",
+            "因果效应 ≈ (SNP→结局的效应) ÷ (SNP→暴露的效应)，这就是 Wald 比值。",
+            "MR 解决的是「反向因果」：到底是 A 导致 B，还是 B 导致 A？用基因当起点，因果方向就定了。"
+          ],
+          code: `# 假想数据：SNP 对暴露效应 beta_x，对结局效应 beta_y
+beta_x <- 0.30; se_x <- 0.04
+beta_y <- 0.12; se_y <- 0.05
+
+# Wald 比值估计因果效应（暴露每变动 1 单位，结局变多少）
+mr_effect <- beta_y / beta_x
+mr_effect
+
+# 强工具检验：F = (beta_x / se_x)^2，> 10 才算强
+F_stat <- (beta_x / se_x)^2
+F_stat   # 几万，远强于阈值`
+        },
+        {
+          t: "mr.2 实战：从 OpenGWAS 拉数据跑 IVW",
+          why: "TwoSampleMR 把最麻烦的「找工具变量 + 数据对齐」都封装好了。你只要给暴露和结局的 GWAS ID，它自动 harmonize（对齐效应等位基因）。",
+          pts: [
+            "暴露和结局必须来自「不同样本」的两项 GWAS（two-sample），否则会低估误差。",
+            "harmonise_data 会自动剔除回文 SNP、对齐链方向——这步不做，结果全是错的。",
+            "主分析用 mr_ivw（逆方差加权），再配 mr_egger_regression 和 mr_weighted_median 交叉验证方向是否一致。"
+          ],
+          code: `library(TwoSampleMR)
+
+# 拉暴露（示例：BMI，ukb-b-19953）的工具变量
+exposure <- extract_instruments(outcomes = "ukb-b-19953", p1 = 5e-8)
+
+# 拉结局（示例：冠心病，ieu-a-7）在这些 SNP 上的效应
+outcome <- extract_outcome_data(snps = exposure$SNP, outcomes = "ieu-a-7")
+
+# 对齐效应等位基因（最关键的一步）
+dat <- harmonise_data(exposure, outcome)
+
+# 跑多种方法
+res <- mr(dat, method_list = c("mr_ivw", "mr_egger_regression", "mr_weighted_median"))
+res`
+        },
+        {
+          t: "mr.3 敏感性分析：结果到底信不信得过",
+          why: "MR 最容易翻车在「水平多效性」——某个 SNP 除了经暴露，还走别的路影响结局。这一步就是用几张图把这种风险暴露出来。",
+          pts: [
+            "异质性 Cochran Q：SNP 间效应差异太大（p<0.05）说明工具变量不齐，IVW 不可靠。",
+            "MR-Egger 截距：显著 ≠ 0 提示存在水平多效性，Egger 能部分纠正。",
+            "留一图（leave-one-out）：逐个剔除 SNP 重算，若去掉某一个结果就塌了，说明结论只靠那一个 SNP，不稳健。",
+            "多重检验：一个暴露去撞几百个结局，必然有假阳性——要 FDR 校正，别报 raw p。"
+          ],
+          code: `# 异质性 + 多效性 + 留一
+het  <- mr_heterogeneity(dat)
+pleio <- mr_pleiotropy_test(dat)
+loo  <- mr_leaveoneout(dat)
+
+het; pleio; loo
+
+# 出图：散点（看方向）、漏斗（看对称）、留一（看稳健）
+mr_scatter_plot(res, dat)
+mr_funnel_plot(res)
+mr_leaveoneout_plot(loo)`
+        }
+      ]
+    },
+    {
+      id: "multiom",
+      title: "专题 · 多组学整合：把转录组、表观、蛋白组拼成一张图",
+      plain: "单一组学只看一个层面：转录组看「哪些基因在表达」，甲基化看「开关怎么被拨」，蛋白组看「最终干了多少活」。整合分析把多个矩阵联合降维，找跨组学的共同驱动因子。课题里可把 scRNA + 空间 + 临床表型一起整合，挖出 RILD 的分型轴，而不是各看各的。",
+      goal: [
+        "能解释「横向整合（同样本多组学）」和「纵向整合（不同层面对应）」的区别",
+        "能用 mixOmics 的 DIABLO 做多组学联合分类/预测",
+        "能用 MOFA2 把多模态数据压成少数隐因子，并解释每个因子代表什么",
+        "能读懂相关性圆图、碎石图、样本散点图",
+        "能判断多组学整合何时真有生物学意义、何时只是炫技凑图"
+      ],
+      watch: [
+        { n: "mixOmics 官方 DIABLO 教程（视频+代码）", u: "https://mixomics.org/mixdiablo/" },
+        { n: "MOFA2 官方 workshop（多组学因子分析）", u: "https://raw.githack.com/bioFAM/MOFA2/master/doc/MOFA_example.html" },
+        { n: "10x Multiome（同一细胞同时测 ATAC+RNA）产品页", u: "https://www.10xgenomics.com/products/single-cell-multiome" }
+      ],
+      refs: [
+        { n: "mixOmics（DIABLO/sPLS-DA）", u: "https://mixomics.org/", d: "多组学联合降维与分类最常用 R 包，教程极全", t: "doc" },
+        { n: "MOFA2（多组学因子分析）", u: "https://github.com/bioFAM/MOFA2", d: "把任意多模态数据压成少数隐因子，适合找共同驱动", t: "doc" },
+        { n: "MultiAssayExperiment（数据结构）", u: "https://bioconductor.org/packages/release/bioc/html/MultiAssayExperiment.html", d: "多组学数据的标准容器，MOFA/很多包都吃它", t: "doc" },
+        { n: "10x Multiome 分析流程", u: "https://www.10xgenomics.com/resources/analysis-guides/multiome", d: "同一细胞同时测 RNA+ATAC 的官方流程", t: "doc" },
+        { n: "iCluster（肿瘤多组学分型）", u: "https://www.bioconductor.org/packages/release/bioc/html/iClusterPlus.html", d: "经典的多组学联合聚类方法", t: "doc" }
+      ],
+      subs: [
+        {
+          t: "multiom.1 概念：整合到底在整合什么",
+          why: "多组学不是把几张图摆一起。整合的前提是你想回答「哪些因子同时驱动了多个层面的变化」——比如一组基因高表达、同时启动子去甲基化、同时蛋白升高，才叫一个协调事件。",
+          pts: [
+            "横向整合：同一批样本测了 mRNA + methyl + miRNA，找它们之间的协同关系。",
+            "纵向整合：不同层面但对应于同一生物学过程（如 scRNA 和空间），把注释对齐。",
+            "降维是核心：每个组学矩阵都高维，先压成少数「组分/因子」，再看这些组分怎么跨组学耦合。"
+          ],
+          code: `# 用 base R 直观看「两个矩阵是否共享信号」
+# 假设 X(基因表达) 和 Y(甲基化) 都按样本对齐
+cor_shared <- cor(X[, 1:5], Y[, 1:5], method = "spearman")
+round(cor_shared, 2)
+
+# 若某基因表达 与 其启动子甲基化 强负相关 -> 表观调控实锤
+# 多组学整合就是把这个直觉自动扩展到全基因组、多组学`
+        },
+        {
+          t: "multiom.2 DIABLO：多组学联合分类",
+          why: "DIABLO 是 mixOmics 里专门针对「多组学 + 已知分组」的算法，一边降维一边让不同组学往同一分类方向上对齐。适合做「用多组学预测 RILD 分型」这类任务。",
+          pts: [
+            "design 矩阵控制组学之间的「耦合强度」：对角 0，非对角是惩罚权重（0.1 起步，越大越强制对齐）。",
+            "keepX 控制每层保留多少特征，要调参：太大过拟合，太小丢信号。",
+            "plotIndiv 看样本在联合空间的分布，分组分得开 = 整合有效。"
+          ],
+          code: `library(mixOmics)
+data(breast.TCGA)
+
+# 三个组学矩阵 + 一个分组标签
+X <- list(mRNA  = breast.TCGA$data.train$mrna,
+          meth  = breast.TCGA$data.train$methyl,
+          mirna = breast.TCGA$data.train$mirna)
+Y <- breast.TCGA$data.train$subtype
+
+design <- matrix(0.1, ncol = 3, nrow = 3); diag(design) <- 0
+
+sgccda.res <- block.splsda(X, Y,
+  ncomp = 2,
+  keepX = list(mRNA = c(50,50), meth = c(30,30), mirna = c(20,20)),
+  design = design)
+
+plotIndiv(sgccda.res, group = Y, legend = TRUE,
+  title = "多组学联合空间（DIABLO）")`
+        },
+        {
+          t: "multiom.3 MOFA：把多模态压成少数隐因子",
+          why: "MOFA 不要求你先有分组标签。它假设所有组学都由少数几个「隐因子」驱动，自动把这些因子解出来。你再去看因子 1 主要被哪些基因/甲基化位点贡献，就能命名这个因子的生物学含义（如「炎症轴」「再生轴」）。",
+          pts: [
+            "plot_variance_explained 看前几个因子解释了多少方差——太多因子才解释一点，说明数据噪声大。",
+            "每个因子是一组特征的加权组合，权重大的特征就是该因子的「代表」。",
+            "因子可以和临床表型（如 RILD 严重度）做相关，挑出与表型挂钩的因子重点挖。"
+          ],
+          code: `library(MOFA2)
+
+# mae 是 MultiAssayExperiment（多个 assay 同样本对齐）
+# 训练（model 会存到磁盘）
+# mofa_model <- create_mofa(multiome_data) %>% 
+#   prepare_mofa() %>% run_mofa()
+# save_model(mofa_model, "model.h5")
+
+# 读回已训练模型后看：
+plot_variance_explained(mofa_model)
+# 因子 1 贡献最大的特征（基因/峰）
+top <- get_weights(mofa_model, factor = 1, view = "mRNA",
+                   abs = TRUE) %>% head(20)
+top`
+        }
+      ]
+    },
+    {
+      id: "epispatial",
+      title: "专题 · 表观遗传与空间转录组：从调控开关到组织定位",
+      plain: "bulk 和 scRNA 告诉我们「哪些基因在表达」，但看不到两件事：① 基因「开关」是怎么被调控的（甲基化、染色质开放）；② 基因「在哪表达」（组织里的空间位置）。表观（ChAMP/ATAC-seq）补调控，空间转录组（10x Visium / Seurat）补定位。两者补足本课题「分区图谱→治疗图谱」里最缺的调控与定位信息。",
+      goal: [
+        "能讲清 DNA 甲基化与基因沉默、ATAC-seq 峰与开放染色质的关系",
+        "能用 ChAMP 跑通甲基化 450k/850k 标准流程并挑差异甲基化位点",
+        "能用 ATAC-seq 找差异开放区域并注释到近端基因",
+        "能用 Seurat 读 10x Visium 做空间降维/聚类/因子分析",
+        "能把空间 spot 的注释和 scRNA 细胞类型对齐（锚定整合）"
+      ],
+      watch: [
+        { n: "ATAC-seq 数据分析实战（BV1C7411C7ez）", u: "https://www.bilibili.com/video/BV1C7411C7ez" },
+        { n: "表观调控组学联合分析实战（av77098514）", u: "https://www.bilibili.com/video/av77098514" },
+        { n: "Seurat 空间转录组手册（BV181wezqEgK）", u: "https://www.bilibili.com/video/BV181wezqEgK" }
+      ],
+      refs: [
+        { n: "ChAMP（甲基化分析）", u: "https://www.bioconductor.org/packages/release/bioc/html/ChAMP.html", d: "450k/850k 甲基化阵列一站式流程，含归一化/批次/DMP/DMR", t: "doc" },
+        { n: "minfi（甲基化底层）", u: "https://bioconductor.org/packages/release/bioc/html/minfi.html", d: "ChAMP 的底层，想自己控流程时看", t: "doc" },
+        { n: "ATACseqQC（ATAC 质控）", u: "https://bioconductor.org/packages/release/bioc/html/ATACseqQC.html", d: "ATAC 特有的插入片段/核小体周期性质控", t: "doc" },
+        { n: "Signac（ATAC 单细胞）", u: "https://stuartlab.org/signac/", d: "和 Seurat 同作者，单细胞 ATAC 标准工具", t: "doc" },
+        { n: "Seurat Spatial（空间转录组）", u: "https://satijalab.org/seurat/articles/spatial_vignette.html", d: "10x Visium 标准流程，读切片图+表达一起", t: "doc" },
+        { n: "10x Visium 官方文档", u: "https://www.10xgenomics.com/platforms/visium", d: "空转数据格式与实验设计说明", t: "doc" },
+        { n: "SpatialExperiment / spatialLIBD", u: "https://bioconductor.org/packages/release/bioc/html/SpatialExperiment.html", d: "空转数据的 Bioconductor 标准容器与数据集", t: "doc" }
+      ],
+      subs: [
+        {
+          t: "epi.1 原理：调控开关与空间定位各自看什么",
+          why: "表达量高不代表「这个基因被主动开着」。甲基化把启动子 CpG 岛罩住，基因就沉默；ATAC-seq 测染色质开放程度，开放区才允许转录因子结合。空间转录组则把表达量贴回组织切片坐标，看「这个基因在肝小叶中央带还是汇管区高」。",
+          pts: [
+            "DNA 甲基化（尤其启动子 CpG 岛）高 → 转录抑制；去甲基化 → 激活。",
+            "ATAC-seq 峰 = 开放染色质 ≈ 转录因子可结合区；峰位置注释到近端基因即候选调控靶点。",
+            "空间转录组保留组织坐标，能复现「分区」——本课题「分区图谱」最直接的数据类型。"
+          ],
+          code: `# 概念验证：甲基化与表达的反向关系
+# 假设 meth(样本×基因启动子甲基化), expr(同样本×基因表达)
+cor_vec <- numeric(ncol(expr))
+for (g in 1:ncol(expr))
+  cor_vec[g] <- cor(meth[, g], expr[, g], method = "spearman")
+
+# 多数基因启动子甲基化 vs 表达 呈负相关
+mean(cor_vec < 0)   # 比例，预期远高于 0.5`
+        },
+        {
+          t: "epi.2 甲基化 / ATAC 实战",
+          why: "甲基化阵列（450k/850k）最成熟，ChAMP 一条龙；ATAC-seq 看开放染色质，Signac 接 Seurat 生态。两者都能产出「差异调控特征」，喂给 k5 预后模型或 k7 WGCNA 做上游。",
+          pts: [
+            "ChAMP 流程：load → norm(BMIQ/quantile) → 批次校正 → champ.MVP/SVD → champ.DMP 挑差异位点。",
+            "甲基化位点(DMP)和区域(DMR)要分开看；DMR 更有生物学意义但计算更重。",
+            "ATAC 先 FindMarkers(assay='peaks') 找差异开放峰，再用职位注释把峰映射到基因。"
+          ],
+          code: `library(ChAMP)
+# 甲基化 450k 标准流程
+myLoad <- champ.load("~/methy_raw", arraytype = "450K")
+myNorm <- champ.norm(myLoad, method = "BMIQ")
+myMVP  <- champ.MVP(myNorm, adjPVal = 0.05)
+DMP    <- champ.DMP(myNorm, pheno = myLoad$pd$Sample_Group)
+head(DMP[order(DMP$P.Value), ])
+
+# ATAC-seq（单细胞）差异开放峰
+library(Signac)
+da <- FindMarkers(atac_obj, ident.1 = "treat", ident.2 = "ctrl",
+                  assay = "peaks", test.use = "LR")
+head(da)`
+        },
+        {
+          t: "epi.3 空间转录组：把表达贴回组织",
+          why: "10x Visium 每个 spot 既测表达又带组织切片坐标。Seurat 能一边做常规降维聚类，一边画 SpatialPlot 把簇贴回切片，直接看「哪个区是再生、哪个区是损伤」。再和 scRNA 锚定，就能给每个 spot 标上细胞类型组成。",
+          pts: [
+            "Load10X_Spatial 同时读表达矩阵和组织图像；SCTransform 做空转专属归一化。",
+            "SpatialPlot(vis, label=TRUE) 看簇在组织里的空间分布，是「分区图谱」的直视图。",
+            "FindTransferAnchors(reference=sc_obj, query=vis) 把 scRNA 的细胞类型注释迁移到空间 spot，得到「每个位置是什么细胞」。"
+          ],
+          code: `library(Seurat)
+# 读 10x Visium（表达 + 切片图）
+vis <- Load10X_Spatial(data.dir = "visium/",
+                       filename = "filtered_feature_bc_matrix.h5")
+vis <- SCTransform(vis, assay = "Spatial")
+vis <- RunPCA(vis) %>% RunUMAP(dims = 1:15)
+vis <- FindNeighbors(vis, dims = 1:15) %>% FindClusters()
+
+# 空间分布图（簇贴回组织）
+SpatialPlot(vis, label = TRUE)
+
+# 把 scRNA 注释迁移到空间 spot
+anchors <- FindTransferAnchors(reference = sc_obj, query = vis,
+  features = VariableFeatures(sc_obj),
+  reference.assay = "SCT", query.assay = "SCT")
+vis <- AddMetaData(vis, metadata = TransferData(
+  anchors, refdata = sc_obj$celltype))
+SpatialPlot(vis, group.by = "celltype")`
+        }
+      ]
     }
   ]
 };

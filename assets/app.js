@@ -16,6 +16,7 @@
     { id: "playbook", name: "套路拆解", group: "more", fn: () => window.SXViewLib.playbook(document.getElementById("view")) },
     { id: "data", name: "数据中心", group: "more", fn: () => window.SXViewLib.data(document.getElementById("view")) },
     { id: "vault", name: "数据仓库", group: "more", fn: () => window.SXViewLib.vault(document.getElementById("view")) },
+    { id: "path", name: "学习路径", group: "more", fn: () => window.SXViewLib.paths(document.getElementById("view")) },
     { id: "write", name: "论文写作台", group: "more", fn: () => window.SXViewWrite.write(document.getElementById("view")) },
     { id: "tutor", name: "AI 导师", group: "more", fn: () => window.SXViewWrite.tutor(document.getElementById("view")) },
     { id: "account", name: "账号", group: "more", fn: () => window.SXViewAccount.render(document.getElementById("view")) },
@@ -35,6 +36,7 @@
     const mo = document.getElementById("navMore");
     if (mo) mo.querySelector("[data-more]").classList.toggle("on", item.group === "more");
     const v = document.getElementById("view");
+    v.className = "page" + (item.id === "course" ? " side-fixed" : "");
     v.innerHTML = "";
     try { item.fn(v); } catch (e) {
       v.innerHTML = '<div class="card"><b>页面加载出错</b><pre class="code">' + E(String(e && e.stack || e)) + "</pre></div>";

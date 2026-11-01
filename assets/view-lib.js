@@ -327,7 +327,7 @@
   }
 
   function knowledgeDraw(root) {
-    const K = (window.SX_KNOWLEDGE || []).concat(window.SX_KNOWLEDGE2 || [], window.SX_KNOWLEDGE3 || []);
+    const K = (window.SX_KNOWLEDGE || []).concat(window.SX_KNOWLEDGE2 || [], window.SX_KNOWLEDGE3 || [], window.SX_KNOWLEDGE4 || []);
     const dom = {};
     K.forEach(x => dom[x.domainName || x.domain] = x.domain);
     let curDom = "ALL", q = "", openId = null;
@@ -345,7 +345,7 @@
         (!q || (x.title + x.summary + x.body + (x.tags || []).join(" ")).toLowerCase().indexOf(q) >= 0));
       root.innerHTML = head("知识库", "共 " + K.length + " 条机制条目，每条带【和生信分析的连接】。") +
         '<div class="card" style="margin-bottom:18px">' +
-        '<div class="viz-h" style="margin-top:0">九个域 · 条目数 / 其中挂真实文献</div>' +
+        '<div class="viz-h" style="margin-top:0">' + Object.keys(dom).length + ' 个域 · 条目数 / 其中挂真实文献</div>' +
         vizBars(domStat()) + "</div>" +
         '<div class="search-bar">' +
         Object.keys(dom).map(n => '<button class="btn sm" data-d="' + E(dom[n]) + '"' +
@@ -424,6 +424,45 @@
     document.getElementById("qM").oninput = SX.debounce(() => {
       q = document.getElementById("qM").value.trim().toLowerCase(); draw();
     }, 250);
+  }
+
+  /* ==================== 学习路径（课程包） ==================== */
+  function paths(root) {
+    const P = window.SX_PATHS || [];
+    const C = window.SX_COURSE || { chapters: [] };
+    const allCH = (window.SX_COURSE0 ? [window.SX_COURSE0] : []).concat(C.chapters || []);
+    const titleOf = id => {
+      const ch = allCH.find(x => x.id === id);
+      return ch ? ch.title.replace(/^第 \d+ 讲　?/, "") : id;
+    };
+    if (!P.length) { root.innerHTML = '<div class="card">学习路径数据没加载。</div>'; return; }
+    let cur = P[0].id;
+    function draw() {
+      const p = P.find(x => x.id === cur) || P[0];
+      root.innerHTML = head("学习路径", "接到某类需求时，按这里串好的顺序点开课程，就是一套完整分析骨架。") +
+        '<div class="search-bar">' + P.map(p2 =>
+          '<button class="btn sm" data-p="' + E(p2.id) + '"' +
+          (cur === p2.id ? ' style="background:var(--brand);color:#fff;border-color:var(--brand)"' : "") +
+          ">" + E(p2.title) + "</button>").join(" ") + "</div>" +
+        '<div class="card" style="margin-top:14px">' +
+        "<h3 style=\"margin-top:0\">" + E(p.title) + "</h3>" +
+        '<div class="lec-plain">' + E(p.plain) + "</div>" +
+        (p.goal ? '<div class="lec-goal">走完这条路径你能：<ul style="margin:6px 0 0 18px;padding:0;list-style:disc">' +
+          p.goal.map(g => '<li style="margin:2px 0">' + E(g) + "</li>").join("") + "</ul></div>" : "") +
+        '<ol style="margin:14px 0 0;padding:0;list-style:none">' +
+        p.steps.map((s, i) =>
+          '<li style="display:flex;gap:12px;align-items:flex-start;padding:12px;border:1px solid var(--line);border-radius:8px;margin-bottom:10px;background:var(--panel)">' +
+          '<span style="flex:0 0 26px;height:26px;border-radius:50%;background:var(--brand);color:#fff;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700">' + (i + 1) + "</span>" +
+          '<div style="flex:1"><b>' + E(titleOf(s.course)) + "</b>" +
+          '<div class="small muted" style="margin:4px 0 8px">' + E(s.note) + "</div>" +
+          '<a class="btn sm" href="#/course" data-go-course="' + E(s.course) + '">去学习 ↗</a></div></li>'
+        ).join("") + "</ol></div>";
+      document.querySelectorAll("[data-p]").forEach(b => b.onclick = () => { cur = b.getAttribute("data-p"); draw(); });
+      document.querySelectorAll("[data-go-course]").forEach(a => a.onclick = () => {
+        window.__sxFocusCourse = a.getAttribute("data-go-course");
+      });
+    }
+    draw();
   }
 
   /* ==================== 数据中心 ==================== */
@@ -580,5 +619,5 @@
     };
   }
 
-  window.SXViewLib = { codebank, papers, playbook, knowledge, scripts, data, vault };
+  window.SXViewLib = { codebank, papers, playbook, knowledge, scripts, data, vault, paths };
 })();

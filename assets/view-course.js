@@ -125,6 +125,19 @@
     const flat = {};
     CH.forEach((ch, ci) => ch.subs.forEach((s, si) => { flat["c" + ci + "-" + si] = s.code; }));
 
+    /* 课程包深链：从「学习路径」点「去学习」进来，自动定位并展开对应讲 */
+    if (window.__sxFocusCourse) {
+      const fid = window.__sxFocusCourse; window.__sxFocusCourse = null;
+      const fi = CH.findIndex(ch => ch.id === fid);
+      if (fi >= 0) {
+        const sec = document.getElementById("lec" + fi);
+        if (sec) {
+          sec.scrollIntoView({ behavior: "smooth", block: "start" });
+          sec.querySelectorAll("details.sec").forEach(d => d.open = true);
+        }
+      }
+    }
+
     root.querySelectorAll("[data-run]").forEach(btn => {
       btn.onclick = async () => {
         const id = btn.getAttribute("data-run");
