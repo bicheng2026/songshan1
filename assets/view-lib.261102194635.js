@@ -39,7 +39,7 @@
   /* ==================== 代码库 ==================== */
   function codebank(root) {
     root.innerHTML = head("代码库", "正在载入代码模板…");
-    ensure("SX_CODEBANK2", "data/codebank2.261102190910.js").then(() => codebankDraw(root));
+    ensure("SX_CODEBANK2", "data/codebank2.261102194635.js").then(() => codebankDraw(root));
   }
 
   function codebankDraw(root) {
@@ -117,7 +117,7 @@
   /* ==================== 论文库 ==================== */
   function papers(root) {
     root.innerHTML = head("论文库", "正在载入论文库（3000+ 篇，首次约 1-2 秒）…");
-    ensure("SX_PAPERS2", "data/papers2.261102190910.js").then(() => papersDraw(root));
+    ensure("SX_PAPERS2", "data/papers2.261102194635.js").then(() => papersDraw(root));
   }
 
   function papersDraw(root) {
@@ -263,7 +263,7 @@
 
   function playbook(root) {
     root.innerHTML = head("套路拆解", "正在匹配代表作…");
-    ensure("SX_PAPERS2", "data/papers2.261102190910.js").then(() => playbookDraw(root));
+    ensure("SX_PAPERS2", "data/papers2.261102194635.js").then(() => playbookDraw(root));
   }
 
   function playbookDraw(root) {
@@ -303,10 +303,10 @@
   /* ==================== 知识库 ==================== */
   function knowledge(root) {
     root.innerHTML = head("知识库", "正在载入机制条目…");
-    ensure("SX_KNOWLEDGE2", "data/knowledge2.261102190910.js").then(() => knowledgeDraw(root));
+    ensure("SX_KNOWLEDGE2", "data/knowledge2.261102194635.js").then(() => knowledgeDraw(root));
   }
 
-  /* 机制条目的真实参考文献：data/know_cite.261102190910.js（Europe PMC 检索所得）*/
+  /* 机制条目的真实参考文献：data/know_cite.261102194635.js（Europe PMC 检索所得）*/
   function refsOf(id) {
     const C = window.SX_KNOW_CITE || {};
     return C[id] || [];
@@ -466,7 +466,7 @@
   }
 
   /* ==================== 数据中心 ==================== */
-  // 数据源清单已外置到 data/sources.261102190910.js（window.SX_SOURCES），便于持续扩充
+  // 数据源清单已外置到 data/sources.261102194635.js（window.SX_SOURCES），便于持续扩充
   const SOURCES = window.SX_SOURCES || [];
   function data(root) {
     const D = window.SX_DATA || {};
