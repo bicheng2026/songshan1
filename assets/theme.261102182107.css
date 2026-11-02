@@ -1198,6 +1198,11 @@ html[data-theme="light"] button.btn.primary:hover {
 .wr-sep { width: 1px; height: 20px; background: var(--line-strong); margin: 0 6px; }
 
 /* AI 导师页：左栏加宽，角色说明限两行，别在窄栏里折成一团 */
+.page.tutor-wide {
+    max-width: min(var(--page-w, 1180px), 1280px);
+    padding-left: clamp(18px, 4.5vw, 72px);
+    padding-right: clamp(18px, 4.5vw, 72px);
+}
 .page.tutor-wide .layout-2 { grid-template-columns: 360px minmax(0, 1fr); gap: 40px; }
 .page.tutor-wide #tutorList .lvrow { display: block; padding: 10px 12px; }
 .page.tutor-wide #tutorList .tiny {
