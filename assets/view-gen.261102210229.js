@@ -16,11 +16,9 @@
   ];
 
   const CHIPS = [
-    "csv 读取 + t 检验 + 箱线图",
-    "表达矩阵算均值方差",
+    "csv → t 检验 → 箱线图",
     "DESeq2 最小示例",
     "ggplot2 火山图",
-    "宽表转长表",
     "KM 生存曲线"
   ];
 
@@ -56,7 +54,7 @@
     const c = cfg();
 
     root.innerHTML =
-      '<div class="page-head"><h2>出代码</h2><p>说清要什么，出 R 代码，当场跑。</p></div>' +
+      '<div class="page-head gen-head"><h2>出代码</h2><p>说清要什么，出 R 代码，当场跑。</p></div>' +
       '<div class="gen-grid">' +
 
       '<div class="gen-main">' +
@@ -67,8 +65,8 @@
       '<div class="gen-chips">' +
       CHIPS.map(s => '<button class="gen-chip" data-fill="' + E(s) + '">' + E(s) + "</button>").join("") +
       "</div>" +
-      '<div class="gen-stage-f"><button class="btn primary" id="genGo">生成代码</button>' +
-      '<span class="gen-note">示例只填进框里，可以再改</span></div>' +
+      '<div class="gen-stage-f"><span class="gen-note">示例只填进框里，可以再改</span>' +
+      '<button class="btn primary" id="genGo">生成代码</button></div>' +
       "</div>" +
       '<div id="genOut"></div>' +
       "</div>" +
@@ -219,7 +217,7 @@
 
     function pickCode(t) {
       const m = /```(?:r|R)?\s*\n([\s\S]*?)```/.exec(t);
-      return (m ? m[1] : t).trim();
+      return (m ? m[1] : t).replace(/^\s*\n+|\s+$/g, "");
     }
 
     function show(code, q, model) {

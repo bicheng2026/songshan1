@@ -1215,8 +1215,8 @@ html[data-theme="light"] button.btn.primary:hover {
 
 /* 需求舞台：左侧 3px 竖脊，像记录本的页边标记 */
 .gen-stage {
-    position: relative; border: 1px solid var(--line-strong);
-    background: var(--panel-2); margin-bottom: calc(30px * var(--sp));
+    position: relative; border: 1px solid var(--line); border-left: none;
+    background: var(--panel); margin-bottom: calc(30px * var(--sp));
 }
 .gen-stage::before {
     content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 3px;
@@ -1228,33 +1228,35 @@ html[data-theme="light"] button.btn.primary:hover {
 .gen-lbl { font-size: calc(13px * var(--fs)); color: var(--ink-3); }
 .gen-stat { font-size: calc(12.5px * var(--fs)); color: var(--ink-3); font-family: var(--mono); }
 .gen-ta {
-    display: block; width: 100%; min-height: 88px; padding: 10px 22px 4px 24px;
+    display: block; width: 100%; min-height: 62px; padding: 10px 22px 4px 24px;
     background: transparent; border: none; outline: none; resize: vertical;
     color: var(--ink); font-family: var(--sans);
     font-size: calc(18px * var(--fs)); line-height: 1.72;
 }
 .gen-ta::placeholder { color: var(--ink-3); }
-.gen-chips { display: flex; flex-wrap: wrap; gap: 7px; padding: 6px 22px 16px 24px; }
+.gen-chips { display: flex; flex-wrap: wrap; gap: 6px; padding: 8px 22px 18px 24px; }
+.gen-chips .gen-chip { white-space: nowrap; }
 .gen-chip {
     font-size: calc(13px * var(--fs)); line-height: 1.5; color: var(--ink-2);
     background: transparent; border: 1px solid var(--line); border-radius: 2px;
     padding: 5px 11px; cursor: pointer;
 }
 .gen-chip:hover { border-color: var(--brand-line); color: var(--ink); background: var(--brand-soft); }
-.gen-stage-f { display: flex; align-items: center; gap: 14px; padding: 14px 22px 14px 24px; border-top: 1px solid var(--line); }
+.gen-stage-f { display: flex; align-items: center; justify-content: space-between; gap: 14px; padding: 13px 18px 13px 24px; border-top: 1px solid var(--line); }
 .gen-note { font-size: calc(12.5px * var(--fs)); line-height: 1.7; color: var(--ink-3); }
 
 /* 右侧栏 */
 .gen-side { display: flex; flex-direction: column; gap: 22px; position: sticky; top: 88px; }
 @media (max-width: 1080px) { .gen-side { position: static; } }
-.gen-panel { border: 1px solid var(--line); background: var(--panel); padding: 16px 18px 18px; }
+.gen-panel { border: 1px solid var(--line); background: transparent; padding: 15px 17px 17px; }
 .gen-panel-h {
     display: flex; align-items: center; justify-content: space-between;
     margin-bottom: 14px; font-size: calc(14px * var(--fs)); color: var(--ink);
 }
 .gen-dot { width: 7px; height: 7px; background: var(--ink-3); display: inline-block; }
 .gen-dot.on { background: var(--ok); box-shadow: 0 0 9px rgba(34, 227, 154, .8); }
-.gen-pres { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 16px; }
+.gen-pres { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px; margin-bottom: 16px; }
+.gen-pres button { text-align: center; }
 .gen-pres button {
     font-size: calc(12.5px * var(--fs)); line-height: 1.5; padding: 4px 9px;
     border: 1px solid var(--line); border-radius: 2px; background: transparent;
@@ -1264,7 +1266,13 @@ html[data-theme="light"] button.btn.primary:hover {
 .gen-pres button.on { border-color: var(--brand); color: var(--brand); background: var(--brand-soft); }
 .gen-f { display: block; margin-bottom: 12px; }
 .gen-f > span { display: block; font-size: calc(12.5px * var(--fs)); color: var(--ink-3); margin-bottom: 5px; }
-.gen-f input { width: 100%; }
+.gen-f input {
+    width: 100%; height: 34px; padding: 0 10px;
+    background: var(--bg-2); border: 1px solid var(--line); border-radius: 2px;
+    color: var(--ink); font-family: var(--mono); font-size: calc(12.5px * var(--fs));
+}
+.gen-f input::placeholder { color: var(--ink-3); }
+.gen-f input:focus { background: var(--panel-2); }
 .gen-clear { font-size: calc(12.5px * var(--fs)); color: var(--ink-3); background: none; border: none; cursor: pointer; padding: 0; }
 .gen-clear:hover { color: var(--brand); }
 .gh-item { padding: 9px 0; border-bottom: 1px solid var(--line); cursor: pointer; }
@@ -1282,15 +1290,16 @@ html[data-theme="light"] button.btn.primary:hover {
 .gen-file { font-family: var(--mono); font-size: calc(13px * var(--fs)); color: var(--brand); }
 .gen-meta { font-family: var(--mono); font-size: calc(12px * var(--fs)); color: var(--ink-3); flex: 1 1 auto; }
 .gen-code { max-height: 480px; overflow: auto; padding: 12px 0; }
-.cl { display: grid; grid-template-columns: 52px minmax(0, 1fr); min-width: max-content; }
+.cl { display: grid; grid-template-columns: 42px minmax(0, 1fr); min-width: max-content; }
 .cl:hover { background: rgba(0, 229, 255, .045); }
 .cl > b {
-    font-family: var(--mono); font-weight: 400; font-size: calc(12.5px * var(--fs));
-    color: var(--ink-3); text-align: right; padding-right: 14px; user-select: none;
+    font-family: var(--mono); font-weight: 400; font-size: calc(12px * var(--fs));
+    color: var(--ink-3); text-align: right; padding-right: 11px; user-select: none;
+    border-right: 1px solid var(--line);
 }
 .cl > span {
-    font-family: var(--mono); font-size: calc(13.5px * var(--fs)); line-height: 1.7;
-    color: var(--ink); white-space: pre; padding-right: 18px;
+    font-family: var(--mono); font-size: calc(14px * var(--fs)); line-height: 1.72;
+    color: var(--ink); white-space: pre; padding: 0 18px 0 13px;
 }
 .gen-term { border-top: 1px solid var(--line); background: var(--out-bg); }
 .gen-term-h { padding: 8px 16px; font-size: calc(12.5px * var(--fs)); color: var(--ink-3); border-bottom: 1px solid var(--line); }
@@ -1313,6 +1322,14 @@ html[data-theme="light"] button.btn.primary:hover {
 .gen-err b { font-size: calc(15px * var(--fs)); }
 
 .gen-empty {
-    padding: 26px 24px; border: 1px dashed var(--line-strong);
-    font-size: calc(14px * var(--fs)); color: var(--ink-3);
+    padding: 6px 0 6px 20px; border-left: 2px solid var(--line-strong);
+    font-size: calc(14px * var(--fs)); color: var(--ink-3); line-height: 1.8;
 }
+
+/* 这页是工具，标题不用杂志那么大一坨 */
+.gen-head { margin-bottom: calc(30px * var(--sp)); }
+.gen-head h2 { font-size: calc(38px * var(--fs)); margin-bottom: calc(10px * var(--sp)); }
+.gen-head h2::before { margin-bottom: calc(16px * var(--sp)); }
+.gen-head p { font-size: calc(16.5px * var(--fs)); }
+
+.gen-stage-f .btn.primary { padding: 9px 22px; font-size: calc(15px * var(--fs)); }
