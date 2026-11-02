@@ -334,7 +334,7 @@
   }
 
   function loadIndex() {
-    ensure("SX_PAPERS2", "data/papers2.261102182107.js").then(() => {
+    ensure("SX_PAPERS2", "data/papers2.261102184006.js").then(() => {
       const A = window.SX_PAPERS || [];
       const B = window.SX_PAPERS2 || [];
       const seen = {};
