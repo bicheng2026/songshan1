@@ -170,7 +170,7 @@ window.SX_COURSE = {
         }
       ],
       "rec": {
-        "u": "https://4007218689.share.123pan.cn/123pan/2rzowh-GFk6d",
+        "u": "https://4007218689.share.123pan.cn/123pan/2rzowh-aeW6d",
         "files": [
           "Class2-1.mp4",
           "Class2-2.mp4",
@@ -283,7 +283,7 @@ window.SX_COURSE = {
         }
       ],
       "rec": {
-        "u": "https://4007218689.share.123pan.cn/123pan/2rzowh-GFk6d",
+        "u": "https://4007218689.share.123pan.cn/123pan/2rzowh-8G3Vd",
         "files": [
           "Class3-1.mp4",
           "Class3-2.mp4",
@@ -394,7 +394,7 @@ window.SX_COURSE = {
         }
       ],
       "rec": {
-        "u": "https://4007218689.share.123pan.cn/123pan/2rzowh-GFk6d",
+        "u": "https://4007218689.share.123pan.cn/123pan/2rzowh-Q8ayd",
         "files": [
           "Class4-1.mp4",
           "Class4-2.mp4",
@@ -716,7 +716,7 @@ window.SX_COURSE = {
         }
       ],
       "rec": {
-        "u": "https://4007218689.share.123pan.cn/123pan/2rzowh-GFk6d",
+        "u": "https://4007218689.share.123pan.cn/123pan/2rzowh-E8ayd",
         "files": [
           "Class5-1.mp4",
           "Class5-2.mp4",
@@ -833,7 +833,7 @@ window.SX_COURSE = {
         }
       ],
       "rec": {
-        "u": "https://4007218689.share.123pan.cn/123pan/2rzowh-GFk6d",
+        "u": "https://4007218689.share.123pan.cn/123pan/2rzowh-fPYyd",
         "files": [
           "Class6-1.mp4",
           "Class6-2.mp4",
@@ -1045,7 +1045,7 @@ window.SX_COURSE = {
         }
       ],
       "rec": {
-        "u": "https://4007218689.share.123pan.cn/123pan/2rzowh-GFk6d",
+        "u": "https://4007218689.share.123pan.cn/123pan/2rzowh-FxoVd",
         "files": [
           "Class8-1.mp4",
           "Class8-2.mp4",
@@ -1151,7 +1151,7 @@ window.SX_COURSE = {
         }
       ],
       "rec": {
-        "u": "https://4007218689.share.123pan.cn/123pan/2rzowh-GFk6d",
+        "u": "https://4007218689.share.123pan.cn/123pan/2rzowh-YxoVd",
         "files": [
           "Class9-1.mp4",
           "Class9-2.mp4",
@@ -1254,7 +1254,7 @@ window.SX_COURSE = {
         }
       ],
       "rec": {
-        "u": "https://4007218689.share.123pan.cn/123pan/2rzowh-GFk6d",
+        "u": "https://4007218689.share.123pan.cn/123pan/2rzowh-GxoVd",
         "files": [
           "Class10-1.mp4",
           "Class10-2.mp4",
