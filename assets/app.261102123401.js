@@ -8,6 +8,7 @@
     { id: "map", name: "修炼地图", group: "main", fn: map },
     { id: "course", name: "通用课程", group: "main", fn: () => window.SXViewCourse.render(document.getElementById("view")) },
     { id: "dojo", name: "代码道场", group: "main", fn: () => window.SXViewDojo.render(document.getElementById("view")) },
+    { id: "practice", name: "练习台", group: "main", fn: () => window.SXViewPractice.render(document.getElementById("view")) },
     { id: "litfind", name: "找文献", group: "main", fn: () => window.SXViewLit.render(document.getElementById("view")) },
     { id: "gen", name: "出代码", group: "main", fn: () => window.SXViewGen.render(document.getElementById("view")) },
     { id: "knowledge", name: "知识库", group: "more", fn: () => window.SXViewLib.knowledge(document.getElementById("view")) },
@@ -35,7 +36,8 @@
     const mo = document.getElementById("navMore");
     if (mo) mo.querySelector("[data-more]").classList.toggle("on", item.group === "more");
     const v = document.getElementById("view");
-    v.className = "page" + (item.id === "course" ? " side-fixed" : "");
+    const PAGE_CLS = { course: " side-fixed", tutor: " tutor-wide" };
+    v.className = "page" + (PAGE_CLS[item.id] || "");
     v.innerHTML = "";
     try { item.fn(v); } catch (e) {
       v.innerHTML = '<div class="card"><b>页面加载出错</b><pre class="code">' + E(String(e && e.stack || e)) + "</pre></div>";

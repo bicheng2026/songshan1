@@ -1,7 +1,7 @@
 // 自动生成：_build/gen_myscripts.py（本机 R 代码资产盘点，已去重）
 window.SX_MYSCRIPTS = [
   {
-    path: "E:\\课程资料库\\生信课程\\SHENGXIN\\代码.R",
+    path: "E:\\苏州河一号\\小陈课程10class\\SHENGXIN\\代码.R",
     kb: 150, lines: 4094,
     title: "课程全量总代码（Class1–10）",
     track: "bulk", trackName: "Bulk RNA-seq",
@@ -11,7 +11,7 @@ window.SX_MYSCRIPTS = [
     pitfalls: ["课上跟着敲过 ≠ 会独立用：WGCNA/LASSO/tableone 在本机其它脚本里从未二次出现"]
   },
   {
-    path: "E:\\课程资料库\\生信课程\\SHENGXIN\\作业代码\\作业1.R",
+    path: "E:\\苏州河一号\\小陈课程10class\\SHENGXIN\\作业代码\\作业1.R",
     kb: 4.8, lines: 115,
     title: "TCGA-LUAD 下载与 counts/tpms 整理",
     track: "bulk", trackName: "Bulk RNA-seq",
@@ -21,7 +21,7 @@ window.SX_MYSCRIPTS = [
     pitfalls: ["TCGA barcode 第 14-15 位是样本类型：01A 是肿瘤、11A 是癌旁，切样本必须靠它"]
   },
   {
-    path: "E:\\课程资料库\\生信课程\\SHENGXIN\\作业代码\\作业2.R",
+    path: "E:\\苏州河一号\\小陈课程10class\\SHENGXIN\\作业代码\\作业2.R",
     kb: 3.9, lines: 112,
     title: "BTK 在 LUAD 的表达图与 GSEA",
     track: "bulk", trackName: "Bulk RNA-seq",
@@ -31,7 +31,7 @@ window.SX_MYSCRIPTS = [
     pitfalls: []
   },
   {
-    path: "E:\\课程资料库\\生信课程\\SHENGXIN\\作业代码\\作业3.R",
+    path: "E:\\苏州河一号\\小陈课程10class\\SHENGXIN\\作业代码\\作业3.R",
     kb: 6.1, lines: 148,
     title: "ESTIMATE + CIBERSORT + 相关性",
     track: "immune", trackName: "免疫浸润",
@@ -41,7 +41,7 @@ window.SX_MYSCRIPTS = [
     pitfalls: ["preprocessCore 在 Windows 上常需从源码编译，是 CIBERSORT 跑不起来最常见的卡点观"]
   },
   {
-    path: "E:\\课程资料库\\生信课程\\SHENGXIN\\作业代码\\作业4.R",
+    path: "E:\\苏州河一号\\小陈课程10class\\SHENGXIN\\作业代码\\作业4.R",
     kb: 15, lines: 358,
     title: "LUAD 生存分析四件套",
     track: "surv", trackName: "生存分析",
@@ -51,7 +51,7 @@ window.SX_MYSCRIPTS = [
     pitfalls: ["surv_cutpoint 自动取截断是把双刃剑：它挑的是最显著的点，容易把显著性吹高"]
   },
   {
-    path: "E:\\课程资料库\\生信课程\\SHENGXIN\\作业代码\\作业5.R",
+    path: "E:\\苏州河一号\\小陈课程10class\\SHENGXIN\\作业代码\\作业5.R",
     kb: 7.9, lines: 241,
     title: "按免疫/基质评分分组取交集做富集",
     track: "immune", trackName: "免疫浸润",
@@ -61,7 +61,7 @@ window.SX_MYSCRIPTS = [
     pitfalls: []
   },
   {
-    path: "E:\\课程资料库\\生信课程\\SHENGXIN\\作业代码\\作业6-1.R",
+    path: "E:\\苏州河一号\\小陈课程10class\\SHENGXIN\\作业代码\\作业6-1.R",
     kb: 3.8, lines: 83,
     title: "单/多因素 Cox 与森林图",
     track: "surv", trackName: "生存分析",
@@ -71,7 +71,7 @@ window.SX_MYSCRIPTS = [
     pitfalls: []
   },
   {
-    path: "E:\\课程资料库\\生信课程\\SHENGXIN\\作业代码\\6-2.R",
+    path: "E:\\苏州河一号\\小陈课程10class\\SHENGXIN\\作业代码\\6-2.R",
     kb: 50, lines: 1328,
     title: "TCGA-COAD 完整毕设套路",
     track: "bulk", trackName: "Bulk RNA-seq",
@@ -81,7 +81,7 @@ window.SX_MYSCRIPTS = [
     pitfalls: ["这是本机唯一一份「从下载写到讨论」的闭环脚本，值得反复拆解"]
   },
   {
-    path: "E:\\课程资料库\\生信课程\\SHENGXIN\\TCGA-STAD\\TMB\\基因分高低组画瀑布图.R",
+    path: "E:\\苏州河一号\\小陈课程10class\\SHENGXIN\\TCGA-STAD\\TMB\\基因分高低组画瀑布图.R",
     kb: 2.7, lines: 53,
     title: "CDKN3 高低组的 TOP30 突变瀑布图",
     track: "bulk", trackName: "Bulk RNA-seq",
@@ -91,7 +91,7 @@ window.SX_MYSCRIPTS = [
     pitfalls: []
   },
   {
-    path: "E:\\学习资料\\练习资料\\一号\\一号.R",
+    path: "E:\\长江一号\\湘江一号\\一号\\一号.R",
     kb: 3.3, lines: 88,
     title: "R 语法第一天",
     track: "rbase", trackName: "R 基础",
@@ -101,7 +101,7 @@ window.SX_MYSCRIPTS = [
     pitfalls: []
   },
   {
-    path: "E:\\学习资料\\练习资料\\二号\\二号.R",
+    path: "E:\\长江一号\\湘江一号\\二号\\二号.R",
     kb: 18, lines: 344,
     title: "TCGA-STAD 下载到差异分析",
     track: "bulk", trackName: "Bulk RNA-seq",
@@ -111,7 +111,7 @@ window.SX_MYSCRIPTS = [
     pitfalls: ["setwd 跳迷宫（TCGA-STAD → .. → T_N_DEG）在后期项目里被 00_config.R 取代，对比着看很直观"]
   },
   {
-    path: "E:\\学习资料\\练习资料\\三号\\三号\\三号.R",
+    path: "E:\\长江一号\\湘江一号\\三号\\三号\\三号.R",
     kb: 30, lines: 564,
     title: "CDKN3 分组 DEG + GO/KEGG/GSEA",
     track: "bulk", trackName: "Bulk RNA-seq",
@@ -121,7 +121,7 @@ window.SX_MYSCRIPTS = [
     pitfalls: ["脚本里有长段注释解释「富集结果为什么按 P 值排而不是按 Count 排」——这是真理解了，不是抄的"]
   },
   {
-    path: "E:\\R练习\\四号.R",
+    path: "E:\\四号\\四号.R",
     kb: 20.6, lines: 469,
     title: "免疫浸润四件套",
     track: "immune", trackName: "免疫浸润",
