@@ -1,12 +1,22 @@
 <!DOCTYPE html>
+<!--
+  嵩山一号 · 科研训练工作站　v1.0
+  Copyright (c) 2026 江德胜　保留所有权利 (All Rights Reserved)
+  著作权人：江德胜　|　版本：1.0　|　发布日期：2026-11-03
+  未经著作权人书面许可，不得复制、修改、分发或用于商业用途。
+  第三方文献、数据集、软件包的著作权归各自权利人所有，详见 COPYRIGHT.md。
+-->
 <html lang="zh-CN">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="description" content="嵩山一号 · 科研训练工作站：浏览器内直接跑 R 的生信训练站。11 讲 36 节课程、27 关 81 个代码任务、212 条机制词典（全部挂真实文献）、3314 篇论文、141 个代码模板。">
+<meta name="author" content="江德胜">
+<meta name="copyright" content="Copyright (c) 2026 江德胜. All Rights Reserved.">
+<meta name="generator" content="嵩山一号 科研训练工作站 v1.0">
 <meta name="theme-color" content="#000000">
 <title>嵩山一号 · 科研训练工作站</title>
-<link rel="stylesheet" href="assets/theme.20261102230305.css">
+<link rel="stylesheet" href="assets/theme.20261103002116.css">
 <script>
 /* 首屏先套用已保存的字号/行距/留白，避免闪一下再变 */
 (function () {
@@ -47,53 +57,60 @@
 
 <main class="wrap">
   <div class="page" id="view"></div>
+  <footer class="sitefoot" role="contentinfo">
+    <span class="sf-brand">嵩山一号 · 科研训练工作站</span>
+    <span class="sf-dot">/</span>
+    <span>v1.0</span>
+    <span class="sf-dot">/</span>
+    <span>© 2026 <b>江德胜</b> 保留所有权利</span>
+  </footer>
 </main>
 
 <div class="toast" id="toast" style="display:none"></div>
 
 <!-- 数据层 -->
-<script src="data/data.20261102230305.js"></script>
-<script src="data/papers.20261102230305.js"></script>
-<script src="data/sources.20261102230305.js"></script>
-<script src="data/codebank.20261102230305.js"></script>
-<script src="data/codebank3.20261102230305.js"></script>
-<script src="data/seed_notes.20261102230305.js"></script>
-    <script src="data/knowledge.20261102230305.js"></script>
-    <script src="data/knowledge2.20261102230305.js"></script>
-    <script src="data/knowledge3.20261102230305.js"></script>
-<script src="data/knowledge4.20261102230305.js"></script>
-<script src="data/knowledge5.20261102230305.js"></script>
-<script src="data/knowledge6.20261102230305.js"></script>
-<script src="data/levels_core.20261102230305.js"></script>
-<script src="data/levels_adv.20261102230305.js"></script>
-<script src="data/examples.20261102230305.js"></script>
-<script src="data/course.20261102230305.js"></script>
-<script src="data/course0.20261102230305.js"></script>
-<script src="data/videos.20261102230305.js"></script>
-<script src="data/digest.20261102230305.js"></script>
-<script src="data/paper_ext.20261102230305.js"></script>
-<script src="data/litports.20261102230305.js"></script>
-<script src="data/playbook.20261102230305.js"></script>
-<script src="data/know_cite.20261102230305.js"></script>
-<script src="data/paths.20261102230305.js"></script>
-<script src="data/writing.20261102230305.js"></script>
-<script src="data/tutors.20261102230305.js"></script>
+<script src="data/data.20261103002116.js"></script>
+<script src="data/papers.20261103002116.js"></script>
+<script src="data/sources.20261103002116.js"></script>
+<script src="data/codebank.20261103002116.js"></script>
+<script src="data/codebank3.20261103002116.js"></script>
+<script src="data/seed_notes.20261103002116.js"></script>
+    <script src="data/knowledge.20261103002116.js"></script>
+    <script src="data/knowledge2.20261103002116.js"></script>
+    <script src="data/knowledge3.20261103002116.js"></script>
+<script src="data/knowledge4.20261103002116.js"></script>
+<script src="data/knowledge5.20261103002116.js"></script>
+<script src="data/knowledge6.20261103002116.js"></script>
+<script src="data/levels_core.20261103002116.js"></script>
+<script src="data/levels_adv.20261103002116.js"></script>
+<script src="data/examples.20261103002116.js"></script>
+<script src="data/course.20261103002116.js"></script>
+<script src="data/course0.20261103002116.js"></script>
+<script src="data/videos.20261103002116.js"></script>
+<script src="data/digest.20261103002116.js"></script>
+<script src="data/paper_ext.20261103002116.js"></script>
+<script src="data/litports.20261103002116.js"></script>
+<script src="data/playbook.20261103002116.js"></script>
+<script src="data/know_cite.20261103002116.js"></script>
+<script src="data/paths.20261103002116.js"></script>
+<script src="data/writing.20261103002116.js"></script>
+<script src="data/tutors.20261103002116.js"></script>
 
 <!-- 逻辑层 -->
-<script src="assets/store.20261102230305.js"></script>
-<script src="assets/webr.20261102230305.js"></script>
-  <script src="assets/view-dojo.20261102230305.js"></script>
-  <script src="assets/view-practice.20261102230305.js"></script>
-  <script src="assets/view-course.20261102230305.js"></script>
-<script src="assets/view-lib.20261102230305.js"></script>
-<script src="assets/view-lit.20261102230305.js"></script>
-<script src="assets/view-gen.20261102230305.js"></script>
-<script src="assets/view-write.20261102230305.js"></script>
-<script src="assets/tutor-dock.20261102230305.js"></script>
-<script src="assets/account.20261102230305.js"></script>
-<script src="assets/view-account.20261102230305.js"></script>
-<script src="assets/view-space.20261102230305.js"></script>
-<script src="assets/app.20261102230305.js"></script>
-<script src="assets/prefs.20261102230305.js"></script>
+<script src="assets/store.20261103002116.js"></script>
+<script src="assets/webr.20261103002116.js"></script>
+  <script src="assets/view-dojo.20261103002116.js"></script>
+  <script src="assets/view-practice.20261103002116.js"></script>
+  <script src="assets/view-course.20261103002116.js"></script>
+<script src="assets/view-lib.20261103002116.js"></script>
+<script src="assets/view-lit.20261103002116.js"></script>
+<script src="assets/view-gen.20261103002116.js"></script>
+<script src="assets/view-write.20261103002116.js"></script>
+<script src="assets/tutor-dock.20261103002116.js"></script>
+<script src="assets/account.20261103002116.js"></script>
+<script src="assets/view-account.20261103002116.js"></script>
+<script src="assets/view-space.20261103002116.js"></script>
+<script src="assets/app.20261103002116.js"></script>
+<script src="assets/prefs.20261103002116.js"></script>
 </body>
 </html>

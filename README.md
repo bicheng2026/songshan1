@@ -1,5 +1,9 @@
 # 嵩山一号 · 科研工作站
 
+> **v1.0**　Copyright © 2026 **江德胜**　保留所有权利（All Rights Reserved）
+> 著作权人：江德胜　|　版本：1.0　|　首次发布：2026-11-03　|　详见 [COPYRIGHT.md](COPYRIGHT.md)
+
+
 一个**纯静态、零后端、打开即用**的生信科研训练站：能读论文、写代码、跑 R、存数据、学机制、练写作、问导师。
 
 - **GitHub Pages**：https://bicheng2026.github.io/songshan1/
@@ -68,6 +72,20 @@ python -m http.server 8901
 - AI 导师的 API Key 只存在你的浏览器 localStorage，只发往你填写的地址。
 - 本仓库的 `dist/` 为脱敏发布版，已去除个人姓名、院校与指导老师姓名。
 
-## 许可
+## 版权与许可
 
-代码 MIT。论文元数据来自 Europe PMC，数据集为教学用途的合成数据。
+**Copyright © 2026 江德胜　保留所有权利（All Rights Reserved）**
+
+本项目（含页面设计、程序代码、课程体系、题库、机制词典、文档）为江德胜的原创作品，自创作完成之日起受著作权法保护。
+
+- **允许**：个人学习、教学演示、学术讨论中浏览与阅读；学术写作中注明出处后引用结论与数据。
+- **需事先书面许可**：复制、转载、镜像、分发；修改、改编、二次开发；任何商业用途；移除或篡改版权标识与署名。
+
+第三方素材的权利归各自权利人所有，不受上述声明主张：
+
+- 论文题录与摘要来自 Europe PMC / PubMed，著作权归原作者与出版方；
+- 示例数据为教学用合成数据；
+- R 包（Seurat、DESeq2、clusterProfiler 等）、WebR、RStudio Server 遵循各自开源许可证。
+
+完整条款见 [COPYRIGHT.md](COPYRIGHT.md)。
+
