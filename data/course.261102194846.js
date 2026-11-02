@@ -16,13 +16,7 @@ window.SX_COURSE = {
           "u": "https://www.bilibili.com/video/BV1cs411j75B"
         }
       ],
-      "rec": {
-        "u": "https://4007218689.share.123pan.cn/123pan/2rzowh-GFk6d",
-        "files": [
-          "class1-1.mp4",
-          "class1-2.mp4"
-        ]
-      },
+      "rec": { "u": "", "files": [] },
       "refs": [
         {
           "n": "Biomamba《手把手教你做单细胞转录组测序数据分析》",
@@ -490,7 +484,7 @@ window.SX_COURSE = {
     {
       "id": "bk",
       "title": "专题 · Bulk RNA-seq 专章：从 counts 到免疫浸润（整合你的一号~四号 + 小陈录播）",
-      "plain": "你的一号~四号笔记（R 基础、TCGA/DESeq2、GO-KEGG/GSEA、ESTIMATE/CIBERSORT/ssGSEA/xCell）就是一套完整的 bulk RNA-seq 主线。本章把它们整章串起来动手跑一遍。【与 k2/k3/k4 的关系，先看这段】k2（TCGA 下载与差异）、k3（富集 ORA/GSEA）、k4（免疫浸润）三讲已经把每个环节的「原理」讲透——为什么这么算、坑在哪。本章不重复原理，而是跟着主公笔记和小陈视频把整条流程真正跑通：每一步都给一段 base R 能直接跑的原理代码，和一段标了真实包名的实战写法。原理卡壳就回去翻对应 k 讲，本章价值在「完整走通 + 小陈录播」。配套视频全部用小陈自己的录播（123 网盘，免登录）。文件与本专章各节对应：class1-1/1-2 = R 基础（第1节）；Class2-1~4 = TCGA 下载与差异分析（第2节）；Class3-1~6 = 富集 / GSEA（第3、4节）；Class4-1~6 = 免疫浸润（第5节）。点开分享链接后，按文件名对应到对应小节即可。",
+      "plain": "你的一号~四号笔记（R 基础、TCGA/DESeq2、GO-KEGG/GSEA、ESTIMATE/CIBERSORT/ssGSEA/xCell）就是一套完整的 bulk RNA-seq 主线。本章把它们整章串起来动手跑一遍。【与 k2/k3/k4 的关系，先看这段】k2（TCGA 下载与差异）、k3（富集 ORA/GSEA）、k4（免疫浸润）三讲已经把每个环节的「原理」讲透——为什么这么算、坑在哪。本章不重复原理，而是跟着主公笔记和小陈视频把整条流程真正跑通：每一步都给一段 base R 能直接跑的原理代码，和一段标了真实包名的实战写法。原理卡壳就回去翻对应 k 讲，本章价值在「完整走通 + 小陈录播」。配套视频全部用小陈自己的录播（123 网盘，免登录）。每节下方都给了对应的 Class 文件夹链接（123 网盘，免登录）：点开后在文件夹里按本节标注的文件名点开即可。不再是原来 50 文件的大文件夹——每节只对应自己的 Class，找起来清爽很多。",
       "goal": [
         "能从 TCGA/GEO 拿到原始 counts 矩阵，并完成 Ensembl/探针 ID → 基因名 的转换",
         "能用 DESeq2 跑通差异分析，说清归一化、离散度估计、Wald 检验各自在干什么",
@@ -498,29 +492,7 @@ window.SX_COURSE = {
         "能做 ORA 富集和 GSEA，知道两者问的根本不是同一个问题",
         "能用 ESTIMATE/CIBERSORT/ssGSEA/xCell 反卷积免疫浸润，并分清比例与分数"
       ],
-      "rec": {
-        "u": "https://4007218689.share.123pan.cn/123pan/2rzowh-GFk6d",
-        "files": [
-          "class1-1.mp4",
-          "class1-2.mp4",
-          "Class2-1.mp4",
-          "Class2-2.mp4",
-          "Class2-3.mp4",
-          "Class2-4.mp4",
-          "Class3-1.mp4",
-          "Class3-2.mp4",
-          "Class3-3.mp4",
-          "Class3-4.mp4",
-          "Class3-5.mp4",
-          "Class3-6.mp4",
-          "Class4-1.mp4",
-          "Class4-2.mp4",
-          "Class4-3.mp4",
-          "Class4-4.mp4",
-          "Class4-5.mp4",
-          "Class4-6.mp4"
-        ]
-      },
+      "rec": { "u": "", "files": [] },
       "refs": [
         {
           "n": "DESeq2 官方 vignette",
@@ -550,7 +522,7 @@ window.SX_COURSE = {
       "subs": [
         {
           "t": "1 · 拿到 counts 矩阵：下载、整理与 ID 转换",
-          "vid": { "u": "https://4007218689.share.123pan.cn/123pan/2rzowh-GFk6d", "n": "本节录播", "files": ["class1-1.mp4", "class1-2.mp4"] },
+          "vid": { "u": "https://4007218689.share.123pan.cn/123pan/2rzowh-feW6d", "n": "本节录播", "files": ["class1-1.mp4", "class1-2.mp4"] },
           "why": "你拿到的表格格子是「这个数在多少条 reads 里」，不是「表达高不高」。TCGA 给 Ensembl ID（带版本号 ENSG0000xxx.1），GEO 芯片给探针 ID，都得先转成基因名才能往下做。",
           "pts": [
             "TCGA 用 TCGAbiolinks 下 STAR - Counts（原始计数），绝不拿 TPM/FPKM 喂 DESeq2",
@@ -566,7 +538,7 @@ window.SX_COURSE = {
         },
         {
           "t": "2 · DESeq2 差异分析：count → DEG list",
-          "vid": { "u": "https://4007218689.share.123pan.cn/123pan/2rzowh-GFk6d", "n": "本节录播", "files": ["Class2-1.mp4", "Class2-2.mp4", "Class2-3.mp4", "Class2-4.mp4"] },
+          "vid": { "u": "https://4007218689.share.123pan.cn/123pan/2rzowh-aeW6d", "n": "本节录播", "files": ["Class2-1.mp4", "Class2-2.mp4", "Class2-3.mp4", "Class2-4.mp4"] },
           "why": "差异分析本质是对每个基因做「两组计数是否真的不同」的假设检验，同时估计归一化因子抵消文库大小，再用负二项分布建模离散度。",
           "pts": [
             "DESeqDataSetFromMatrix 吃原始 counts，design = ~ group",
@@ -582,7 +554,7 @@ window.SX_COURSE = {
         },
         {
           "t": "3 · 火山图与热图：把差异结果画出来",
-          "vid": { "u": "https://4007218689.share.123pan.cn/123pan/2rzowh-GFk6d", "n": "本节录播", "files": ["Class3-1.mp4", "Class3-2.mp4", "Class3-3.mp4", "Class3-4.mp4", "Class3-5.mp4", "Class3-6.mp4"] },
+          "vid": { "u": "https://4007218689.share.123pan.cn/123pan/2rzowh-8G3Vd", "n": "本节录播", "files": ["Class3-1.mp4", "Class3-2.mp4", "Class3-3.mp4", "Class3-4.mp4", "Class3-5.mp4", "Class3-6.mp4"] },
           "why": "火山图一眼看「又显著又变化大」的基因；热图看一批基因在样本间的表达模式。两者都是差异分析的门面。",
           "pts": [
             "火山图 x=log2FC, y=-log10(padj)，画阈值线",
@@ -598,7 +570,7 @@ window.SX_COURSE = {
         },
         {
           "t": "4 · 富集分析：ORA 与 GSEA 根本不是一回事",
-          "vid": { "u": "https://4007218689.share.123pan.cn/123pan/2rzowh-GFk6d", "n": "本节录播（与第3节同批视频）", "files": ["Class3-1.mp4", "Class3-2.mp4", "Class3-3.mp4", "Class3-4.mp4", "Class3-5.mp4", "Class3-6.mp4"] },
+          "vid": { "u": "https://4007218689.share.123pan.cn/123pan/2rzowh-8G3Vd", "n": "本节录播（与第3节同批视频）", "files": ["Class3-1.mp4", "Class3-2.mp4", "Class3-3.mp4", "Class3-4.mp4", "Class3-5.mp4", "Class3-6.mp4"] },
           "why": "ORA（超几何检验）问的是「差异基因里某个通路的基因是不是扎堆了」；GSEA 问的是「按表达变化排好序的全基因列表里，某通路的基因是不是整体靠前」。一个只看显著基因，一个用全基因排名。",
           "pts": [
             "ORA 用 enrichGO/enrichKEGG，背景集要选对",
@@ -614,7 +586,7 @@ window.SX_COURSE = {
         },
         {
           "t": "5 · 免疫浸润：ESTIMATE / CIBERSORT / ssGSEA / xCell",
-          "vid": { "u": "https://4007218689.share.123pan.cn/123pan/2rzowh-GFk6d", "n": "本节录播", "files": ["Class4-1.mp4", "Class4-2.mp4", "Class4-3.mp4", "Class4-4.mp4", "Class4-5.mp4", "Class4-6.mp4"] },
+          "vid": { "u": "https://4007218689.share.123pan.cn/123pan/2rzowh-Q8ayd", "n": "本节录播", "files": ["Class4-1.mp4", "Class4-2.mp4", "Class4-3.mp4", "Class4-4.mp4", "Class4-5.mp4", "Class4-6.mp4"] },
           "why": "一块组织混着多种细胞，测序只给混合平均值。反卷积就是用一份「参考特征」把混合信号拆回各细胞类型的占比/分数。四种方法给的东西不一样：ESTIMATE 给基质/免疫分数，CIBERSORT 给 22 种免疫细胞比例，ssGSEA/xCell 给富集分数（不是百分比）。",
           "pts": [
             "CIBERSORT 输出比例（加起来≈1），需网页版或自带 LM22 矩阵",
@@ -630,7 +602,7 @@ window.SX_COURSE = {
         },
         {
           "t": "6 · 相关性热图与接回单细胞",
-          "vid": { "u": "https://4007218689.share.123pan.cn/123pan/2rzowh-GFk6d", "n": "本节衔接单细胞，无单独录播（复用第5节视频即可）", "files": [] },
+          "vid": { "u": "https://4007218689.share.123pan.cn/123pan/2rzowh-Q8ayd", "n": "本节衔接单细胞，无单独录播（复用第5节视频即可）", "files": [] },
           "why": "算基因间/样本间相关性是 bulk 里最常做的探索；做完 bulk，再上单细胞看「哪些细胞在驱动这些信号」，两层的结论才闭环。",
           "pts": [
             "cor() 算相关性，heatmap 可视化",
@@ -643,6 +615,84 @@ window.SX_COURSE = {
             "pkg": "Seurat",
             "code": "library(Seurat)\nIdents(sc) <- sc$celltype\n# 把 bulk 差异基因拿去单细胞验证：哪群细胞在驱动\nVlnPlot(sc, features = head(deg_symbols), group.by = \"celltype\")"
           }
+        }
+      ]
+    },
+    {
+      "id": "vc",
+      "title": "专题 · 小陈全套生信录播总索引（10 个 Class · 123 网盘 · 免登录）",
+      "plain": "小陈的生信录播一共 10 个 Class（Class1~Class10）。每个 Class 都是一个独立的 123 网盘文件夹（免登录），点开后在文件夹里按文件名点对应视频即可。本索引把 10 个文件夹一次性列齐，方便你按自己的进度跳着看。Class7 暂未提供分享链接，补上后会自动出现。",
+      "goal": ["随时找到任意 Class 的录播", "点开即免登录看，不用注册"],
+      "subs": [
+        {
+          "t": "Class1 · 全套录播（R 基础 / R & RStudio 安装）",
+          "vid": { "u": "https://4007218689.share.123pan.cn/123pan/2rzowh-feW6d", "n": "Class1 录播文件夹", "files": ["class1-1.mp4","class1-2.mp4"] },
+          "why": "小陈这门课的完整录播，点开 123 文件夹后按上面列出的文件名点开即可。",
+          "pts": ["打开链接免登录", "在文件夹里找本节标注的 mp4 文件名点开", "Class1 共 2 个视频"],
+          "code": "# Class1 为录播视频，无代码练习"
+        },
+        {
+          "t": "Class2 · 全套录播（TCGA 下载与 DESeq2 差异分析）",
+          "vid": { "u": "https://4007218689.share.123pan.cn/123pan/2rzowh-aeW6d", "n": "Class2 录播文件夹", "files": ["Class2-1.mp4","Class2-2.mp4","Class2-3.mp4","Class2-4.mp4"] },
+          "why": "小陈这门课的完整录播，点开 123 文件夹后按上面列出的文件名点开即可。",
+          "pts": ["打开链接免登录", "在文件夹里找本节标注的 mp4 文件名点开", "Class2 共 4 个视频"],
+          "code": "# Class2 为录播视频，无代码练习"
+        },
+        {
+          "t": "Class3 · 全套录播（火山图 / 热图 / 富集 ORA 与 GSEA）",
+          "vid": { "u": "https://4007218689.share.123pan.cn/123pan/2rzowh-8G3Vd", "n": "Class3 录播文件夹", "files": ["Class3-1.mp4","Class3-2.mp4","Class3-3.mp4","Class3-4.mp4","Class3-5.mp4","Class3-6.mp4"] },
+          "why": "小陈这门课的完整录播，点开 123 文件夹后按上面列出的文件名点开即可。",
+          "pts": ["打开链接免登录", "在文件夹里找本节标注的 mp4 文件名点开", "Class3 共 6 个视频"],
+          "code": "# Class3 为录播视频，无代码练习"
+        },
+        {
+          "t": "Class4 · 全套录播（免疫浸润 ESTIMATE / CIBERSORT / ssGSEA / xCell）",
+          "vid": { "u": "https://4007218689.share.123pan.cn/123pan/2rzowh-Q8ayd", "n": "Class4 录播文件夹", "files": ["Class4-1.mp4","Class4-2.mp4","Class4-3.mp4","Class4-4.mp4","Class4-5.mp4","Class4-6.mp4"] },
+          "why": "小陈这门课的完整录播，点开 123 文件夹后按上面列出的文件名点开即可。",
+          "pts": ["打开链接免登录", "在文件夹里找本节标注的 mp4 文件名点开", "Class4 共 6 个视频"],
+          "code": "# Class4 为录播视频，无代码练习"
+        },
+        {
+          "t": "Class5 · 全套录播（见视频标题）",
+          "vid": { "u": "https://4007218689.share.123pan.cn/123pan/2rzowh-E8ayd", "n": "Class5 录播文件夹", "files": ["Class5-1.mp4","Class5-2.mp4","Class5-3.mp4","Class5-4.mp4","Class5-5.mp4","Class5-6.mp4"] },
+          "why": "小陈这门课的完整录播，点开 123 文件夹后按上面列出的文件名点开即可。",
+          "pts": ["打开链接免登录", "在文件夹里找本节标注的 mp4 文件名点开", "Class5 共 6 个视频"],
+          "code": "# Class5 为录播视频，无代码练习"
+        },
+        {
+          "t": "Class6 · 全套录播（见视频标题）",
+          "vid": { "u": "https://4007218689.share.123pan.cn/123pan/2rzowh-fPYyd", "n": "Class6 录播文件夹", "files": ["Class6-1.mp4","Class6-2.mp4","Class6-3.mp4","Class6-4.mp4","Class6-5.mp4","Class6-6.mp4"] },
+          "why": "小陈这门课的完整录播，点开 123 文件夹后按上面列出的文件名点开即可。",
+          "pts": ["打开链接免登录", "在文件夹里找本节标注的 mp4 文件名点开", "Class6 共 6 个视频"],
+          "code": "# Class6 为录播视频，无代码练习"
+        },
+        {
+          "t": "Class7 · 全套录播（（见视频标题）— 暂无分享链接，待补）",
+          "vid": { "u": "", "n": "Class7（暂无链接）", "files": ["Class7-1.mp4","Class7-2.mp4","Class7-3.mp4","Class7-4.mp4","Class7-5.mp4","Class7-6.mp4"] },
+          "why": "小陈这门课的完整录播，点开 123 文件夹后按上面列出的文件名点开即可。本 Class 暂未提供 123 分享链接，请联系管理员补充。",
+          "pts": ["打开链接免登录", "在文件夹里找本节标注的 mp4 文件名点开", "Class7 共 6 个视频"],
+          "code": "# Class7 为录播视频，无代码练习"
+        },
+        {
+          "t": "Class8 · 全套录播（见视频标题）",
+          "vid": { "u": "https://4007218689.share.123pan.cn/123pan/2rzowh-FxoVd", "n": "Class8 录播文件夹", "files": ["Class8-1.mp4","Class8-2.mp4","Class8-3.mp4","Class8-4.mp4","Class8-5.mp4"] },
+          "why": "小陈这门课的完整录播，点开 123 文件夹后按上面列出的文件名点开即可。",
+          "pts": ["打开链接免登录", "在文件夹里找本节标注的 mp4 文件名点开", "Class8 共 5 个视频"],
+          "code": "# Class8 为录播视频，无代码练习"
+        },
+        {
+          "t": "Class9 · 全套录播（见视频标题）",
+          "vid": { "u": "https://4007218689.share.123pan.cn/123pan/2rzowh-YxoVd", "n": "Class9 录播文件夹", "files": ["Class9-1.mp4","Class9-2.mp4","Class9-3.mp4","Class9-4.mp4","Class9-5.mp4","Class9-6.mp4"] },
+          "why": "小陈这门课的完整录播，点开 123 文件夹后按上面列出的文件名点开即可。",
+          "pts": ["打开链接免登录", "在文件夹里找本节标注的 mp4 文件名点开", "Class9 共 6 个视频"],
+          "code": "# Class9 为录播视频，无代码练习"
+        },
+        {
+          "t": "Class10 · 全套录播（见视频标题）",
+          "vid": { "u": "https://4007218689.share.123pan.cn/123pan/2rzowh-GxoVd", "n": "Class10 录播文件夹", "files": ["Class10-1.mp4","Class10-2.mp4","Class10-3.mp4"] },
+          "why": "小陈这门课的完整录播，点开 123 文件夹后按上面列出的文件名点开即可。",
+          "pts": ["打开链接免登录", "在文件夹里找本节标注的 mp4 文件名点开", "Class10 共 3 个视频"],
+          "code": "# Class10 为录播视频，无代码练习"
         }
       ]
     },

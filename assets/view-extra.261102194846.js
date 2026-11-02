@@ -110,7 +110,7 @@
 
     h += '<div class="card" style="margin-top:16px"><b>数据与方法来源</b>' +
       '<table class="tbl"><thead><tr><th>内容</th><th>来源</th></tr></thead><tbody>' +
-      "<tr><td>论文元数据（3247 篇）</td><td>Europe PMC REST（24 个主题检索，按被引/日期排序）+ 泰山一号每日精读日报</td></tr>" +
+      "<tr><td>论文元数据（3247 篇）</td><td>Europe PMC REST（24 个主题检索，按被引/日期排序）+ 论文订阅每日精读日报</td></tr>" +
       "<tr><td>全文链接 / 开放获取标记（300 篇）</td><td>Europe PMC core 接口（fullTextUrlList、isOpenAccess）</td></tr>" +
       "<tr><td>练习数据</td><td>按课题设计仿真的 RILD 大鼠三区 × 六时间点表达矩阵、TCGA-LIHC 子集、空间 spot、MR/coloc 汇总统计</td></tr>" +
       "<tr><td>机制条目（144 条）</td><td>按教科书与共识文献整理，每条标注「这对纯计算课题意味着什么」</td></tr>" +
