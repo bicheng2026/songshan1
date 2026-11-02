@@ -1,5 +1,5 @@
 /* 嵩山一号 · 工作站 —— 看视频（视频课入口）
-   数据在 data/videos.261102184006.js；标题/时长/播放量取自 B 站官方接口。 */
+   数据在 data/videos.261102190910.js；标题/时长/播放量取自 B 站官方接口。 */
 (function () {
   "use strict";
   const SX = window.SX;

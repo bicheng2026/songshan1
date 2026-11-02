@@ -1,7 +1,7 @@
 /* 嵩山一号 · 工作站 —— 通用课程（已合并「看视频」：视频清单按学习顺序排在课程顶部）
    第 0 讲从「1+1 怎么写」开始；每节默认折叠，点开才展开。
    每节两段代码：base R 能在本页直接跑（讲原理）；标了包名的「真实写法」讲实战。
-   视频数据在 data/videos.261102184006.js；标题/时长/播放量取自 B 站官方接口。 */
+   视频数据在 data/videos.261102190910.js；标题/时长/播放量取自 B 站官方接口。 */
 (function () {
   "use strict";
   const SX = window.SX;
@@ -128,6 +128,10 @@
           "<summary>" + E(s.t) + "</summary>" +
           '<div class="sec-b">' +
           '<div class="why">' + E(s.why) + "</div>" +
+          (s.vid ? '<div class="lec-watch">' + (s.vid.n ? E(s.vid.n) + "：" : "本节视频：") +
+            '<a href="' + E(s.vid.u) + '" target="_blank" rel="noopener">打开小陈录播(123) ▶</a>' +
+            (s.vid.files && s.vid.files.length ? '　本节点文件：' + s.vid.files.map(f => '<code>' + E(f) + '</code>').join("、") +
+              '（在打开的文件夹里找这些文件名点开即可）' : "") + "</div>" : "") +
           '<div class="pts"><div class="pts-h">要点</div><ol class="crit">' +
           s.pts.map(p => "<li>" + mdInline(p) + "</li>").join("") + "</ol></div>" +
           "<pre class='code'>" + E(s.code) + "</pre>" +

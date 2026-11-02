@@ -550,6 +550,7 @@ window.SX_COURSE = {
       "subs": [
         {
           "t": "1 · 拿到 counts 矩阵：下载、整理与 ID 转换",
+          "vid": { "u": "https://4007218689.share.123pan.cn/123pan/2rzowh-GFk6d", "n": "本节录播", "files": ["class1-1.mp4", "class1-2.mp4"] },
           "why": "你拿到的表格格子是「这个数在多少条 reads 里」，不是「表达高不高」。TCGA 给 Ensembl ID（带版本号 ENSG0000xxx.1），GEO 芯片给探针 ID，都得先转成基因名才能往下做。",
           "pts": [
             "TCGA 用 TCGAbiolinks 下 STAR - Counts（原始计数），绝不拿 TPM/FPKM 喂 DESeq2",
@@ -565,6 +566,7 @@ window.SX_COURSE = {
         },
         {
           "t": "2 · DESeq2 差异分析：count → DEG list",
+          "vid": { "u": "https://4007218689.share.123pan.cn/123pan/2rzowh-GFk6d", "n": "本节录播", "files": ["Class2-1.mp4", "Class2-2.mp4", "Class2-3.mp4", "Class2-4.mp4"] },
           "why": "差异分析本质是对每个基因做「两组计数是否真的不同」的假设检验，同时估计归一化因子抵消文库大小，再用负二项分布建模离散度。",
           "pts": [
             "DESeqDataSetFromMatrix 吃原始 counts，design = ~ group",
@@ -580,6 +582,7 @@ window.SX_COURSE = {
         },
         {
           "t": "3 · 火山图与热图：把差异结果画出来",
+          "vid": { "u": "https://4007218689.share.123pan.cn/123pan/2rzowh-GFk6d", "n": "本节录播", "files": ["Class3-1.mp4", "Class3-2.mp4", "Class3-3.mp4", "Class3-4.mp4", "Class3-5.mp4", "Class3-6.mp4"] },
           "why": "火山图一眼看「又显著又变化大」的基因；热图看一批基因在样本间的表达模式。两者都是差异分析的门面。",
           "pts": [
             "火山图 x=log2FC, y=-log10(padj)，画阈值线",
@@ -595,6 +598,7 @@ window.SX_COURSE = {
         },
         {
           "t": "4 · 富集分析：ORA 与 GSEA 根本不是一回事",
+          "vid": { "u": "https://4007218689.share.123pan.cn/123pan/2rzowh-GFk6d", "n": "本节录播（与第3节同批视频）", "files": ["Class3-1.mp4", "Class3-2.mp4", "Class3-3.mp4", "Class3-4.mp4", "Class3-5.mp4", "Class3-6.mp4"] },
           "why": "ORA（超几何检验）问的是「差异基因里某个通路的基因是不是扎堆了」；GSEA 问的是「按表达变化排好序的全基因列表里，某通路的基因是不是整体靠前」。一个只看显著基因，一个用全基因排名。",
           "pts": [
             "ORA 用 enrichGO/enrichKEGG，背景集要选对",
@@ -610,6 +614,7 @@ window.SX_COURSE = {
         },
         {
           "t": "5 · 免疫浸润：ESTIMATE / CIBERSORT / ssGSEA / xCell",
+          "vid": { "u": "https://4007218689.share.123pan.cn/123pan/2rzowh-GFk6d", "n": "本节录播", "files": ["Class4-1.mp4", "Class4-2.mp4", "Class4-3.mp4", "Class4-4.mp4", "Class4-5.mp4", "Class4-6.mp4"] },
           "why": "一块组织混着多种细胞，测序只给混合平均值。反卷积就是用一份「参考特征」把混合信号拆回各细胞类型的占比/分数。四种方法给的东西不一样：ESTIMATE 给基质/免疫分数，CIBERSORT 给 22 种免疫细胞比例，ssGSEA/xCell 给富集分数（不是百分比）。",
           "pts": [
             "CIBERSORT 输出比例（加起来≈1），需网页版或自带 LM22 矩阵",
@@ -625,6 +630,7 @@ window.SX_COURSE = {
         },
         {
           "t": "6 · 相关性热图与接回单细胞",
+          "vid": { "u": "https://4007218689.share.123pan.cn/123pan/2rzowh-GFk6d", "n": "本节衔接单细胞，无单独录播（复用第5节视频即可）", "files": [] },
           "why": "算基因间/样本间相关性是 bulk 里最常做的探索；做完 bulk，再上单细胞看「哪些细胞在驱动这些信号」，两层的结论才闭环。",
           "pts": [
             "cor() 算相关性，heatmap 可视化",

@@ -121,23 +121,25 @@
       "&page=1&high_quality=1&danmaku=0&autoplay=0";
   }
 
-  function render(root) {
+  function render(root, opts) {
     const list = allVideos();
     const first = (list[0] || {}).bv || "BV1cs411j75B";
     let vTabs = list.map((v, i) =>
       '<button class="pv-tab' + (i === 0 ? " on" : "") + '" data-bv="' + E(v.bv) + '">' +
       (i + 1) + ". " + E(v.n || v.t || v.bv) + "</button>").join("");
 
-    root.innerHTML =
-      '<div class="page-head"><h2>练习台 · 一边看视频一边敲代码</h2>' +
-      '<p class="hero-sub">左边放教学视频，右边写 R 代码并直接运行。默认用浏览器内的 R（WebR，打开即用）。' +
-      '想要更强大（装任意包、读本地文件），点右上「一键连接本机 R」，装好 R 后一键接管。</p></div>' +
+    const head = (!opts || !opts.bare)
+      ? '<div class="page-head"><h2>练习台 · 一边看视频一边敲代码</h2>' +
+        '<p class="hero-sub">左边放教学视频，右边写 R 代码并直接运行。默认用浏览器内的 R（WebR，打开即用）。' +
+        '想要更强大（装任意包、读本地文件），点右上「一键连接本机 R」，装好 R 后一键接管。</p></div>'
+      : '';
+    root.innerHTML = head +
       '<div class="practice-bar" style="display:flex;flex-wrap:wrap;gap:10px;justify-content:space-between;align-items:center">' +
       '<div class="pv-tabs" style="display:flex;flex-wrap:wrap;gap:6px">' + vTabs + '</div>' +
       '<div class="practice-tools" style="display:flex;gap:8px;align-items:center">' +
       '<button class="btn primary sm" id="btnLocal">一键连接本机 R</button>' +
       '<button class="btn sm ghost" id="btnRstudio">还没装 R？</button>' +
-      '<span class="tiny muted" id="beStat">当前：浏览器内 R</span>' +
+      '<span class="tiny muted" id="beStat">当前：浏览器内 R（点「一键连接本机 R」可用你电脑的完整 R）</span>' +
       '</div></div>' +
       '<div class="practice-split" style="display:flex;gap:14px;align-items:stretch;margin-top:10px">' +
       '<div class="pv-left" style="flex:0 0 44%">' +
@@ -220,6 +222,17 @@
     let pollTimer = null;
     function stopPoll() { if (pollTimer) { clearInterval(pollTimer); pollTimer = null; } }
 
+    function setStat() {
+      if (backend === "local" && localInfo) {
+        beStat.innerHTML = "✓ 已用你本机 R " + (localInfo.rversion || "") +
+          (localInfo.rhome ? "  (" + localInfo.rhome + ")" : "");
+        beStat.style.color = "var(--ok, #4caf50)";
+      } else {
+        beStat.textContent = "当前：浏览器内 R（点「一键连接本机 R」可用你电脑的完整 R）";
+        beStat.style.color = "";
+      }
+    }
+
     async function tryConnect() {
       try {
         const r = await fetch("http://127.0.0.1:19810/ping", { method: "POST" });
@@ -227,6 +240,7 @@
         if (j && j.ok) {
           backend = "local"; localReady = true; localInfo = j;
           btnLocal.textContent = "已用本机 R（点此切回）";
+          setStat();
           return true;
         }
       } catch (e) {}
@@ -237,26 +251,17 @@
       if (backend === "local" && localReady) {
         backend = "webr"; localReady = false; localInfo = null; stopPoll();
         btnLocal.textContent = "一键连接本机 R";
-        beStat.textContent = "当前：浏览器内 R";
+        setStat();
         return;
       }
       beStat.textContent = "正在连接本机 R…";
-      if (await tryConnect()) {
-        beStat.textContent = "✓ 已用你本机 R " + (localInfo.rversion || "") +
-          (localInfo.rhome ? "  (" + localInfo.rhome + ")" : "");
-        return;
-      }
+      if (await tryConnect()) { SX.toast("已切换到你本机的 R"); return; }
       // 没连上：自动下载启动器并轮询，用户只需双击刚下载的 .bat，网页会自动连上
       SX.download("嵩山一号-本机R启动器.bat", LAUNCH_BAT, "application/octet-stream");
       beStat.innerHTML = '<span style="color:var(--accent,#e85)">已下载启动器，请双击它（保持黑窗口开着），网页会自动连上</span>';
       stopPoll();
       pollTimer = setInterval(async () => {
-        if (await tryConnect()) {
-          stopPoll();
-          beStat.textContent = "✓ 已用你本机 R " + (localInfo.rversion || "") +
-            (localInfo.rhome ? "  (" + localInfo.rhome + ")" : "");
-          SX.toast("已切换到你本机的 R");
-        }
+        if (await tryConnect()) { stopPoll(); SX.toast("已切换到你本机的 R"); }
       }, 1500);
     };
 
@@ -264,7 +269,8 @@
     const card = document.getElementById("rstudioCard");
     btnRs.onclick = () => { card.style.display = card.style.display === "none" ? "block" : "none"; };
 
-    // 进入页面先悄悄探一下本机 R 是否已连（方便已启动的用户）
+    // 进入页面先探测本机 R 是否已连（已启动则直接显示「已用你本机 R」）
+    setStat();
     tryConnect();
   }
 
