@@ -667,9 +667,9 @@ window.SX_COURSE = {
           "code": "# Class6 为录播视频，无代码练习"
         },
         {
-          "t": "Class7 · 全套录播（（见视频标题）— 暂无分享链接，待补）",
-          "vid": { "u": "", "n": "Class7（暂无链接）", "files": ["Class7-1.mp4","Class7-2.mp4","Class7-3.mp4","Class7-4.mp4","Class7-5.mp4","Class7-6.mp4"] },
-          "why": "小陈这门课的完整录播，点开 123 文件夹后按上面列出的文件名点开即可。本 Class 暂未提供 123 分享链接，请联系管理员补充。",
+          "t": "Class7 · 全套录播（见视频标题）",
+          "vid": { "u": "https://4007218689.share.123pan.cn/123pan/2rzowh-stkyd", "n": "Class7 录播文件夹", "files": ["Class7-1.mp4","Class7-2.mp4","Class7-3.mp4","Class7-4.mp4","Class7-5.mp4","Class7-6.mp4"] },
+          "why": "小陈这门课的完整录播，点开 123 文件夹后按上面列出的文件名点开即可。",
           "pts": ["打开链接免登录", "在文件夹里找本节标注的 mp4 文件名点开", "Class7 共 6 个视频"],
           "code": "# Class7 为录播视频，无代码练习"
         },
@@ -934,7 +934,7 @@ window.SX_COURSE = {
         }
       ],
       "rec": {
-        "u": "https://4007218689.share.123pan.cn/123pan/2rzowh-GFk6d",
+        "u": "https://4007218689.share.123pan.cn/123pan/2rzowh-stkyd",
         "files": [
           "Class7-1.mp4",
           "Class7-2.mp4",
